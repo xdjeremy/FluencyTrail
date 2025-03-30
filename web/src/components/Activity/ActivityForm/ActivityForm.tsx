@@ -100,7 +100,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                           )}
                         >
                           {field.value ? (
-                            format(field.value, 'PPP')
+                            format(new Date(field.value), 'PPP')
                           ) : (
                             <span>Pick a date</span>
                           )}
