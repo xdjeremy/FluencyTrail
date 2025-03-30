@@ -1,7 +1,6 @@
-import * as React from "react";
-import { useFormContext } from "react-hook-form";
-
-import { FormFieldContext, FormItemContext } from "./form";
+import { useFormContext } from '@redwoodjs/forms';
+import * as React from 'react';
+import { FormFieldContext, FormItemContext } from './form';
 
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
@@ -11,7 +10,7 @@ const useFormField = () => {
   const fieldState = getFieldState(fieldContext.name, formState);
 
   if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>");
+    throw new Error('useFormField should be used within <FormField>');
   }
 
   const { id } = itemContext;

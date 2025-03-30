@@ -7,16 +7,27 @@
 // 'src/pages/HomePage/HomePage.js'         -> HomePage
 // 'src/pages/Admin/BooksPage/BooksPage.js' -> AdminBooksPage
 
-import { Route, Router, Set } from '@redwoodjs/router';
+import { Route, Router, Set } from '@redwoodjs/router'
+
+import ScaffoldLayout from 'src/layouts/ScaffoldLayout';
 import { useAuth } from './auth';
 import AuthLayout from './layouts/AuthLayout/AuthLayout';
 import ProvidersLayout from './layouts/ProvidersLayout/ProvidersLayout';
+import BaseLayout from './layouts/BaseLayout/BaseLayout';
 
 const Routes = () => {
   return (
     <Router useAuth={useAuth}>
+      <Set wrap={ScaffoldLayout} title="Activities" titleTo="activities" buttonLabel="New Activity" buttonTo="newActivity">
+        <Route path="/activities/new" page={ActivityNewActivityPage} name="newActivity" />
+        <Route path="/activities/{id}/edit" page={ActivityEditActivityPage} name="editActivity" />
+        <Route path="/activities/{id}" page={ActivityActivityPage} name="activity" />
+        <Route path="/activities" page={ActivityActivitiesPage} name="activities" />
+      </Set>
       <Set wrap={ProvidersLayout}>
-        <Route path="/" page={HomePage} name="home" />
+        <Set wrap={BaseLayout}>
+          <Route path="/" page={HomePage} name="home" />
+        </Set>
         <Set wrap={AuthLayout}>
           <Route path="/login" page={LoginPage} name="login" />
           <Route path="/signup" page={SignupPage} name="signup" />
