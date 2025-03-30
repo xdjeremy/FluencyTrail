@@ -15,12 +15,36 @@ generator client {
 }
 
 model User {
-  id                  Int       @id @default(autoincrement())
-  email               String    @unique
+  id                  Int        @id @default(autoincrement())
+  email               String     @unique
   hashedPassword      String
   salt                String
   resetToken          String?
   resetTokenExpiresAt DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  Activity            Activity[]
+}
+
+model Activity {
+  id           String       @id @default(uuid())
+  userId       Int
+  user         User         @relation(fields: [userId], references: [id])
+  activityType ActivityType
+  notes        String?
+  duration     Int?
+  date         DateTime     @default(now()) @db.Date
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+enum ActivityType {
+  WATCHING
+  READING
+  LISTENING
+  GRAMMAR
+  VOCABULARY
+  WRITING
+  PLAYING
+  OTHER
 }
