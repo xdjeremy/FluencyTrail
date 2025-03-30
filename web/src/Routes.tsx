@@ -19,7 +19,6 @@ const Routes = () => {
   return (
     <Router useAuth={useAuth}>
       <Set wrap={ScaffoldLayout} title="Activities" titleTo="activities" buttonLabel="New Activity" buttonTo="newActivity">
-        <Route path="/activities/new" page={ActivityNewActivityPage} name="newActivity" />
         <Route path="/activities/{id}/edit" page={ActivityEditActivityPage} name="editActivity" />
         <Route path="/activities/{id}" page={ActivityActivityPage} name="activity" />
         <Route path="/activities" page={ActivityActivitiesPage} name="activities" />

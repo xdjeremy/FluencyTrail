@@ -28,7 +28,6 @@ export const schema = gql`
   }
 
   input CreateActivityInput {
-    userId: Int!
     activityType: ActivityType!
     notes: String
     duration: Int
@@ -36,7 +35,6 @@ export const schema = gql`
   }
 
   input UpdateActivityInput {
-    userId: Int
     activityType: ActivityType
     notes: String
     duration: Int

@@ -4,14 +4,14 @@ import type {
   CreateActivityMutationVariables,
 } from 'types/graphql';
 
-import { navigate, routes } from '@redwoodjs/router';
 import type { TypedDocumentNode } from '@redwoodjs/web';
 import { useMutation } from '@redwoodjs/web';
-import { toast } from '@redwoodjs/web/toast';
 
 import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from 'src/components/ui/button';
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
+import ActivityForm from '../ActivityForm';
 
 const CREATE_ACTIVITY_MUTATION: TypedDocumentNode<
   CreateActivityMutation,
@@ -19,7 +19,10 @@ const CREATE_ACTIVITY_MUTATION: TypedDocumentNode<
 > = gql`
   mutation CreateActivityMutation($input: CreateActivityInput!) {
     createActivity(input: $input) {
-      id
+      activityType
+      date
+      duration
+      notes
     }
   }
 `;
@@ -32,7 +35,8 @@ const NewActivity = () => {
     {
       onCompleted: () => {
         toast.success('Activity created');
-        navigate(routes.activities());
+        setActivityModalOpen(false);
+        // navigate(routes.activities());
       },
       onError: error => {
         toast.error(error.message);
@@ -53,16 +57,8 @@ const NewActivity = () => {
       >
         <Plus className="h-6 w-6" />
       </Button>
-      {/* <AddActivityModal /> */}
+      <ActivityForm onSave={onSave} loading={loading} error={error} />
     </>
-    // <div className="rw-segment">
-    //   <header className="rw-segment-header">
-    //     <h2 className="rw-heading rw-heading-secondary">New Activity</h2>
-    //   </header>
-    //   <div className="rw-segment-main">
-    //     <ActivityForm onSave={onSave} loading={loading} error={error} />
-    //   </div>
-    // </div>
   );
 };
 

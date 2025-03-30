@@ -1,6 +1,7 @@
 import { ActivityType } from '@prisma/client';
 import {
   Form,
+  NumberField,
   SubmitHandler,
   useForm,
   type RWGqlError,
@@ -27,12 +28,13 @@ import {
 } from 'src/components/ui/dialog';
 import {
   FormControl,
+  FormErrorMessage,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from 'src/components/ui/form';
-import { Input } from 'src/components/ui/input';
+import { Input, inputVariants } from 'src/components/ui/input';
 import {
   Popover,
   PopoverContent,
@@ -65,12 +67,11 @@ const ActivityForm = (props: ActivityFormProps) => {
   });
 
   const onSubmit: SubmitHandler<FormActivity> = data => {
-    return console.log(data);
     props.onSave(data, props?.activity?.id);
   };
 
   return (
-    <Dialog open={true} onOpenChange={setActivityModalOpen}>
+    <Dialog open={isActivityModalOpen} onOpenChange={setActivityModalOpen}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Add Activity</DialogTitle>
@@ -80,6 +81,7 @@ const ActivityForm = (props: ActivityFormProps) => {
         </DialogHeader>
 
         <Form formMethods={form} onSubmit={onSubmit} error={props.error}>
+          <FormErrorMessage error={props.error} />
           <div className="grid gap-4 py-4">
             <FormField
               control={form.control}
@@ -192,9 +194,10 @@ const ActivityForm = (props: ActivityFormProps) => {
               name="duration"
               render={({ field }) => (
                 <FormItem className="grid grid-cols-4 items-center gap-4">
-                  <FormLabel className="text-right">Duration (min)</FormLabel>
+                  <FormLabel className="text-right">Duration* (min)</FormLabel>
                   <FormControl className="col-span-3">
-                    <Input placeholder="15" type="number" {...field} />
+                    <NumberField className={cn(inputVariants())} {...field} />
+                    {/* <Input placeholder="15" type="number" {...field} /> */}
                   </FormControl>
                   <FormMessage />
                 </FormItem>

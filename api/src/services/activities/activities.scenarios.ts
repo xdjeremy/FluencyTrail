@@ -1,13 +1,15 @@
-import type { Prisma, Activity } from '@prisma/client'
+import type { Prisma, Activity } from '@prisma/client';
 
-import type { ScenarioData } from '@redwoodjs/testing/api'
+import type { ScenarioData } from '@redwoodjs/testing/api';
 
 export const standard = defineScenario<Prisma.ActivityCreateArgs>({
   activity: {
     one: {
       data: {
         activityType: 'WATCHING',
-        updatedAt: '2025-03-30T11:11:31.020Z',
+        date: '2025-03-30T11:11:30.989Z',
+        duration: 15,
+        notes: 'String',
         user: {
           create: {
             email: 'String2017493',
@@ -21,7 +23,9 @@ export const standard = defineScenario<Prisma.ActivityCreateArgs>({
     two: {
       data: {
         activityType: 'WATCHING',
-        updatedAt: '2025-03-30T11:11:31.024Z',
+        date: '2025-03-30T11:11:30.989Z',
+        duration: 15,
+        notes: 'String',
         user: {
           create: {
             email: 'String1483700',
@@ -33,6 +37,6 @@ export const standard = defineScenario<Prisma.ActivityCreateArgs>({
       },
     },
   },
-})
+});
 
-export type StandardScenario = ScenarioData<Activity, 'activity'>
+export type StandardScenario = ScenarioData<Activity, 'activity'>;

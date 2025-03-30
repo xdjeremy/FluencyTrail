@@ -1,5 +1,6 @@
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
+import { FormError } from '@redwoodjs/forms';
 import * as React from 'react';
 import {
   Controller,
@@ -141,6 +142,19 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = 'FormMessage';
 
+const FormErrorMessage = React.forwardRef<
+  React.ElementRef<typeof FormError>,
+  React.ComponentPropsWithoutRef<typeof FormError>
+>(({ ...props }) => {
+  return (
+    <FormError
+      wrapperClassName="text-destructive text-sm font-medium"
+      {...props}
+    />
+  );
+});
+FormErrorMessage.displayName = 'FormErrorMessage';
+
 export {
   Form,
   FormControl,
@@ -149,4 +163,5 @@ export {
   FormItem,
   FormLabel,
   FormMessage,
+  FormErrorMessage,
 };

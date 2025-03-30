@@ -1,3 +1,4 @@
+import NewActivity from 'src/components/Activity/NewActivity/NewActivity';
 import Header from 'src/components/Header/Header';
 
 type BaseLayoutProps = {
@@ -9,6 +10,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
     <>
       <Header />
       {children}
+      <NewActivity />
     </>
   );
 };
