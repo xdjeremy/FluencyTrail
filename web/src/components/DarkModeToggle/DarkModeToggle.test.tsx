@@ -1,14 +1,14 @@
 import { render } from '@redwoodjs/testing/web'
 
-import ProvidersLayout from './ProvidersLayout'
+import DarkModeToggle from './DarkModeToggle'
 
 //   Improve this test with help from the Redwood Testing Doc:
-//   https://redwoodjs.com/docs/testing#testing-pages-layouts
+//    https://redwoodjs.com/docs/testing#testing-components
 
-describe('ProvidersLayout', () => {
+describe('DarkModeToggle', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<ProvidersLayout />)
+      render(<DarkModeToggle />)
     }).not.toThrow()
   })
 })

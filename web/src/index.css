@@ -27,3 +27,85 @@ body {
     @apply border-neutral-200;
   }
 }
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+
+  --neutral-50: #fafafa;
+  --neutral-100: #f4f4f4;
+  --neutral-200: #e6e6e6;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a2a2a2;
+  --neutral-500: #727272;
+  --neutral-600: #535353;
+  --neutral-700: #404040;
+  --neutral-800: #272727;
+  --neutral-900: #181818;
+
+  --brand-50: #f0f9ff;
+  --brand-100: #e0f2fe;
+  --brand-200: #bae6fd;
+  --brand-300: #7dd3fc;
+  --brand-400: #38bdf8;
+  --brand-500: #0ea5e9;
+  --brand-600: #0284c7;
+  --brand-700: #0369a1;
+  --brand-800: #075985;
+  --brand-900: #0c4a6e;
+
+  --highlight-50: #fefce8;
+  --highlight-100: #fef9c3;
+  --highlight-200: #fef08a;
+  --highlight-300: #fde047;
+  --highlight-400: #facc15;
+  --highlight-500: #eab308;
+  --highlight-600: #ca8a04;
+  --highlight-700: #a16207;
+  --highlight-800: #854d0e;
+  --highlight-900: #713f12;
+
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+}
+
+.dark {
+  --background: #121212;
+  --foreground: #ffffff;
+
+  --neutral-50: #181818;
+  --neutral-100: #272727;
+  --neutral-200: #404040;
+  --neutral-300: #535353;
+  --neutral-400: #727272;
+  --neutral-500: #a2a2a2;
+  --neutral-600: #d4d4d4;
+  --neutral-700: #e6e6e6;
+  --neutral-800: #f4f4f4;
+  --neutral-900: #fafafa;
+
+  --brand-50: #0c4a6e;
+  --brand-100: #075985;
+  --brand-200: #0369a1;
+  --brand-300: #0284c7;
+  --brand-400: #0ea5e9;
+  --brand-500: #38bdf8;
+  --brand-600: #7dd3fc;
+  --brand-700: #bae6fd;
+  --brand-800: #e0f2fe;
+  --brand-900: #f0f9ff;
+
+  --highlight-50: #713f12;
+  --highlight-100: #854d0e;
+  --highlight-200: #a16207;
+  --highlight-300: #ca8a04;
+  --highlight-400: #eab308;
+  --highlight-500: #facc15;
+  --highlight-600: #fde047;
+  --highlight-700: #fef08a;
+  --highlight-800: #fef9c3;
+  --highlight-900: #fefce8;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+}
