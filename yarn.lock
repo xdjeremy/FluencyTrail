@@ -17729,6 +17729,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"next-themes@npm:^0.4.6":
+  version: 0.4.6
+  resolution: "next-themes@npm:0.4.6"
+  peerDependencies:
+    react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+  checksum: 10c0/83590c11d359ce7e4ced14f6ea9dd7a691d5ce6843fe2dc520fc27e29ae1c535118478d03e7f172609c41b1ef1b8da6b8dd2d2acd6cd79cac1abbdbd5b99f2c4
+  languageName: node
+  linkType: hard
+
 "no-case@npm:^3.0.4":
   version: 3.0.4
   resolution: "no-case@npm:3.0.4"
@@ -23062,6 +23072,7 @@ __metadata:
     clsx: "npm:^2.1.1"
     cmdk: "npm:^1.1.1"
     lucide-react: "npm:^0.485.0"
+    next-themes: "npm:^0.4.6"
     postcss: "npm:^8.5.3"
     postcss-loader: "npm:^8.1.1"
     react: "npm:18.3.1"

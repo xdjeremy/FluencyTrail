@@ -1,3 +1,4 @@
+import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'src/components/ui/toaster';
 
 type ProviderLayoutProps = {
@@ -7,8 +8,10 @@ type ProviderLayoutProps = {
 const ProviderLayout = ({ children }: ProviderLayoutProps) => {
   return (
     <>
-      <Toaster />
-      {children}
+      <ThemeProvider attribute={'class'} defaultTheme="system" enableSystem>
+        <Toaster />
+        {children}
+      </ThemeProvider>
     </>
   );
 };
