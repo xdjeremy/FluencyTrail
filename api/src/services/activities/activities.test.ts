@@ -4,8 +4,8 @@ import {
   activities,
   activity,
   createActivity,
-  updateActivity,
   deleteActivity,
+  updateActivity,
 } from './activities';
 import type { StandardScenario } from './activities.scenarios';
 
@@ -29,6 +29,10 @@ describe('activities', () => {
   });
 
   scenario('creates a activity', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.activity.two.userId,
+    });
+
     const result = await createActivity({
       input: {
         activityType: scenario.activity.two.activityType,
@@ -39,8 +43,10 @@ describe('activities', () => {
     });
 
     expect(result.userId).toEqual(scenario.activity.two.userId);
-    expect(result.activityType).toEqual('WATCHING');
-    expect(result.updatedAt).toEqual(new Date('2025-03-30T11:11:30.989Z'));
+    expect(result.activityType).toEqual(scenario.activity.two.activityType);
+    expect(result.notes).toEqual(scenario.activity.two.notes);
+    expect(result.duration).toEqual(scenario.activity.two.duration);
+    expect(result.date).toEqual(scenario.activity.two.date);
   });
 
   scenario('updates a activity', async (scenario: StandardScenario) => {
