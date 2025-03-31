@@ -1,7 +1,7 @@
-import type { Media } from '@prisma/client'
+import type { Media } from '@prisma/client';
 
-import { medias } from './medias'
-import type { StandardScenario } from './medias.scenarios'
+import { medias, searchMedias } from './medias';
+import type { StandardScenario } from './medias.scenarios';
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float.
@@ -11,8 +11,16 @@ import type { StandardScenario } from './medias.scenarios'
 
 describe('medias', () => {
   scenario('returns all medias', async (scenario: StandardScenario) => {
-    const result = await medias()
+    const result = await medias();
 
-    expect(result.length).toEqual(Object.keys(scenario.media).length)
-  })
-})
+    expect(result.length).toEqual(Object.keys(scenario.media).length);
+  });
+
+  scenario('searches medias', async (scenario: StandardScenario) => {
+    const result = await searchMedias({
+      query: 'Batman',
+    });
+
+    expect(result).toHaveLength;
+  });
+});

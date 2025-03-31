@@ -5,6 +5,9 @@
   "dependencies": {
     "@redwoodjs/api": "8.6.0",
     "@redwoodjs/auth-dbauth-api": "8.6.0",
-    "@redwoodjs/graphql-server": "8.6.0"
+    "@redwoodjs/graphql-server": "8.6.0",
+    "axios": "^1.8.4",
+    "axios-rate-limit": "^1.4.0",
+    "node-cache": "^5.1.2"
   }
 }
