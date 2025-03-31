@@ -15,27 +15,29 @@ generator client {
 }
 
 model User {
-  id                  Int        @id @default(autoincrement())
-  email               String     @unique
+  id                  Int       @id @default(autoincrement())
+  email               String    @unique
   hashedPassword      String
   salt                String
   resetToken          String?
   resetTokenExpiresAt DateTime?
-  createdAt           DateTime   @default(now())
-  updatedAt           DateTime   @updatedAt
-  Activity            Activity[]
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  Activity Activity[]
 }
 
 model Activity {
   id           String       @id @default(uuid())
   userId       Int
-  user         User         @relation(fields: [userId], references: [id])
   activityType ActivityType
   notes        String?
   duration     Int?
   date         DateTime     @default(now()) @db.Date
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum ActivityType {
@@ -47,4 +49,40 @@ enum ActivityType {
   WRITING
   PLAYING
   OTHER
+}
+
+model Media {
+  id            String    @id @default(uuid())
+  externalId    String    @unique
+  title         String
+  mediaType     MediaType
+  originalTitle String?
+  description   String?
+  posterUrl     String?
+  backdropUrl   String?
+  popularity    Float?
+  releaseDate   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  MovieMetadata MovieMetadata?
+
+  @@unique([externalId, mediaType])
+}
+
+enum MediaType {
+  MOVIE
+  TV
+  BOOK
+}
+
+model MovieMetadata {
+  mediaId          String   @id @unique
+  adult            Boolean?
+  originalLanguage String?
+  genres           String[]
+  runtime          Int?
+  rawData          Json
+
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 }
