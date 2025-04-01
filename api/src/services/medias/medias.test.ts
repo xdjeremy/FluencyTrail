@@ -19,6 +19,6 @@ describe('medias', () => {
       query: 'Batman',
     });
 
-    expect(result).toBeGreaterThanOrEqual(1);
+    expect(result.length).toBeGreaterThanOrEqual(1);
   });
 });
