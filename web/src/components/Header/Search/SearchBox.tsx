@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Search, X } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import useDebounce from 'src/lib/hooks/useDebounce';
@@ -49,7 +49,8 @@ const SearchBox = () => {
     <>
       <Button
         onClick={() => setOpen(true)}
-        className="focus-visible:ring-ring ring-offset-background inline-flex h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:hover:bg-neutral-800 dark:hover:text-neutral-50"
+        variant="outline"
+        className="hidden md:flex"
       >
         <Search className="mr-2 h-4 w-4" />
         <span>Search...</span>
@@ -69,13 +70,6 @@ const SearchBox = () => {
               placeholder="Search for movies, TV shows, books..."
               className="h-12 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <button
-              onClick={() => setOpen(false)}
-              className="ml-2 rounded-md p-1 hover:bg-neutral-100 dark:hover:bg-neutral-800"
-            >
-              <X className="h-4 w-4 text-neutral-500 dark:text-neutral-400" />
-              <span className="sr-only">Close</span>
-            </button>
           </div>
 
           <SearchCell query={debouncedSearch} />
