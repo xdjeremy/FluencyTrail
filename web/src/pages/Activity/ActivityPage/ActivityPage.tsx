@@ -1,11 +1,11 @@
-import ActivityCell from 'src/components/Activity/ActivityCell'
+import ActivityCell from 'src/components/Activity/ActivityCell';
 
 type ActivityPageProps = {
-  id: string
-}
+  id: string;
+};
 
 const ActivityPage = ({ id }: ActivityPageProps) => {
-  return <ActivityCell id={id} />
-}
+  return <ActivityCell id={id} />;
+};
 
-export default ActivityPage
+export default ActivityPage;

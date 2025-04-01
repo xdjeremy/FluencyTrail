@@ -1,6 +1,6 @@
-import type { Prisma, Media } from '@prisma/client'
+import type { Prisma, Media } from '@prisma/client';
 
-import type { ScenarioData } from '@redwoodjs/testing/api'
+import type { ScenarioData } from '@redwoodjs/testing/api';
 
 export const standard = defineScenario<Prisma.MediaCreateArgs>({
   media: {
@@ -21,6 +21,6 @@ export const standard = defineScenario<Prisma.MediaCreateArgs>({
       },
     },
   },
-})
+});
 
-export type StandardScenario = ScenarioData<Media, 'media'>
+export type StandardScenario = ScenarioData<Media, 'media'>;

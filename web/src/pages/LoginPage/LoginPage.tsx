@@ -1,10 +1,13 @@
+import { useEffect, useRef, useState } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Book, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
 import { SubmitHandler, useForm } from '@redwoodjs/forms';
 import { Link, navigate, routes } from '@redwoodjs/router';
 import { Metadata } from '@redwoodjs/web';
-import { Book, Loader2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
+
 import { useAuth } from 'src/auth';
 import { Button } from 'src/components/ui/button';
 import {
@@ -16,6 +19,7 @@ import {
   FormMessage,
 } from 'src/components/ui/form';
 import { Input } from 'src/components/ui/input';
+
 import { LoginSchema, LoginSchemaType } from './LoginSchema';
 
 const LoginPage = () => {

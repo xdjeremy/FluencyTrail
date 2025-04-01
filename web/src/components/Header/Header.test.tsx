@@ -1,6 +1,6 @@
-import { render } from '@redwoodjs/testing/web'
+import { render } from '@redwoodjs/testing/web';
 
-import Header from './Header'
+import Header from './Header';
 
 //   Improve this test with help from the Redwood Testing Doc:
 //    https://redwoodjs.com/docs/testing#testing-components
@@ -8,7 +8,7 @@ import Header from './Header'
 describe('Header', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<Header />)
-    }).not.toThrow()
-  })
-})
+      render(<Header />);
+    }).not.toThrow();
+  });
+});

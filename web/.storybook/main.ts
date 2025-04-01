@@ -1,8 +1,8 @@
-import type { StorybookConfig } from 'storybook-framework-redwoodjs-vite'
+import type { StorybookConfig } from 'storybook-framework-redwoodjs-vite';
 
-import { getPaths, importStatementPath } from '@redwoodjs/project-config'
+import { getPaths, importStatementPath } from '@redwoodjs/project-config';
 
-const redwoodProjectPaths = getPaths()
+const redwoodProjectPaths = getPaths();
 
 const config: StorybookConfig = {
   framework: 'storybook-framework-redwoodjs-vite',
@@ -14,6 +14,6 @@ const config: StorybookConfig = {
   ],
 
   addons: ['@storybook/addon-essentials'],
-}
+};
 
-export default config
+export default config;

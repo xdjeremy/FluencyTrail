@@ -1,5 +1,6 @@
 import cacheManager from 'src/lib/api/cache';
 import ExternalAPI from 'src/lib/api/externalapi';
+
 import { TmdbSearchMultiResponse } from './interfaces';
 
 interface SearchOptions {
@@ -50,7 +51,7 @@ class TheMovieDb extends ExternalAPI {
       });
 
       return data;
-    } catch (e) {
+    } catch {
       return {
         page: 1,
         results: [],

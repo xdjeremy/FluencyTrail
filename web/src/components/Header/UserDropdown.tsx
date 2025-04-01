@@ -1,5 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/src/shared/ui/avatar";
-import { Button } from "@/src/shared/ui/button";
+import { LogOut, Settings, User } from 'lucide-react';
+import Link from 'next/link';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/src/shared/ui/avatar';
+import { Button } from '@/src/shared/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,14 +11,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/src/shared/ui/dropdown-menu";
-import { LogOut, Settings, User } from "lucide-react";
-import Link from "next/link";
+} from '@/src/shared/ui/dropdown-menu';
 
 const UserDropdown = () => {
   return (
     <div
-      className="hidden md:flex items-center gap-2"
+      className="hidden items-center gap-2 md:flex"
       data-testid="user-dropdown"
     >
       <DropdownMenu>
@@ -28,7 +29,7 @@ const UserDropdown = () => {
             <Avatar>
               <AvatarImage
                 src="https://placehold.co/600x400"
-                className="w-10 h-10"
+                className="h-10 w-10"
               />
               <AvatarFallback className="bg-brand-100 text-brand-800 dark:bg-brand-800 dark:text-brand-200">
                 AJ
@@ -54,7 +55,7 @@ const UserDropdown = () => {
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="text-red-500 dark:text-red-400 focus:text-red-500 dark:focus:text-red-400">
+          <DropdownMenuItem className="text-red-500 focus:text-red-500 dark:text-red-400 dark:focus:text-red-400">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>

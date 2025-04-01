@@ -1,7 +1,7 @@
+import * as React from 'react';
+
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
-import { FormError } from '@redwoodjs/forms';
-import * as React from 'react';
 import {
   Controller,
   ControllerProps,
@@ -9,8 +9,13 @@ import {
   FieldValues,
   FormProvider,
 } from 'react-hook-form';
+
+import { FormError } from '@redwoodjs/forms';
+
 import { cn } from 'src/utils/cn';
+
 import { Label } from '../ui/label';
+
 import { useFormField } from './useFormField';
 
 const Form = FormProvider;

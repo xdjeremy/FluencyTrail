@@ -2,14 +2,14 @@ import type {
   DeleteUserMutation,
   DeleteUserMutationVariables,
   FindUserById,
-} from 'types/graphql'
+} from 'types/graphql';
 
-import { Link, routes, navigate } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import type { TypedDocumentNode } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+import { Link, routes, navigate } from '@redwoodjs/router';
+import { useMutation } from '@redwoodjs/web';
+import type { TypedDocumentNode } from '@redwoodjs/web';
+import { toast } from '@redwoodjs/web/toast';
 
-import { timeTag } from 'src/lib/formatters'
+import { timeTag } from 'src/lib/formatters';
 
 const DELETE_USER_MUTATION: TypedDocumentNode<
   DeleteUserMutation,
@@ -20,28 +20,28 @@ const DELETE_USER_MUTATION: TypedDocumentNode<
       id
     }
   }
-`
+`;
 
 interface Props {
-  user: NonNullable<FindUserById['user']>
+  user: NonNullable<FindUserById['user']>;
 }
 
 const User = ({ user }: Props) => {
   const [deleteUser] = useMutation(DELETE_USER_MUTATION, {
     onCompleted: () => {
-      toast.success('User deleted')
-      navigate(routes.users())
+      toast.success('User deleted');
+      navigate(routes.users());
     },
-    onError: (error) => {
-      toast.error(error.message)
+    onError: error => {
+      toast.error(error.message);
     },
-  })
+  });
 
   const onDeleteClick = (id: DeleteUserMutationVariables['id']) => {
     if (confirm('Are you sure you want to delete user ' + id + '?')) {
-      deleteUser({ variables: { id } })
+      deleteUser({ variables: { id } });
     }
-  }
+  };
 
   return (
     <>
@@ -104,7 +104,7 @@ const User = ({ user }: Props) => {
         </button>
       </nav>
     </>
-  )
-}
+  );
+};
 
-export default User
+export default User;

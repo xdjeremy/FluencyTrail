@@ -1,6 +1,6 @@
-import { render } from '@redwoodjs/testing/web'
+import { render } from '@redwoodjs/testing/web';
 
-import DarkModeToggle from './DarkModeToggle'
+import DarkModeToggle from './DarkModeToggle';
 
 //   Improve this test with help from the Redwood Testing Doc:
 //    https://redwoodjs.com/docs/testing#testing-components
@@ -8,7 +8,7 @@ import DarkModeToggle from './DarkModeToggle'
 describe('DarkModeToggle', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<DarkModeToggle />)
-    }).not.toThrow()
-  })
-})
+      render(<DarkModeToggle />);
+    }).not.toThrow();
+  });
+});

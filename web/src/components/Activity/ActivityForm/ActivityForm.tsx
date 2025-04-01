@@ -1,4 +1,8 @@
 import { ActivityType } from '@prisma/client';
+import { format } from 'date-fns';
+import { CalendarIcon, Check, ChevronsUpDown, Save } from 'lucide-react';
+import type { EditActivityById, UpdateActivityInput } from 'types/graphql';
+
 import {
   Form,
   NumberField,
@@ -6,8 +10,7 @@ import {
   useForm,
   type RWGqlError,
 } from '@redwoodjs/forms';
-import { format } from 'date-fns';
-import { CalendarIcon, Check, ChevronsUpDown, Save } from 'lucide-react';
+
 import { Button } from 'src/components/ui/button';
 import { Calendar } from 'src/components/ui/calendar';
 import {
@@ -43,7 +46,6 @@ import {
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
 import { formatPrismaEnum } from 'src/lib/formatters';
 import { cn } from 'src/utils/cn';
-import type { EditActivityById, UpdateActivityInput } from 'types/graphql';
 
 type FormActivity = NonNullable<EditActivityById['activity']>;
 

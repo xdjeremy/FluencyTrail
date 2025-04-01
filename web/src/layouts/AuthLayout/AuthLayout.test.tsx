@@ -1,6 +1,6 @@
-import { render } from '@redwoodjs/testing/web'
+import { render } from '@redwoodjs/testing/web';
 
-import AuthLayout from './AuthLayout'
+import AuthLayout from './AuthLayout';
 
 //   Improve this test with help from the Redwood Testing Doc:
 //   https://redwoodjs.com/docs/testing#testing-pages-layouts
@@ -8,7 +8,7 @@ import AuthLayout from './AuthLayout'
 describe('AuthLayout', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<AuthLayout />)
-    }).not.toThrow()
-  })
-})
+      render(<AuthLayout />);
+    }).not.toThrow();
+  });
+});

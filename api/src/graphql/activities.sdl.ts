@@ -47,4 +47,4 @@ export const schema = gql`
       @requireAuth
     deleteActivity(id: String!): Activity! @requireAuth
   }
-`
+`;

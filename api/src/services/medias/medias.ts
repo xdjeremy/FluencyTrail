@@ -1,9 +1,10 @@
-import type { QueryResolvers, MediaRelationResolvers } from 'types/graphql';
+import type { MediaRelationResolvers, QueryResolvers } from 'types/graphql';
 
+import { mapSearchResults } from 'src/lib/api/mapresult';
 import { db } from 'src/lib/db';
+
 import TheMovieDb from './themoviedb';
 import { TmdbSearchMultiResponse } from './themoviedb/interfaces';
-import { mapSearchResults, ServiceMedia } from 'src/lib/api/mapresult';
 
 export const medias: QueryResolvers['medias'] = () => {
   return db.media.findMany();
@@ -12,11 +13,11 @@ export const medias: QueryResolvers['medias'] = () => {
 export const searchMedias: QueryResolvers['searchMedias'] = async ({
   query,
 }) => {
-  let results: TmdbSearchMultiResponse;
+  // let results: TmdbSearchMultiResponse;
 
   const tmdb = new TheMovieDb();
 
-  results = await tmdb.searchMulti({
+  const results: TmdbSearchMultiResponse = await tmdb.searchMulti({
     query,
     page: Number(1),
     // language: (req.query.language as string) ?? req.locale,
@@ -25,7 +26,6 @@ export const searchMedias: QueryResolvers['searchMedias'] = async ({
   // const media = await Media.getRelatedMedia(
   //   results.results.map(result => result.id)
   // );
-  console.log(mapSearchResults(results.results));
   return mapSearchResults(results.results);
   // return res.status(200).json({
   //   page: results.page,

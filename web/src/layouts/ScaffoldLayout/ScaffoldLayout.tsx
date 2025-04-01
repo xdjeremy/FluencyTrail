@@ -1,13 +1,13 @@
-import { Link, routes } from '@redwoodjs/router'
-import { Toaster } from '@redwoodjs/web/toast'
+import { Link, routes } from '@redwoodjs/router';
+import { Toaster } from '@redwoodjs/web/toast';
 
 type LayoutProps = {
-  title: string
-  titleTo: keyof typeof routes
-  buttonLabel: string
-  buttonTo: keyof typeof routes
-  children: React.ReactNode
-}
+  title: string;
+  titleTo: keyof typeof routes;
+  buttonLabel: string;
+  buttonTo: keyof typeof routes;
+  children: React.ReactNode;
+};
 
 const ScaffoldLayout = ({
   title,
@@ -31,7 +31,7 @@ const ScaffoldLayout = ({
       </header>
       <main className="rw-main">{children}</main>
     </div>
-  )
-}
+  );
+};
 
-export default ScaffoldLayout
+export default ScaffoldLayout;

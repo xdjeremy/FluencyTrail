@@ -1,5 +1,3 @@
-import type { Media } from '@prisma/client';
-
 import { medias, searchMedias } from './medias';
 import type { StandardScenario } from './medias.scenarios';
 
@@ -16,11 +14,11 @@ describe('medias', () => {
     expect(result.length).toEqual(Object.keys(scenario.media).length);
   });
 
-  scenario('searches medias', async (scenario: StandardScenario) => {
+  scenario('searches medias', async () => {
     const result = await searchMedias({
       query: 'Batman',
     });
 
-    expect(result).toHaveLength;
+    expect(result).toBeGreaterThanOrEqual(1);
   });
 });

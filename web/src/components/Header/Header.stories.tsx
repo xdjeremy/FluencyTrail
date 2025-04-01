@@ -10,17 +10,17 @@
 //
 // See https://storybook.js.org/docs/7/writing-stories/args
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import Header from './Header'
+import Header from './Header';
 
 const meta: Meta<typeof Header> = {
   component: Header,
   tags: ['autodocs'],
-}
+};
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof Header>
+type Story = StoryObj<typeof Header>;
 
-export const Primary: Story = {}
+export const Primary: Story = {};

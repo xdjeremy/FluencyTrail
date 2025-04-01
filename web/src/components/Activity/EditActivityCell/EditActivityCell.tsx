@@ -2,18 +2,18 @@ import type {
   EditActivityById,
   UpdateActivityInput,
   UpdateActivityMutationVariables,
-} from 'types/graphql'
+} from 'types/graphql';
 
-import { navigate, routes } from '@redwoodjs/router'
+import { navigate, routes } from '@redwoodjs/router';
 import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
-} from '@redwoodjs/web'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+} from '@redwoodjs/web';
+import { useMutation } from '@redwoodjs/web';
+import { toast } from '@redwoodjs/web/toast';
 
-import ActivityForm from 'src/components/Activity/ActivityForm'
+import ActivityForm from 'src/components/Activity/ActivityForm';
 
 export const QUERY: TypedDocumentNode<EditActivityById> = gql`
   query EditActivityById($id: String!) {
@@ -28,7 +28,7 @@ export const QUERY: TypedDocumentNode<EditActivityById> = gql`
       updatedAt
     }
   }
-`
+`;
 
 const UPDATE_ACTIVITY_MUTATION: TypedDocumentNode<
   EditActivityById,
@@ -46,34 +46,34 @@ const UPDATE_ACTIVITY_MUTATION: TypedDocumentNode<
       updatedAt
     }
   }
-`
+`;
 
-export const Loading = () => <div>Loading...</div>
+export const Loading = () => <div>Loading...</div>;
 
 export const Failure = ({ error }: CellFailureProps) => (
   <div className="rw-cell-error">{error?.message}</div>
-)
+);
 
 export const Success = ({ activity }: CellSuccessProps<EditActivityById>) => {
   const [updateActivity, { loading, error }] = useMutation(
     UPDATE_ACTIVITY_MUTATION,
     {
       onCompleted: () => {
-        toast.success('Activity updated')
-        navigate(routes.activities())
+        toast.success('Activity updated');
+        navigate(routes.activities());
       },
-      onError: (error) => {
-        toast.error(error.message)
+      onError: error => {
+        toast.error(error.message);
       },
     }
-  )
+  );
 
   const onSave = (
     input: UpdateActivityInput,
     id: EditActivityById['activity']['id']
   ) => {
-    updateActivity({ variables: { id, input } })
-  }
+    updateActivity({ variables: { id, input } });
+  };
 
   return (
     <div className="rw-segment">
@@ -91,5 +91,5 @@ export const Success = ({ activity }: CellSuccessProps<EditActivityById>) => {
         />
       </div>
     </div>
-  )
-}
+  );
+};

@@ -1,7 +1,7 @@
-import ActivitiesCell from 'src/components/Activity/ActivitiesCell'
+import ActivitiesCell from 'src/components/Activity/ActivitiesCell';
 
 const ActivitiesPage = () => {
-  return <ActivitiesCell />
-}
+  return <ActivitiesCell />;
+};
 
-export default ActivitiesPage
+export default ActivitiesPage;

@@ -40,4 +40,4 @@ export const schema = gql`
     ): TvMetadata! @requireAuth
     deleteTvMetadata(mediaId: String!): TvMetadata! @requireAuth
   }
-`
+`;

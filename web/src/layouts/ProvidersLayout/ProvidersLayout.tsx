@@ -1,5 +1,7 @@
 import { ThemeProvider } from 'next-themes';
+
 import { Toaster } from 'src/components/ui/toaster';
+
 import { ActivityProvider } from './Providers/ActivityProvider';
 
 type ProviderLayoutProps = {

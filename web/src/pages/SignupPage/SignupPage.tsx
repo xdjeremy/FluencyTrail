@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react';
 
 import {
   Form,
@@ -7,43 +7,43 @@ import {
   PasswordField,
   FieldError,
   Submit,
-} from '@redwoodjs/forms'
-import { Link, navigate, routes } from '@redwoodjs/router'
-import { Metadata } from '@redwoodjs/web'
-import { toast, Toaster } from '@redwoodjs/web/toast'
+} from '@redwoodjs/forms';
+import { Link, navigate, routes } from '@redwoodjs/router';
+import { Metadata } from '@redwoodjs/web';
+import { toast, Toaster } from '@redwoodjs/web/toast';
 
-import { useAuth } from 'src/auth'
+import { useAuth } from 'src/auth';
 
 const SignupPage = () => {
-  const { isAuthenticated, signUp } = useAuth()
+  const { isAuthenticated, signUp } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(routes.home())
+      navigate(routes.home());
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated]);
 
   // focus on username box on page load
-  const usernameRef = useRef<HTMLInputElement>(null)
+  const usernameRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    usernameRef.current?.focus()
-  }, [])
+    usernameRef.current?.focus();
+  }, []);
 
   const onSubmit = async (data: Record<string, string>) => {
     const response = await signUp({
       username: data.username,
       password: data.password,
-    })
+    });
 
     if (response.message) {
-      toast(response.message)
+      toast(response.message);
     } else if (response.error) {
-      toast.error(response.error)
+      toast.error(response.error);
     } else {
       // user is signed in automatically
-      toast.success('Welcome!')
+      toast.success('Welcome!');
     }
-  }
+  };
 
   return (
     <>
@@ -120,7 +120,7 @@ const SignupPage = () => {
         </div>
       </main>
     </>
-  )
-}
+  );
+};
 
-export default SignupPage
+export default SignupPage;

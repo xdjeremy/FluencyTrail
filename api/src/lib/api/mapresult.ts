@@ -1,26 +1,27 @@
+import { Media, ResolverTypeWrapper } from 'types/graphql';
+
 import {
   TmdbMovieResult,
   TmdbTvResult,
 } from 'src/services/medias/themoviedb/interfaces';
-import { Media, ResolverTypeWrapper, MediaType } from 'types/graphql';
 
 export type ServiceMedia = ResolverTypeWrapper<
   Omit<Media, 'releaseDate' | 'createdAt' | 'updatedAt'> & {
-    releaseDate: Date
-    createdAt: Date
-    updatedAt: Date
+    releaseDate: Date;
+    createdAt: Date;
+    updatedAt: Date;
   } & (
-    | {
-        mediaType: 'MOVIE'
-        MovieMetadata: Media['MovieMetadata']
-      }
-    | {
-        mediaType: 'TV'
-        TvMetadata: Omit<Media['TvMetadata'], 'firstAirDate'> & {
-          firstAirDate: Date | null
+      | {
+          mediaType: 'MOVIE';
+          MovieMetadata: Media['MovieMetadata'];
         }
-      }
-  )
+      | {
+          mediaType: 'TV';
+          TvMetadata: Omit<Media['TvMetadata'], 'firstAirDate'> & {
+            firstAirDate: Date | null;
+          };
+        }
+    )
 >;
 
 export const mapMovieResult = (

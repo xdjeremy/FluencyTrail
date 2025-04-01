@@ -1,6 +1,6 @@
-import type { EditUserById, UpdateUserInput } from 'types/graphql'
+import type { EditUserById, UpdateUserInput } from 'types/graphql';
 
-import type { RWGqlError } from '@redwoodjs/forms'
+import type { RWGqlError } from '@redwoodjs/forms';
 import {
   Form,
   FormError,
@@ -9,27 +9,27 @@ import {
   TextField,
   DatetimeLocalField,
   Submit,
-} from '@redwoodjs/forms'
+} from '@redwoodjs/forms';
 
-const formatDatetime = (value) => {
+const formatDatetime = value => {
   if (value) {
-    return value.replace(/:\d{2}\.\d{3}\w/, '')
+    return value.replace(/:\d{2}\.\d{3}\w/, '');
   }
-}
+};
 
-type FormUser = NonNullable<EditUserById['user']>
+type FormUser = NonNullable<EditUserById['user']>;
 
 interface UserFormProps {
-  user?: EditUserById['user']
-  onSave: (data: UpdateUserInput, id?: FormUser['id']) => void
-  error: RWGqlError
-  loading: boolean
+  user?: EditUserById['user'];
+  onSave: (data: UpdateUserInput, id?: FormUser['id']) => void;
+  error: RWGqlError;
+  loading: boolean;
 }
 
 const UserForm = (props: UserFormProps) => {
   const onSubmit = (data: FormUser) => {
-    props.onSave(data, props?.user?.id)
-  }
+    props.onSave(data, props?.user?.id);
+  };
 
   return (
     <div className="rw-form-wrapper">
@@ -136,7 +136,7 @@ const UserForm = (props: UserFormProps) => {
         </div>
       </Form>
     </div>
-  )
-}
+  );
+};
 
-export default UserForm
+export default UserForm;

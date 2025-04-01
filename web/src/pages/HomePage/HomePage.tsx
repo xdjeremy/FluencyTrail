@@ -1,6 +1,7 @@
 // import { Link, routes } from '@redwoodjs/router'
-import { Metadata } from '@redwoodjs/web'
-import { Button } from 'src/components/ui/button'
+import { Metadata } from '@redwoodjs/web';
+
+import { Button } from 'src/components/ui/button';
 
 const HomePage = () => {
   return (
@@ -11,15 +12,13 @@ const HomePage = () => {
       <p>
         Find me in <code>./web/src/pages/HomePage/HomePage.tsx</code>
       </p>
-      <Button variant='brand'>
-        Hello Worlds
-      </Button>
+      <Button variant="brand">Hello Worlds</Button>
       {/*
           My default route is named `home`, link to me with:
           `<Link to={routes.home()}>Home</Link>`
       */}
     </>
-  )
-}
+  );
+};
 
-export default HomePage
+export default HomePage;

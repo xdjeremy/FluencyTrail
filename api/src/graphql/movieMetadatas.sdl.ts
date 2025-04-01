@@ -30,4 +30,4 @@ export const schema = gql`
     runtime: Int
     rawData: JSON
   }
-`
+`;

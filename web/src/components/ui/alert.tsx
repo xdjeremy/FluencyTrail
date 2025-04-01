@@ -1,6 +1,9 @@
-import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
+
+import { cva, type VariantProps } from 'class-variance-authority';
+
 import { cn } from 'src/utils/cn';
+
 import { dialogTitleStaticClasses } from './dialog';
 
 const alertVariants = cva(

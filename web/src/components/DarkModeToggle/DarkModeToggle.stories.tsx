@@ -10,17 +10,17 @@
 //
 // See https://storybook.js.org/docs/7/writing-stories/args
 
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/react';
 
-import DarkModeToggle from './DarkModeToggle'
+import DarkModeToggle from './DarkModeToggle';
 
 const meta: Meta<typeof DarkModeToggle> = {
   component: DarkModeToggle,
   tags: ['autodocs'],
-}
+};
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof DarkModeToggle>
+type Story = StoryObj<typeof DarkModeToggle>;
 
-export const Primary: Story = {}
+export const Primary: Story = {};

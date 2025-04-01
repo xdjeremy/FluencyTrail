@@ -1,8 +1,11 @@
-import { Link, routes } from '@redwoodjs/router';
 import { Book, Menu } from 'lucide-react';
-import SearchMedia from './SearchMedia';
-import MobileMenu from './MobileMenu';
+
+import { Link, routes } from '@redwoodjs/router';
+
 import { Button } from '../ui/button';
+
+import MobileMenu from './MobileMenu';
+import SearchMedia from './SearchMedia';
 
 const Header = () => {
   return (

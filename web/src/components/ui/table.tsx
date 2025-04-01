@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { cn } from 'src/utils/cn';
 
 const Table = React.forwardRef<
@@ -112,6 +113,5 @@ export {
   TableFooter,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 };
-

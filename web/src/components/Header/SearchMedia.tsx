@@ -1,5 +1,7 @@
-import { Search, X } from 'lucide-react';
 import { useState } from 'react';
+
+import { Search, X } from 'lucide-react';
+
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 

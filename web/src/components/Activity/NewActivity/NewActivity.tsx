@@ -1,3 +1,5 @@
+import { Plus } from 'lucide-react';
+import { toast } from 'sonner';
 import type {
   CreateActivityInput,
   CreateActivityMutation,
@@ -7,10 +9,9 @@ import type {
 import type { TypedDocumentNode } from '@redwoodjs/web';
 import { useMutation } from '@redwoodjs/web';
 
-import { Plus } from 'lucide-react';
-import { toast } from 'sonner';
 import { Button } from 'src/components/ui/button';
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
+
 import ActivityForm from '../ActivityForm';
 
 const CREATE_ACTIVITY_MUTATION: TypedDocumentNode<

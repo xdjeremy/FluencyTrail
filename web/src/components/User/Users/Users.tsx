@@ -2,15 +2,15 @@ import type {
   DeleteUserMutation,
   DeleteUserMutationVariables,
   FindUsers,
-} from 'types/graphql'
+} from 'types/graphql';
 
-import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import type { TypedDocumentNode } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+import { Link, routes } from '@redwoodjs/router';
+import { useMutation } from '@redwoodjs/web';
+import type { TypedDocumentNode } from '@redwoodjs/web';
+import { toast } from '@redwoodjs/web/toast';
 
-import { QUERY } from 'src/components/User/UsersCell'
-import { timeTag, truncate } from 'src/lib/formatters'
+import { QUERY } from 'src/components/User/UsersCell';
+import { timeTag, truncate } from 'src/lib/formatters';
 
 const DELETE_USER_MUTATION: TypedDocumentNode<
   DeleteUserMutation,
@@ -21,28 +21,28 @@ const DELETE_USER_MUTATION: TypedDocumentNode<
       id
     }
   }
-`
+`;
 
 const UsersList = ({ users }: FindUsers) => {
   const [deleteUser] = useMutation(DELETE_USER_MUTATION, {
     onCompleted: () => {
-      toast.success('User deleted')
+      toast.success('User deleted');
     },
-    onError: (error) => {
-      toast.error(error.message)
+    onError: error => {
+      toast.error(error.message);
     },
     // This refetches the query on the list page. Read more about other ways to
     // update the cache over here:
     // https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
     refetchQueries: [{ query: QUERY }],
     awaitRefetchQueries: true,
-  })
+  });
 
   const onDeleteClick = (id: DeleteUserMutationVariables['id']) => {
     if (confirm('Are you sure you want to delete user ' + id + '?')) {
-      deleteUser({ variables: { id } })
+      deleteUser({ variables: { id } });
     }
-  }
+  };
 
   return (
     <div className="rw-segment rw-table-wrapper-responsive">
@@ -61,7 +61,7 @@ const UsersList = ({ users }: FindUsers) => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {users.map(user => (
             <tr key={user.id}>
               <td>{truncate(user.id)}</td>
               <td>{truncate(user.email)}</td>
@@ -102,7 +102,7 @@ const UsersList = ({ users }: FindUsers) => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default UsersList
+export default UsersList;

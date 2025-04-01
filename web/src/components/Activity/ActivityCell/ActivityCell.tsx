@@ -1,12 +1,15 @@
-import type { FindActivityById, FindActivityByIdVariables } from 'types/graphql'
+import type {
+  FindActivityById,
+  FindActivityByIdVariables,
+} from 'types/graphql';
 
 import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
-} from '@redwoodjs/web'
+} from '@redwoodjs/web';
 
-import Activity from 'src/components/Activity/Activity'
+import Activity from 'src/components/Activity/Activity';
 
 export const QUERY: TypedDocumentNode<
   FindActivityById,
@@ -24,20 +27,20 @@ export const QUERY: TypedDocumentNode<
       updatedAt
     }
   }
-`
+`;
 
-export const Loading = () => <div>Loading...</div>
+export const Loading = () => <div>Loading...</div>;
 
-export const Empty = () => <div>Activity not found</div>
+export const Empty = () => <div>Activity not found</div>;
 
 export const Failure = ({
   error,
 }: CellFailureProps<FindActivityByIdVariables>) => (
   <div className="rw-cell-error">{error?.message}</div>
-)
+);
 
 export const Success = ({
   activity,
 }: CellSuccessProps<FindActivityById, FindActivityByIdVariables>) => {
-  return <Activity activity={activity} />
-}
+  return <Activity activity={activity} />;
+};
