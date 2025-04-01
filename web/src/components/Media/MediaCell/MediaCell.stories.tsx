@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import { Loading, Empty, Failure, Success } from './SearchCell';
-import { standard } from './SearchCell.mock';
+import { Empty, Failure, Loading, Success } from './MediaCell';
+import { standard } from './MediaCell.mock';
 
 const meta: Meta = {
-  title: 'Cells/SearchCell',
+  title: 'Cells/MediaCell',
   tags: ['autodocs'],
 };
 
@@ -30,7 +30,7 @@ export const failure: StoryObj<typeof Failure> = {
 
 export const success: StoryObj<typeof Success> = {
   args: {
-    query: 'Star Wars',
+    id: '42',
   },
   render: args => {
     return Success ? <Success {...standard()} {...args} /> : <></>;

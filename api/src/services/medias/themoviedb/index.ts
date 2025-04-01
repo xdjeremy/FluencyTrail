@@ -1,7 +1,7 @@
 import cacheManager from 'src/lib/api/cache';
 import ExternalAPI from 'src/lib/api/externalapi';
 
-import { TmdbSearchMultiResponse } from './interfaces';
+import { TmdbMovieDetails, TmdbSearchMultiResponse } from './interfaces';
 
 interface SearchOptions {
   query: string;
@@ -58,6 +58,33 @@ class TheMovieDb extends ExternalAPI {
         total_pages: 1,
         total_results: 0,
       };
+    }
+  };
+
+  public getMovie = async ({
+    movieId,
+    language = 'en',
+  }: {
+    movieId: number;
+    language?: string;
+  }): Promise<TmdbMovieDetails> => {
+    try {
+      const data = await this.get<TmdbMovieDetails>(
+        `/movie/${movieId}`,
+        {
+          params: {
+            language,
+            append_to_response:
+              'credits,external_ids,videos,keywords,release_dates,watch/providers',
+            include_video_language: language + ', en',
+          },
+        },
+        43200
+      );
+
+      return data;
+    } catch (e) {
+      throw new Error(`[TMDB] Failed to fetch movie details: ${e.message}`);
     }
   };
 }

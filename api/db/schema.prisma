@@ -53,6 +53,7 @@ enum ActivityType {
 
 model Media {
   id            String    @id @default(uuid())
+  slug          String    @unique
   externalId    String    @unique
   title         String
   mediaType     MediaType

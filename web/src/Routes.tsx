@@ -19,6 +19,7 @@ import ProvidersLayout from './layouts/ProvidersLayout/ProvidersLayout';
 const Routes = () => {
   return (
     <Router useAuth={useAuth}>
+      <Route path="/media" page={MediaPage} name="media" />
       <Set
         wrap={ScaffoldLayout}
         title="Activities"
@@ -45,6 +46,7 @@ const Routes = () => {
       <Set wrap={ProvidersLayout}>
         <Set wrap={BaseLayout}>
           <Route path="/" page={HomePage} name="home" />
+          <Route path="/media/{id}" page={MediaPage} name="media" />
         </Set>
         <Set wrap={AuthLayout}>
           <Route path="/login" page={LoginPage} name="login" />

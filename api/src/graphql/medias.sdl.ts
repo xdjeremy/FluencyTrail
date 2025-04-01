@@ -23,7 +23,7 @@ export const schema = gql`
   }
 
   type Query {
+    media(id: String!): Media @skipAuth
     medias(query: String!): [Media!]! @skipAuth
-    media(query: String!): Media @skipAuth
   }
 `;
