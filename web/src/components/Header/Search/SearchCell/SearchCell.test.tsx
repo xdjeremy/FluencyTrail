@@ -24,7 +24,7 @@ describe('MediasCell', () => {
 
   it('renders Failure successfully', async () => {
     expect(() => {
-      render(<Failure error={new Error('Oh no')} />);
+      render(<Failure query="Starwars" error={new Error('Oh no')} />);
     }).not.toThrow();
   });
 
@@ -36,7 +36,7 @@ describe('MediasCell', () => {
 
   it('renders Success successfully', async () => {
     expect(() => {
-      render(<Success medias={standard().medias} />);
+      render(<Success query="Starwars" medias={standard().medias} />);
     }).not.toThrow();
   });
 });
