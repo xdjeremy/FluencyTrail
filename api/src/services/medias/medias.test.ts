@@ -1,4 +1,4 @@
-import { medias } from './medias';
+import { media } from './medias';
 import type { StandardScenario } from './medias.scenarios';
 
 // Generated boilerplate tests do not account for all circumstances
@@ -8,9 +8,9 @@ import type { StandardScenario } from './medias.scenarios';
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('medias', () => {
-  scenario('returns all medias', async (scenario: StandardScenario) => {
-    const result = await medias();
+  scenario('return first media', async (scenario: StandardScenario) => {
+    const result = await media();
 
-    expect(result.length).toEqual(Object.keys(scenario.media).length);
+    expect(result).toEqual(scenario.media.one);
   });
 });

@@ -1,4 +1,4 @@
-import { Book, Film, Tv } from 'lucide-react';
+import { Book, FileQuestion, Film, Tv } from 'lucide-react';
 import { MediaType, SearchMediaByQuery } from 'types/graphql';
 
 import { cn } from 'src/utils/cn';
@@ -20,6 +20,8 @@ export const Result = ({
         return <Tv className="h-4 w-4" />;
       case 'BOOK':
         return <Book className="h-4 w-4" />;
+      default:
+        return <FileQuestion className="h-4 w-4" />;
     }
   };
   return (
