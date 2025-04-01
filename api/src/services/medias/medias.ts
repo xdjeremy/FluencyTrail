@@ -6,13 +6,11 @@ import { db } from 'src/lib/db';
 import TheMovieDb from './themoviedb';
 import { TmdbSearchMultiResponse } from './themoviedb/interfaces';
 
-export const medias: QueryResolvers['medias'] = () => {
-  return db.media.findMany();
+export const media: QueryResolvers['media'] = () => {
+  return db.media.findFirst();
 };
 
-export const searchMedias: QueryResolvers['searchMedias'] = async ({
-  query,
-}) => {
+export const medias: QueryResolvers['medias'] = async ({ query }) => {
   // let results: TmdbSearchMultiResponse;
 
   const tmdb = new TheMovieDb();

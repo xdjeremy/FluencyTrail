@@ -5,7 +5,7 @@ import { Link, routes } from '@redwoodjs/router';
 import { Button } from '../ui/button';
 
 import MobileMenu from './MobileMenu';
-import SearchMedia from './SearchMedia';
+import SearchBox from './Search/SearchBox';
 
 const Header = () => {
   return (
@@ -48,7 +48,7 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <SearchMedia />
+          <SearchBox />
           {/* <DarkModeToggle /> */}
 
           {/* {user ? (

@@ -2,10 +2,10 @@ import { useState } from 'react';
 
 import { Search, X } from 'lucide-react';
 
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
 
-const SearchMedia = () => {
+const SearchBox = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
@@ -44,4 +44,4 @@ const SearchMedia = () => {
   );
 };
 
-export default SearchMedia;
+export default SearchBox;

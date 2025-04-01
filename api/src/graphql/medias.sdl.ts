@@ -23,31 +23,7 @@ export const schema = gql`
   }
 
   type Query {
-    medias: [Media!]! @requireAuth
-    searchMedias(query: String!): [Media!] @skipAuth
-  }
-
-  input CreateMediaInput {
-    externalId: String!
-    title: String!
-    mediaType: MediaType!
-    originalTitle: String
-    description: String
-    posterUrl: String
-    backdropUrl: String
-    popularity: Float
-    releaseDate: DateTime
-  }
-
-  input UpdateMediaInput {
-    externalId: String
-    title: String
-    mediaType: MediaType
-    originalTitle: String
-    description: String
-    posterUrl: String
-    backdropUrl: String
-    popularity: Float
-    releaseDate: DateTime
+    medias(query: String!): [Media!]! @skipAuth
+    media(query: String!): Media @skipAuth
   }
 `;
