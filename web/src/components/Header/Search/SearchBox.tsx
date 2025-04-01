@@ -3,22 +3,25 @@ import { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import useDebounce from 'src/lib/hooks/useDebounce';
+
 import { Button } from '../../ui/button';
 import { Dialog, DialogContent } from '../../ui/dialog';
 import { Input } from '../../ui/input';
 
 import SearchCell from './SearchCell';
+import { useSearchNavigation } from './useSearchNavigation';
 
 const SearchBox = () => {
-  const [open, setOpen] = useState(false);
+  const { open, setOpen, setSelectedIndex } = useSearchNavigation();
   const [search, setSearch] = useState('');
-  const [_selectedIndex, setSelectedIndex] = useState(0);
+  const debouncedSearch = useDebounce(search, 300); // 300 ms debounce delay
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Handle keyboard shortcuts
   useHotkeys('ctrl+k, cmd+k', e => {
     e.preventDefault();
-    setOpen(open => !open);
+    setOpen(!open);
   });
 
   // Close on escape
@@ -30,41 +33,6 @@ const SearchBox = () => {
     { enableOnFormTags: true }
   );
 
-  // Navigate results with arrow keys
-  // useHotkeys(
-  //   'arrowdown',
-  //   e => {
-  //     e.preventDefault();
-  //     if (results.length) {
-  //       setSelectedIndex((selectedIndex + 1) % results.length);
-  //     }
-  //   },
-  //   { enableOnFormTags: true, enabled: open }
-  // );
-
-  // useHotkeys(
-  //   'arrowup',
-  //   e => {
-  //     e.preventDefault();
-  //     if (results.length) {
-  //       setSelectedIndex((selectedIndex - 1 + results.length) % results.length);
-  //     }
-  //   },
-  //   { enableOnFormTags: true, enabled: open }
-  // );
-
-  // Select result with enter
-  // useHotkeys(
-  //   'enter',
-  //   e => {
-  //     e.preventDefault();
-  //     if (results.length && open) {
-  //       handleSelect(results[selectedIndex]);
-  //     }
-  //   },
-  //   { enableOnFormTags: true, enabled: open }
-  // );
-
   // Focus input when opened
   useEffect(() => {
     if (open) {
@@ -75,12 +43,7 @@ const SearchBox = () => {
       setSearch('');
       setSelectedIndex(0);
     }
-  }, [open]);
-
-  // const handleSelect = (item: MediaItem) => {
-  //   setOpen(false);
-  //   router.push(`/media/${item.id}`);
-  // };
+  }, [open, setSelectedIndex]);
 
   return (
     <>
@@ -115,7 +78,7 @@ const SearchBox = () => {
             </button>
           </div>
 
-          <SearchCell query={search} />
+          <SearchCell query={debouncedSearch} />
         </DialogContent>
       </Dialog>
     </>

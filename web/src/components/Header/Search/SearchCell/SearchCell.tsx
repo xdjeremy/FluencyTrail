@@ -1,4 +1,5 @@
 import { Loader2 } from 'lucide-react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { SearchMediaByQuery, SearchMediaByQueryVariables } from 'types/graphql';
 
 import type {
@@ -8,6 +9,7 @@ import type {
 } from '@redwoodjs/web';
 
 import { Result } from '../Results';
+import { useSearchNavigation } from '../useSearchNavigation';
 
 export const QUERY: TypedDocumentNode<
   SearchMediaByQuery,
@@ -51,11 +53,54 @@ export const Failure = ({
 export const Success = ({
   medias,
 }: CellSuccessProps<SearchMediaByQuery, SearchMediaByQueryVariables>) => {
+  const { selectedIndex, setSelectedIndex, open, handleSelect } =
+    useSearchNavigation();
+
+  // Navigate results with arrow keys
+  useHotkeys(
+    'arrowdown',
+    e => {
+      e.preventDefault();
+      if (medias.length) {
+        setSelectedIndex((selectedIndex + 1) % medias.length);
+      }
+    },
+    { enableOnFormTags: true, enabled: open }
+  );
+
+  useHotkeys(
+    'arrowup',
+    e => {
+      e.preventDefault();
+      if (medias.length) {
+        setSelectedIndex((selectedIndex - 1 + medias.length) % medias.length);
+      }
+    },
+    { enableOnFormTags: true, enabled: open }
+  );
+
+  // Select result with enter
+  useHotkeys(
+    'enter',
+    e => {
+      e.preventDefault();
+      if (medias.length && open) {
+        handleSelect(medias[selectedIndex].id);
+      }
+    },
+    { enableOnFormTags: true, enabled: open }
+  );
+
   return (
     <div className="max-h-[60vh] overflow-y-auto py-2">
       {medias.map((item, index) => {
         return (
-          <Result key={item.id} index={index} selectedIndex={1} media={item} />
+          <Result
+            key={item.id}
+            index={index}
+            selectedIndex={selectedIndex}
+            media={item}
+          />
         );
       })}
     </div>

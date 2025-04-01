@@ -2,56 +2,59 @@ import { Book, Menu } from 'lucide-react';
 
 import { Link, routes } from '@redwoodjs/router';
 
+import DarkModeToggle from '../DarkModeToggle/DarkModeToggle';
 import { Button } from '../ui/button';
 
 import MobileMenu from './MobileMenu';
 import SearchBox from './Search/SearchBox';
+import { SearchNavigationProvider } from './Search/useSearchNavigation';
 
 const Header = () => {
   return (
-    <header className="bg-background sticky top-0 z-50 w-full border-b">
-      <div className="container mx-auto flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link to={routes.home()} className="flex items-center gap-2">
-            <Book className="text-brand-600 h-6 w-6" />
-            <span className="hidden text-xl font-semibold sm:inline-block">
-              FluencyTrail
-            </span>
-          </Link>
+    <SearchNavigationProvider>
+      <header className="bg-background sticky top-0 z-50 w-full border-b">
+        <div className="container mx-auto flex h-16 items-center justify-between">
+          <div className="flex items-center gap-6">
+            <Link to={routes.home()} className="flex items-center gap-2">
+              <Book className="text-brand-600 h-6 w-6" />
+              <span className="hidden text-xl font-semibold sm:inline-block">
+                FluencyTrail
+              </span>
+            </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
-            <Link
-              to={routes.home()}
-              className="text-brand-600 hover:text-brand-800 text-sm font-medium transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              to={routes.home()}
-              className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
-            >
-              Lessons
-            </Link>
-            <Link
-              to={routes.home()}
-              className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
-            >
-              Practice
-            </Link>
-            <Link
-              to={routes.home()}
-              className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
-            >
-              Progress
-            </Link>
-          </nav>
-        </div>
+            <nav className="hidden items-center gap-6 md:flex">
+              <Link
+                to={routes.home()}
+                className="text-brand-600 hover:text-brand-800 text-sm font-medium transition-colors"
+              >
+                Home
+              </Link>
+              <Link
+                to={routes.home()}
+                className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
+              >
+                Lessons
+              </Link>
+              <Link
+                to={routes.home()}
+                className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
+              >
+                Practice
+              </Link>
+              <Link
+                to={routes.home()}
+                className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
+              >
+                Progress
+              </Link>
+            </nav>
+          </div>
 
-        <div className="flex items-center gap-4">
-          <SearchBox />
-          {/* <DarkModeToggle /> */}
+          <div className="flex items-center gap-4">
+            <SearchBox />
+            <DarkModeToggle />
 
-          {/* {user ? (
+            {/* {user ? (
             // if user is logged in
             <UserDropdown />
           ) : (
@@ -66,19 +69,20 @@ const Header = () => {
             </div>
           )} */}
 
-          <div className="md:hidden">
-            <MobileMenu
-              trigger={
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                  <span className="sr-only">Toggle menu</span>
-                </Button>
-              }
-            />
+            <div className="md:hidden">
+              <MobileMenu
+                trigger={
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                }
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </SearchNavigationProvider>
   );
 };
 
