@@ -2,24 +2,39 @@ import {
   TmdbMovieResult,
   TmdbTvResult,
 } from 'src/services/medias/themoviedb/interfaces';
-import { Media, ResolverTypeWrapper } from 'types/graphql';
+import { Media, ResolverTypeWrapper, MediaType } from 'types/graphql';
 
-export type MediaType = 'tv' | 'movie' | 'person' | 'collection';
-
-type ServiceMedia = ResolverTypeWrapper<Media>;
+export type ServiceMedia = ResolverTypeWrapper<
+  Omit<Media, 'releaseDate' | 'createdAt' | 'updatedAt'> & {
+    releaseDate: Date
+    createdAt: Date
+    updatedAt: Date
+  } & (
+    | {
+        mediaType: 'MOVIE'
+        MovieMetadata: Media['MovieMetadata']
+      }
+    | {
+        mediaType: 'TV'
+        TvMetadata: Omit<Media['TvMetadata'], 'firstAirDate'> & {
+          firstAirDate: Date | null
+        }
+      }
+  )
+>;
 
 export const mapMovieResult = (
   movieResult: TmdbMovieResult
   // media?: Media
 ): ServiceMedia => ({
   externalId: movieResult.id.toString(),
-  mediaType: 'MOVIE',
+  mediaType: 'MOVIE' as const,
   originalTitle: movieResult.original_title,
   description: movieResult.overview,
   popularity: movieResult.popularity,
   releaseDate: movieResult.release_date
     ? new Date(movieResult.release_date)
-    : new Date(),
+    : new Date(0), // Fallback to epoch time if missing
   title: movieResult.title,
   backdropUrl: movieResult.backdrop_path,
   posterUrl: movieResult.poster_path,
@@ -44,7 +59,7 @@ export const mapTvResult = (
 ): ServiceMedia => ({
   id: tvResult.id.toString(),
   // Some results from tmdb dont return the mediaType so we force it here!
-  mediaType: 'TV',
+  mediaType: 'TV' as const,
   title: tvResult.name,
   originalTitle: tvResult.original_name,
   description: tvResult.overview,
@@ -56,7 +71,7 @@ export const mapTvResult = (
   externalId: tvResult.id.toString(),
   releaseDate: tvResult.first_air_date
     ? new Date(tvResult.first_air_date)
-    : new Date(),
+    : new Date(0), // Fallback to epoch time if missing
   TvMetadata: {
     genres: tvResult.genre_ids.map(id => id.toString()),
     originalLanguage: tvResult.original_language,

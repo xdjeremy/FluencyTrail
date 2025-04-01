@@ -3,7 +3,7 @@ import type { QueryResolvers, MediaRelationResolvers } from 'types/graphql';
 import { db } from 'src/lib/db';
 import TheMovieDb from './themoviedb';
 import { TmdbSearchMultiResponse } from './themoviedb/interfaces';
-import { mapSearchResults } from 'src/lib/api/mapresult';
+import { mapSearchResults, ServiceMedia } from 'src/lib/api/mapresult';
 
 export const medias: QueryResolvers['medias'] = () => {
   return db.media.findMany();
@@ -26,7 +26,7 @@ export const searchMedias: QueryResolvers['searchMedias'] = async ({
   //   results.results.map(result => result.id)
   // );
   console.log(mapSearchResults(results.results));
-  return mapSearchResults(results.results) as any;
+  return mapSearchResults(results.results);
   // return res.status(200).json({
   //   page: results.page,
   //   totalPages: results.total_pages,
