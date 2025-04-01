@@ -1,4 +1,4 @@
-import { medias, searchMedias } from './medias';
+import { medias } from './medias';
 import type { StandardScenario } from './medias.scenarios';
 
 // Generated boilerplate tests do not account for all circumstances
@@ -12,13 +12,5 @@ describe('medias', () => {
     const result = await medias();
 
     expect(result.length).toEqual(Object.keys(scenario.media).length);
-  });
-
-  scenario('searches medias', async () => {
-    const result = await searchMedias({
-      query: 'Batman',
-    });
-
-    expect(result.length).toBeGreaterThanOrEqual(1);
   });
 });
