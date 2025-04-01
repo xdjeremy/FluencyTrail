@@ -13,6 +13,7 @@ export const schema = gql`
     createdAt: DateTime!
     updatedAt: DateTime!
     MovieMetadata: MovieMetadata
+    TvMetadata: TvMetadata
   }
 
   enum MediaType {

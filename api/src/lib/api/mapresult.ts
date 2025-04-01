@@ -1,162 +1,93 @@
 import {
-  TmdbCollectionResult,
   TmdbMovieResult,
-  TmdbPersonResult,
   TmdbTvResult,
 } from 'src/services/medias/themoviedb/interfaces';
+import { Media, ResolverTypeWrapper } from 'types/graphql';
 
 export type MediaType = 'tv' | 'movie' | 'person' | 'collection';
 
-interface SearchResult {
-  id: number;
-  mediaType: MediaType;
-  popularity: number;
-  posterPath?: string;
-  backdropPath?: string;
-  voteCount: number;
-  voteAverage: number;
-  genreIds: number[];
-  overview: string;
-  originalLanguage: string;
-  // mediaInfo?: Media;
-}
-
-export interface MovieResult extends SearchResult {
-  mediaType: 'movie';
-  title: string;
-  originalTitle: string;
-  releaseDate: string;
-  adult: boolean;
-  video: boolean;
-  // mediaInfo?: Media;
-}
-
-export interface TvResult extends SearchResult {
-  mediaType: 'tv';
-  name: string;
-  originalName: string;
-  originCountry: string[];
-  firstAirDate: string;
-}
-
-export interface CollectionResult {
-  id: number;
-  mediaType: 'collection';
-  title: string;
-  originalTitle: string;
-  adult: boolean;
-  posterPath?: string;
-  backdropPath?: string;
-  overview: string;
-  originalLanguage: string;
-}
-
-export interface PersonResult {
-  id: number;
-  name: string;
-  popularity: number;
-  profilePath?: string;
-  adult: boolean;
-  mediaType: 'person';
-  knownFor: (MovieResult | TvResult)[];
-}
-
-export type Results = MovieResult | TvResult | PersonResult | CollectionResult;
+type ServiceMedia = ResolverTypeWrapper<Media>;
 
 export const mapMovieResult = (
   movieResult: TmdbMovieResult
   // media?: Media
-): MovieResult => ({
-  id: movieResult.id,
-  mediaType: 'movie',
-  adult: movieResult.adult,
-  genreIds: movieResult.genre_ids,
-  originalLanguage: movieResult.original_language,
+): ServiceMedia => ({
+  externalId: movieResult.id.toString(),
+  mediaType: 'MOVIE',
   originalTitle: movieResult.original_title,
-  overview: movieResult.overview,
+  description: movieResult.overview,
   popularity: movieResult.popularity,
-  releaseDate: movieResult.release_date,
+  releaseDate: movieResult.release_date
+    ? new Date(movieResult.release_date)
+    : new Date(),
   title: movieResult.title,
-  video: movieResult.video,
-  voteAverage: movieResult.vote_average,
-  voteCount: movieResult.vote_count,
-  backdropPath: movieResult.backdrop_path,
-  posterPath: movieResult.poster_path,
+  backdropUrl: movieResult.backdrop_path,
+  posterUrl: movieResult.poster_path,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  id: movieResult.id.toString(),
+  MovieMetadata: {
+    adult: movieResult.adult,
+    genres: movieResult.genre_ids.map(id => id.toString()),
+    originalLanguage: movieResult.original_language,
+    media: null,
+    mediaId: null,
+    rawData: JSON.stringify(movieResult),
+    runtime: null,
+  },
   // mediaInfo: media,
 });
 
 export const mapTvResult = (
   tvResult: TmdbTvResult
   // media?: Media
-): TvResult => ({
-  id: tvResult.id,
-  firstAirDate: tvResult.first_air_date,
-  genreIds: tvResult.genre_ids,
+): ServiceMedia => ({
+  id: tvResult.id.toString(),
   // Some results from tmdb dont return the mediaType so we force it here!
-  mediaType: tvResult.media_type || 'tv',
-  name: tvResult.name,
-  originCountry: tvResult.origin_country,
-  originalLanguage: tvResult.original_language,
-  originalName: tvResult.original_name,
-  overview: tvResult.overview,
+  mediaType: 'TV',
+  title: tvResult.name,
+  originalTitle: tvResult.original_name,
+  description: tvResult.overview,
   popularity: tvResult.popularity,
-  voteAverage: tvResult.vote_average,
-  voteCount: tvResult.vote_count,
-  backdropPath: tvResult.backdrop_path,
-  posterPath: tvResult.poster_path,
+  backdropUrl: tvResult.backdrop_path,
+  posterUrl: tvResult.poster_path,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  externalId: tvResult.id.toString(),
+  releaseDate: tvResult.first_air_date
+    ? new Date(tvResult.first_air_date)
+    : new Date(),
+  TvMetadata: {
+    genres: tvResult.genre_ids.map(id => id.toString()),
+    originalLanguage: tvResult.original_language,
+    media: null,
+    mediaId: null,
+    originalCountry: tvResult.origin_country,
+    adult: false,
+    firstAirDate: tvResult.first_air_date
+      ? new Date(tvResult.first_air_date)
+      : null,
+  },
+
   // mediaInfo: media,
 });
 
-export const mapCollectionResult = (
-  collectionResult: TmdbCollectionResult
-): CollectionResult => ({
-  id: collectionResult.id,
-  mediaType: collectionResult.media_type || 'collection',
-  adult: collectionResult.adult,
-  originalLanguage: collectionResult.original_language,
-  originalTitle: collectionResult.original_title,
-  title: collectionResult.title,
-  overview: collectionResult.overview,
-  backdropPath: collectionResult.backdrop_path,
-  posterPath: collectionResult.poster_path,
-});
-
-export const mapPersonResult = (
-  personResult: TmdbPersonResult
-): PersonResult => ({
-  id: personResult.id,
-  name: personResult.name,
-  popularity: personResult.popularity,
-  adult: personResult.adult,
-  mediaType: personResult.media_type,
-  profilePath: personResult.profile_path,
-  knownFor: personResult.known_for.map(result => {
-    if (result.media_type === 'movie') {
-      return mapMovieResult(result);
-    }
-
-    return mapTvResult(result);
-  }),
-});
-
 export const mapSearchResults = (
-  results: (
-    | TmdbMovieResult
-    | TmdbTvResult
-    | TmdbPersonResult
-    | TmdbCollectionResult
-  )[]
+  results: (TmdbMovieResult | TmdbTvResult)[]
   // media?: Media[]
-): Results[] =>
-  results.map(result => {
-    switch (result.media_type) {
-      case 'movie':
-        return mapMovieResult(result);
-      case 'tv':
-        return mapTvResult(result);
-      case 'collection':
-        return mapCollectionResult(result);
-      default:
-        return mapPersonResult(result);
-    }
-  });
+): ServiceMedia[] =>
+  results
+    .map(result => {
+      if (!result.media_type) {
+        return null;
+      }
+      switch (result.media_type) {
+        case 'movie':
+          return mapMovieResult(result);
+        case 'tv':
+          return mapTvResult(result);
+        default:
+          return null;
+      }
+    })
+    .filter((result): result is ServiceMedia => result !== null);

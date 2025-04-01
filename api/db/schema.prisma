@@ -66,6 +66,7 @@ model Media {
   updatedAt     DateTime  @updatedAt
 
   MovieMetadata MovieMetadata?
+  TvMetadata    TvMetadata?
 
   @@unique([externalId, mediaType])
 }
@@ -83,6 +84,17 @@ model MovieMetadata {
   genres           String[]
   runtime          Int?
   rawData          Json
+
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+}
+
+model TvMetadata {
+  mediaId          String    @id @unique
+  adult            Boolean?
+  originalLanguage String?
+  genres           String[]
+  firstAirDate     DateTime?
+  originalCountry  String[]
 
   media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 }

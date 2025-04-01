@@ -57,12 +57,7 @@ interface TmdbPaginatedResponse {
 }
 
 export interface TmdbSearchMultiResponse extends TmdbPaginatedResponse {
-  results: (
-    | TmdbMovieResult
-    | TmdbTvResult
-    | TmdbPersonResult
-    | TmdbCollectionResult
-  )[];
+  results: (TmdbMovieResult | TmdbTvResult)[];
 }
 
 export interface TmdbSearchMovieResponse extends TmdbPaginatedResponse {

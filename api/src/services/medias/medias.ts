@@ -25,15 +25,14 @@ export const searchMedias: QueryResolvers['searchMedias'] = async ({
   // const media = await Media.getRelatedMedia(
   //   results.results.map(result => result.id)
   // );
-
   console.log(mapSearchResults(results.results));
+  return mapSearchResults(results.results) as any;
   // return res.status(200).json({
   //   page: results.page,
   //   totalPages: results.total_pages,
   //   totalResults: results.total_results,
   //   results: mapSearchResults(results.results, media),
   // });
-  return db.media.findMany();
 };
 
 export const Media: MediaRelationResolvers = {
