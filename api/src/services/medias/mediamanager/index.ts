@@ -134,29 +134,55 @@ export default class MediaManager {
       ...mediaTypeMetadata,
     };
 
-    // For existing records, delete old metadata and create new
-    const updateData = {
-      ...baseMediaData,
-      updatedAt: new Date(),
-      ...(finalMediaType === 'MOVIE'
-        ? {
-            MovieMetadata: {
-              delete: true,
-              create: movieMetadata,
-            },
-          }
-        : {
-            TvMetadata: {
-              delete: true,
-              create: tvMetadata,
-            },
-          }),
-    };
-
-    return db.media.upsert({
+    // Find existing media to check its type
+    const existingMedia = await db.media.findUnique({
       where: { externalId: tmdbId.toString() },
-      create: createData,
-      update: updateData,
+      include: {
+        MovieMetadata: true,
+        TvMetadata: true,
+      },
+    });
+
+    if (existingMedia) {
+      return db.$transaction(async tx => {
+        // Always delete existing metadata before update
+        if (finalMediaType === 'MOVIE') {
+          await tx.movieMetadata.deleteMany({
+            where: { mediaId: existingMedia.id },
+          });
+        } else {
+          await tx.tvMetadata.deleteMany({
+            where: { mediaId: existingMedia.id },
+          });
+        }
+
+        // Update media with new data
+        const updateData = {
+          ...baseMediaData,
+          updatedAt: new Date(),
+          ...(finalMediaType === 'MOVIE'
+            ? {
+                MovieMetadata: {
+                  create: movieMetadata,
+                },
+              }
+            : {
+                TvMetadata: {
+                  create: tvMetadata,
+                },
+              }),
+        };
+
+        return tx.media.update({
+          where: { externalId: tmdbId.toString() },
+          data: updateData,
+        });
+      });
+    }
+
+    // For new records, create media with metadata
+    return db.media.create({
+      data: createData,
     });
   }
 
