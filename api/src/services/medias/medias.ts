@@ -3,11 +3,13 @@ import type { MediaRelationResolvers, QueryResolvers } from 'types/graphql';
 import { mapSearchResults } from 'src/lib/api/mapresult';
 import { db } from 'src/lib/db';
 
+import MediaManager from './mediamanager';
 import TheMovieDb from './themoviedb';
 import { TmdbSearchMultiResponse } from './themoviedb/interfaces';
 
-export const media: QueryResolvers['media'] = () => {
-  return db.media.findFirst();
+export const media: QueryResolvers['media'] = async ({ slug }) => {
+  const mediaManager = new MediaManager();
+  return mediaManager.getMediaBySlug(slug);
 };
 
 export const medias: QueryResolvers['medias'] = async ({ query }) => {

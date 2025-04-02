@@ -2,6 +2,8 @@ import { ArrowLeft } from 'lucide-react';
 
 import { Link, routes } from '@redwoodjs/router';
 
+import MediaCell from 'src/components/Media/MediaCell';
+
 interface MediaPageProps {
   id: string;
 }
@@ -17,7 +19,7 @@ const MediaPage = ({ id }: MediaPageProps) => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Home
         </Link>
-        {id}
+        <MediaCell slug={id} />
       </div>
     </>
   );

@@ -2,6 +2,7 @@ export const schema = gql`
   type Media {
     id: String!
     externalId: String!
+    slug: String!
     title: String!
     mediaType: MediaType!
     originalTitle: String
@@ -23,7 +24,7 @@ export const schema = gql`
   }
 
   type Query {
-    media(id: String!): Media @skipAuth
+    media(slug: String!): Media @skipAuth
     medias(query: String!): [Media!]! @skipAuth
   }
 `;

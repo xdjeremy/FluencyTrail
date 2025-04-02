@@ -23,6 +23,7 @@ export const QUERY: TypedDocumentNode<
       releaseDate
       mediaType
       originalTitle
+      slug
     }
   }
 `;

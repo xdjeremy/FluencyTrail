@@ -19,7 +19,6 @@ import ProvidersLayout from './layouts/ProvidersLayout/ProvidersLayout';
 const Routes = () => {
   return (
     <Router useAuth={useAuth}>
-      <Route path="/media" page={MediaPage} name="media" />
       <Set
         wrap={ScaffoldLayout}
         title="Activities"

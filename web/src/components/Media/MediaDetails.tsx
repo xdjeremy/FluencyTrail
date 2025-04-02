@@ -58,7 +58,7 @@ const MediaDetails = ({ media }: FindMediaQuery) => {
               <span>Original Title: {media.originalTitle}</span>
             </div>
           )}
-          {media.MovieMetadata.originalLanguage && (
+          {media.MovieMetadata?.originalLanguage && (
             <div className="flex items-center gap-2 text-neutral-600 dark:text-neutral-400">
               <span>
                 Original Language: {media.MovieMetadata.originalLanguage}
@@ -86,7 +86,7 @@ const MediaDetails = ({ media }: FindMediaQuery) => {
         </div>
 
         <div className="mb-6 flex flex-wrap gap-2">
-          {media.MovieMetadata.genres.map(genre => (
+          {media.MovieMetadata?.genres.map(genre => (
             <span
               key={genre}
               className="inline-flex items-center rounded-full bg-neutral-100 px-2.5 py-0.5 text-sm font-medium text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200"

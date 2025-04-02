@@ -1,7 +1,11 @@
 import cacheManager from 'src/lib/api/cache';
 import ExternalAPI from 'src/lib/api/externalapi';
 
-import { TmdbMovieDetails, TmdbSearchMultiResponse } from './interfaces';
+import {
+  TmdbMovieDetails,
+  TmdbSearchMultiResponse,
+  TmdbTvDetails, // Added TV Details interface import
+} from './interfaces';
 
 interface SearchOptions {
   query: string;
@@ -85,6 +89,33 @@ class TheMovieDb extends ExternalAPI {
       return data;
     } catch (e) {
       throw new Error(`[TMDB] Failed to fetch movie details: ${e.message}`);
+    }
+  };
+
+  public getTv = async ({
+    tvId,
+    language = 'en',
+  }: {
+    tvId: number;
+    language?: string;
+  }): Promise<TmdbTvDetails> => {
+    try {
+      const data = await this.get<TmdbTvDetails>(
+        `/tv/${tvId}`,
+        {
+          params: {
+            language,
+            // Added common append_to_response params for TV
+            append_to_response:
+              'credits,external_ids,videos,keywords,content_ratings,watch/providers',
+            include_video_language: language + ', en',
+          },
+        },
+        43200 // Using the same cache duration as movies for now (12 hours)
+      );
+      return data;
+    } catch (e) {
+      throw new Error(`[TMDB] Failed to fetch TV details: ${e.message}`);
     }
   };
 }

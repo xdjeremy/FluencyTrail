@@ -6,7 +6,8 @@ export const standard = defineScenario<Prisma.MediaCreateArgs>({
   media: {
     one: {
       data: {
-        externalId: 'String2327280',
+        slug: 'john-wick-1234',
+        externalId: '1234',
         title: 'String',
         mediaType: 'MOVIE',
         updatedAt: '2025-03-31T19:12:33.873Z',
@@ -14,7 +15,8 @@ export const standard = defineScenario<Prisma.MediaCreateArgs>({
     },
     two: {
       data: {
-        externalId: 'String4636330',
+        slug: 'dr-strange-12322',
+        externalId: '12322',
         title: 'String',
         mediaType: 'MOVIE',
         updatedAt: '2025-03-31T19:12:33.873Z',

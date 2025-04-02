@@ -10,4 +10,8 @@ export default meta;
 
 type Story = StoryObj<typeof MediaPage>;
 
-export const Primary: Story = {};
+export const Primary: Story = {
+  args: {
+    id: 'john-wick-1234',
+  },
+};

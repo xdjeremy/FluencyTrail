@@ -10,8 +10,8 @@ import MediaDetails from '../MediaDetails';
 
 export const QUERY: TypedDocumentNode<FindMediaQuery, FindMediaQueryVariables> =
   gql`
-    query FindMediaQuery($id: String!) {
-      media: media(id: $id) {
+    query FindMediaQuery($slug: String!) {
+      media: media(slug: $slug) {
         id
         title
         description

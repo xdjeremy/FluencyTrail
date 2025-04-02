@@ -1,7 +1,11 @@
 import { Book, FileQuestion, Film, Tv } from 'lucide-react';
 import { MediaType, SearchMediaByQuery } from 'types/graphql';
 
+import { navigate, routes } from '@redwoodjs/router';
+
 import { cn } from 'src/utils/cn';
+
+import { useSearchNavigation } from './useSearchNavigation';
 
 export const Result = ({
   selectedIndex,
@@ -12,6 +16,8 @@ export const Result = ({
   index: number;
   media: SearchMediaByQuery['medias'][number];
 }) => {
+  const { setOpen } = useSearchNavigation();
+
   const getMediaIcon = (type: MediaType) => {
     switch (type) {
       case 'MOVIE':
@@ -24,9 +30,19 @@ export const Result = ({
         return <FileQuestion className="h-4 w-4" />;
     }
   };
+
+  const handleSelect = () => {
+    setOpen(false);
+    navigate(
+      routes.media({
+        id: media.slug,
+      })
+    );
+  };
+
   return (
     <button
-      // onClick={() => handleSelect(item)}
+      onClick={() => handleSelect()}
       className={cn(
         'flex w-full items-start gap-3 px-4 py-2 text-left',
         index === selectedIndex
