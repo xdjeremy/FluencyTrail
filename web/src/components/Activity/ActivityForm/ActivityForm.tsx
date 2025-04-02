@@ -1,4 +1,3 @@
-import { ActivityType } from '@prisma/client';
 import { format } from 'date-fns';
 import { CalendarIcon, Check, ChevronsUpDown, Save } from 'lucide-react';
 import type { EditActivityById, UpdateActivityInput } from 'types/graphql';
@@ -44,8 +43,9 @@ import {
   PopoverTrigger,
 } from 'src/components/ui/popover';
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
-import { formatPrismaEnum } from 'src/lib/formatters';
 import { cn } from 'src/utils/cn';
+
+import { activityTypes } from './constants';
 
 type FormActivity = NonNullable<EditActivityById['activity']>;
 
@@ -141,14 +141,14 @@ const ActivityForm = (props: ActivityFormProps) => {
                           variant="outline"
                           role="combobox"
                           className={cn(
-                            'col-span-3 justify-between',
+                            'col-span-3 justify-between lowercase',
                             !field.value && 'text-muted-foreground'
                           )}
                         >
                           {field.value
-                            ? formatPrismaEnum(ActivityType).find(
-                                activity => activity.value === field.value
-                              )?.label
+                            ? activityTypes.find(
+                                activity => activity === field.value
+                              )
                             : 'Select activity'}
                           <ChevronsUpDown className="size-4 opacity-50" />
                         </Button>
@@ -163,19 +163,21 @@ const ActivityForm = (props: ActivityFormProps) => {
                         <CommandList>
                           <CommandEmpty>No activity found.</CommandEmpty>
                           <CommandGroup>
-                            {formatPrismaEnum(ActivityType).map(activity => (
+                            {activityTypes.map(activity => (
                               <CommandItem
-                                value={activity.value}
-                                key={activity.value}
+                                value={activity}
+                                key={activity}
+                                className="lowercase"
                                 onSelect={() => {
-                                  form.setValue('activityType', activity.value);
+                                  form.setValue('activityType', activity);
+                                  form.setFocus('duration');
                                 }}
                               >
-                                {activity.label}
+                                {activity}
                                 <Check
                                   className={cn(
                                     'ml-auto size-4',
-                                    activity.value === field.value
+                                    activity === field.value
                                       ? 'opacity-100'
                                       : 'opacity-0'
                                   )}

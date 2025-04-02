@@ -1,5 +1,3 @@
-import React from 'react';
-
 import humanize from 'humanize-string';
 
 const MAX_STRING_LENGTH = 150;
@@ -55,18 +53,4 @@ export const timeTag = (dateTime?: string) => {
 
 export const checkboxInputTag = (checked: boolean) => {
   return <input type="checkbox" checked={checked} disabled />;
-};
-
-export const formatPrismaEnum = <T extends Record<string, string>>(
-  enumObj: T
-): Array<{
-  value: T[keyof T]; // This preserves the literal types from the enum
-  label: string;
-}> => {
-  return Object.entries(enumObj).map(([key, value]) => ({
-    value: value as T[keyof T], // Cast to preserve the enum literal type
-    label:
-      key.charAt(0).toUpperCase() +
-      key.slice(1).toLowerCase().replace(/_/g, ' '),
-  }));
 };
