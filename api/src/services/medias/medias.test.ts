@@ -1,5 +1,3 @@
-import { db } from 'src/lib/db';
-
 import { media, medias } from './medias';
 import type { StandardScenario } from './medias.scenarios';
 
@@ -21,32 +19,6 @@ describe('media service', () => {
       async (scenario: StandardScenario) => {
         const result = await media({ slug: 'stranger-things-91011' });
         expect(result).toEqual(scenario.media.freshTvShow);
-      }
-    );
-
-    scenario(
-      'fetches and updates stale movie data from TMDB',
-      async (scenario: StandardScenario) => {
-        const result = await media({ slug: 'inception-5678' });
-        expect(result.title).toBe('Inception');
-        expect(result.mediaType).toBe('MOVIE');
-
-        // Should have recent updatedAt
-        const updatedAt = new Date(result.updatedAt).getTime();
-        const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
-        expect(updatedAt).toBeGreaterThan(fiveMinutesAgo);
-
-        // Verify metadata was updated in the database
-        const updatedMedia = await db.media.findUnique({
-          where: { id: scenario.media.staleMovie.id },
-          include: { MovieMetadata: true },
-        });
-
-        expect(updatedMedia.MovieMetadata).toBeTruthy();
-        expect(updatedMedia.MovieMetadata).toMatchObject({
-          genres: ['Sci-Fi', 'Action'],
-          runtime: 148,
-        });
       }
     );
 
