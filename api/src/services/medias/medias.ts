@@ -39,4 +39,8 @@ export const Media: MediaRelationResolvers = {
   MovieMetadata: (_obj, { root }) => {
     return db.media.findUnique({ where: { id: root?.id } }).MovieMetadata();
   },
+  TvMetadata: (_obj, { root }) => {
+    // Added TvMetadata resolver
+    return db.media.findUnique({ where: { id: root?.id } }).TvMetadata();
+  },
 };

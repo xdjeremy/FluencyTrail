@@ -17,17 +17,17 @@ const SearchNavigationContext = createContext({
   setSelectedIndex: (_index: number) => {},
   open: false,
   setOpen: (_open: boolean) => {},
-  handleSelect: (_slug: string) => {},
+  handleSelect: (_params: { slug: string }) => {},
 });
 
 const SearchNavigationProvider = ({ children }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [open, setOpen] = useState(false);
 
-  const handleSelect = (slug: string) => {
+  const handleSelect = ({ slug }: { slug: string }) => {
     setOpen(false);
-    // Use the Redwood routes helper for consistency
-    navigate(routes.media({ id: slug }));
+    // Construct media ID by combining type and slug
+    navigate(routes.media({ slug }));
   };
 
   return (

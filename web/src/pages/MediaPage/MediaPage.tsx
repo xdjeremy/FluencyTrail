@@ -5,10 +5,10 @@ import { Link, routes } from '@redwoodjs/router';
 import MediaCell from 'src/components/Media/MediaCell';
 
 interface MediaPageProps {
-  id: string;
+  slug: string;
 }
 
-const MediaPage = ({ id }: MediaPageProps) => {
+const MediaPage = ({ slug }: MediaPageProps) => {
   return (
     <>
       <div className="container mx-auto px-4 py-8">
@@ -19,7 +19,7 @@ const MediaPage = ({ id }: MediaPageProps) => {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Home
         </Link>
-        <MediaCell slug={id} />
+        <MediaCell slug={slug} />
       </div>
     </>
   );

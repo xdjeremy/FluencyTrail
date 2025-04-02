@@ -31,7 +31,7 @@ export const mapMovieResult = (
 ): ServiceMedia => {
   const mediaManager = new MediaManager();
   return {
-    slug: mediaManager.generateSlug(movieResult.title, movieResult.id),
+    slug: mediaManager.generateSlug(movieResult.title, movieResult.id, 'MOVIE'),
     externalId: movieResult.id.toString(),
     mediaType: 'MOVIE' as const,
     originalTitle: movieResult.original_title,
@@ -66,7 +66,7 @@ export const mapTvResult = (
   const mediaManager = new MediaManager();
   return {
     id: tvResult.id.toString(),
-    slug: mediaManager.generateSlug(tvResult.name, tvResult.id),
+    slug: mediaManager.generateSlug(tvResult.name, tvResult.id, 'TV'),
     // Some results from tmdb dont return the mediaType so we force it here!
     mediaType: 'TV' as const,
     title: tvResult.name,

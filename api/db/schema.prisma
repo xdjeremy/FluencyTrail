@@ -95,6 +95,10 @@ model TvMetadata {
   originalLanguage String?
   genres           String[]
   firstAirDate     DateTime?
+  lastAirDate      DateTime? // Added
+  numberOfSeasons  Int? // Added
+  numberOfEpisodes Int? // Added
+  status           String? // Added (e.g., "Returning Series", "Ended")
   originalCountry  String[]
 
   media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)

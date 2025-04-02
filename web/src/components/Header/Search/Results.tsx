@@ -34,8 +34,13 @@ export const Result = ({
 
   return (
     <button
-      // Call the handleSelect from the hook with the slug
-      onClick={() => handleSelect(media.slug)}
+      // Navigate using the media type and slug
+      onClick={() => {
+        // Extract type and base slug
+        handleSelect({
+          slug: media.slug,
+        });
+      }}
       className={cn(
         'flex w-full items-start gap-3 px-4 py-2 text-left',
         index === selectedIndex
@@ -65,6 +70,7 @@ export const Result = ({
           <p className="text-brand-600 dark:text-brand-400 mt-0.5 text-xs">
             {media.originalTitle}{' '}
             {/* {item.originalLanguage && `(${item.originalLanguage})`} */}
+            {media.slug}
           </p>
         )}
         <p className="mt-1 line-clamp-2 text-xs text-neutral-500 dark:text-neutral-400">
