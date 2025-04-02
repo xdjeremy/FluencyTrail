@@ -49,40 +49,86 @@ export default class MediaManager {
       mediaData = await this.tmdb.getTv({ tvId: tmdbId }); // Using TV as fallback
     }
 
+    const baseMediaData = {
+      externalId: tmdbId.toString(),
+      title: mediaData.title || mediaData.name,
+      slug: this.generateSlug(mediaData.title || mediaData.name, tmdbId),
+      mediaType: mediaType.toUpperCase() as 'MOVIE' | 'TV',
+      originalTitle: mediaData.original_title || mediaData.original_name,
+      description: mediaData.overview,
+      posterUrl: mediaData.poster_path
+        ? `https://image.tmdb.org/t/p/w500${mediaData.poster_path}`
+        : null,
+      backdropUrl: mediaData.backdrop_path
+        ? `https://image.tmdb.org/t/p/original${mediaData.backdrop_path}`
+        : null,
+      popularity: mediaData.popularity,
+      releaseDate:
+        mediaData.release_date || mediaData.first_air_date
+          ? new Date(mediaData.release_date || mediaData.first_air_date)
+          : null,
+    };
+
+    const movieMetadata = {
+      adult: mediaData.adult,
+      originalLanguage: mediaData.original_language,
+      genres: mediaData.genres?.map(g => g.name) || [],
+      runtime: mediaData.runtime,
+      rawData: mediaData,
+    };
+
+    const tvMetadata = {
+      adult: mediaData.adult,
+      originalLanguage: mediaData.original_language,
+      genres: mediaData.genres?.map(g => g.name) || [],
+      firstAirDate: mediaData.first_air_date
+        ? new Date(mediaData.first_air_date)
+        : null,
+      originalCountry: mediaData.origin_country || [],
+    };
+
+    const mediaTypeMetadata =
+      mediaType === 'movie'
+        ? {
+            MovieMetadata: {
+              create: movieMetadata,
+            },
+          }
+        : {
+            TvMetadata: {
+              create: tvMetadata,
+            },
+          };
+
+    // For new records, create media with metadata
+    const createData = {
+      ...baseMediaData,
+      ...mediaTypeMetadata,
+    };
+
+    // For existing records, delete old metadata and create new
+    const updateData = {
+      ...baseMediaData,
+      updatedAt: new Date(),
+      ...(mediaType === 'movie'
+        ? {
+            MovieMetadata: {
+              delete: true,
+              create: movieMetadata,
+            },
+          }
+        : {
+            TvMetadata: {
+              delete: true,
+              create: tvMetadata,
+            },
+          }),
+    };
+
     return db.media.upsert({
       where: { externalId: tmdbId.toString() },
-      create: {
-        externalId: tmdbId.toString(),
-        title: mediaData.title || mediaData.name,
-        slug: this.generateSlug(mediaData.title || mediaData.name, tmdbId),
-        mediaType: mediaType.toUpperCase() as 'MOVIE' | 'TV', // Convert to enum value
-        originalTitle: mediaData.original_title || mediaData.original_name,
-        description: mediaData.overview,
-        posterUrl: mediaData.poster_path
-          ? `https://image.tmdb.org/t/p/w500${mediaData.poster_path}`
-          : null,
-        backdropUrl: mediaData.backdrop_path
-          ? `https://image.tmdb.org/t/p/original${mediaData.backdrop_path}`
-          : null,
-        popularity: mediaData.popularity,
-        releaseDate:
-          mediaData.release_date || mediaData.first_air_date
-            ? new Date(mediaData.release_date || mediaData.first_air_date)
-            : null,
-      },
-      update: {
-        title: mediaData.title || mediaData.name,
-        originalTitle: mediaData.original_title || mediaData.original_name,
-        description: mediaData.overview,
-        posterUrl: mediaData.poster_path
-          ? `https://image.tmdb.org/t/p/w500${mediaData.poster_path}`
-          : null,
-        backdropUrl: mediaData.backdrop_path
-          ? `https://image.tmdb.org/t/p/original${mediaData.backdrop_path}`
-          : null,
-        popularity: mediaData.popularity,
-        updatedAt: new Date(),
-      },
+      create: createData,
+      update: updateData,
     });
   }
 
