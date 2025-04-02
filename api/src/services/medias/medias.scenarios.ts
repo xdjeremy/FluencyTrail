@@ -4,22 +4,76 @@ import type { ScenarioData } from '@redwoodjs/testing/api';
 
 export const standard = defineScenario<Prisma.MediaCreateArgs>({
   media: {
-    one: {
+    freshMovie: {
       data: {
         slug: 'john-wick-1234',
         externalId: '1234',
-        title: 'String',
+        title: 'John Wick',
         mediaType: 'MOVIE',
-        updatedAt: '2025-03-31T19:12:33.873Z',
+        updatedAt: new Date().toISOString(),
+        MovieMetadata: {
+          create: {
+            adult: false,
+            originalLanguage: 'en',
+            genres: ['Action', 'Thriller'],
+            runtime: 120,
+            rawData: { some: 'data' },
+          },
+        },
       },
     },
-    two: {
+    staleMovie: {
       data: {
-        slug: 'dr-strange-12322',
-        externalId: '12322',
-        title: 'String',
+        slug: 'inception-5678',
+        externalId: '5678',
+        title: 'Inception',
         mediaType: 'MOVIE',
-        updatedAt: '2025-03-31T19:12:33.873Z',
+        updatedAt: new Date('2024-01-01').toISOString(), // Old data
+        MovieMetadata: {
+          create: {
+            adult: false,
+            originalLanguage: 'en',
+            genres: ['Sci-Fi', 'Action'],
+            runtime: 148,
+            rawData: { some: 'data' },
+          },
+        },
+      },
+    },
+    freshTvShow: {
+      data: {
+        slug: 'stranger-things-91011',
+        externalId: '91011',
+        title: 'Stranger Things',
+        mediaType: 'TV',
+        updatedAt: new Date().toISOString(),
+        TvMetadata: {
+          create: {
+            adult: false,
+            originalLanguage: 'en',
+            genres: ['Drama', 'Horror'],
+            firstAirDate: new Date('2016-07-15').toISOString(),
+            originalCountry: ['US'],
+          },
+        },
+      },
+    },
+    staleTvShow: {
+      data: {
+        slug: 'breaking-bad-1213',
+        externalId: '1213',
+        title: 'Breaking Bad',
+        mediaType: 'TV',
+        updatedAt: new Date('2024-01-01').toISOString(), // Old data
+        TvMetadata: {
+          create: {
+            adult: false,
+            originalLanguage: 'en',
+            genres: ['Drama', 'Crime'],
+            firstAirDate: new Date('2008-01-20').toISOString(),
+            originalCountry: ['US'],
+          },
+        },
       },
     },
   },
