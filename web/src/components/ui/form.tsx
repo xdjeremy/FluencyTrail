@@ -147,17 +147,16 @@ const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = 'FormMessage';
 
-const FormErrorMessage = React.forwardRef<
-  React.ElementRef<typeof FormError>,
-  React.ComponentPropsWithoutRef<typeof FormError>
->(({ ...props }) => {
+const FormErrorMessage = (
+  props: React.ComponentPropsWithoutRef<typeof FormError>
+) => {
   return (
     <FormError
       wrapperClassName="text-destructive text-sm font-medium"
       {...props}
     />
   );
-});
+};
 FormErrorMessage.displayName = 'FormErrorMessage';
 
 export {
