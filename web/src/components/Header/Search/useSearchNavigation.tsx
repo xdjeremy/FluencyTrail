@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 
-import { navigate } from '@redwoodjs/router';
+import { navigate, routes } from '@redwoodjs/router';
 
 const useSearchNavigation = () => {
   const context = useContext(SearchNavigationContext);
@@ -17,16 +17,17 @@ const SearchNavigationContext = createContext({
   setSelectedIndex: (_index: number) => {},
   open: false,
   setOpen: (_open: boolean) => {},
-  handleSelect: (_mediaId: string) => {},
+  handleSelect: (_slug: string) => {},
 });
 
 const SearchNavigationProvider = ({ children }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [open, setOpen] = useState(false);
 
-  const handleSelect = (mediaId: string) => {
+  const handleSelect = (slug: string) => {
     setOpen(false);
-    navigate(`/media/${mediaId}`);
+    // Use the Redwood routes helper for consistency
+    navigate(routes.media({ id: slug }));
   };
 
   return (
