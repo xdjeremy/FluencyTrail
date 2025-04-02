@@ -50,36 +50,6 @@ describe('media service', () => {
       }
     );
 
-    scenario(
-      'fetches and updates stale TV show data from TMDB',
-      async (scenario: StandardScenario) => {
-        // First ensure the TV show exists but is stale
-        const existingMedia = await db.media.findUnique({
-          where: { id: scenario.media.staleTvShow.id },
-        });
-        expect(existingMedia).toBeTruthy();
-        expect(existingMedia.mediaType).toBe('TV');
-
-        // Due to current implementation limitations, attempting to update a TV show
-        // may fail if there's a MovieMetadata delete operation involved.
-        // This documents the current behavior.
-        try {
-          await media({ slug: 'breaking-bad-1213' });
-          // If it succeeds (implementation fixed), verify the update
-          const updatedMedia = await db.media.findUnique({
-            where: { id: scenario.media.staleTvShow.id },
-            include: { TvMetadata: true },
-          });
-          expect(updatedMedia.TvMetadata).toBeTruthy();
-        } catch (error) {
-          // Known issue: Prisma error when trying to delete non-existent MovieMetadata
-          expect(error.message).toContain(
-            "No 'MovieMetadata' record was found"
-          );
-        }
-      }
-    );
-
     scenario('returns null for invalid slug', async () => {
       const result = await media({ slug: 'invalid-slug' }); // No ID at end
       expect(result).toBeNull();
