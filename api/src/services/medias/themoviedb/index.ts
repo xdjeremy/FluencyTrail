@@ -1,9 +1,13 @@
+import { MediaType } from 'types/graphql';
+
 import cacheManager from 'src/lib/api/cache';
 import ExternalAPI from 'src/lib/api/externalapi';
 
 import {
   TmdbMovieDetails,
+  TmdbSearchMovieResponse,
   TmdbSearchMultiResponse,
+  TmdbSearchTvResponse,
   TmdbTvDetails, // Added TV Details interface import
 } from './interfaces';
 
@@ -118,6 +122,103 @@ class TheMovieDb extends ExternalAPI {
       throw new Error(`[TMDB] Failed to fetch TV details: ${e.message}`);
     }
   };
+
+  private async getMovieSimilar({
+    movieId,
+    page = 1,
+    language = 'en',
+  }: {
+    movieId: number;
+    page?: number;
+    language?: string;
+  }): Promise<TmdbSearchMovieResponse> {
+    try {
+      const data = await this.get<TmdbSearchMovieResponse>(
+        `/movie/${movieId}/similar`,
+        {
+          params: {
+            page,
+            language,
+          },
+        }
+      );
+
+      // Append media_type to all results
+      const processedData = {
+        ...data,
+        results: data.results.map(movie => ({
+          ...movie,
+          media_type: 'movie' as const,
+        })),
+      };
+      return processedData;
+    } catch (e) {
+      throw new Error(`[TMDB] Failed to fetch discover movies: ${e.message}`);
+    }
+  }
+
+  private async getTvSimilar({
+    tvId,
+    page = 1,
+    language = 'en',
+  }: {
+    tvId: number;
+    page?: number;
+    language?: string;
+  }): Promise<TmdbSearchTvResponse> {
+    try {
+      const data = await this.get<TmdbSearchTvResponse>(`/tv/${tvId}/similar`, {
+        params: {
+          page,
+          language,
+        },
+      });
+
+      // Append media_type to all results
+      const processedData = {
+        ...data,
+        results: data.results.map(movie => ({
+          ...movie,
+          media_type: 'tv' as const,
+        })),
+      };
+      return processedData;
+    } catch (e) {
+      throw new Error(`[TMDB] Failed to fetch TV similar: ${e.message}`);
+    }
+  }
+
+  public async getSimilarMedias({
+    mediaId,
+    mediaType,
+    page = 1,
+    language = 'en',
+  }: {
+    mediaId: number;
+    mediaType: MediaType;
+    page?: number;
+    language?: string;
+  }): Promise<TmdbSearchTvResponse | TmdbSearchMovieResponse> {
+    try {
+      if (mediaType === 'MOVIE') {
+        return await this.getMovieSimilar({
+          movieId: mediaId,
+          page,
+          language,
+        });
+      } else if (mediaType === 'TV') {
+        return await this.getTvSimilar({
+          tvId: mediaId,
+          page,
+          language,
+        });
+      } else {
+        throw new Error('Unsupported media type');
+      }
+    } catch (e) {
+      throw new Error(`[TMDB] Failed to fetch similar media: ${e.message}`);
+    }
+  }
 }
 
 export default TheMovieDb;

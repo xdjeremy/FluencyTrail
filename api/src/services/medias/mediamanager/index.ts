@@ -209,4 +209,21 @@ export default class MediaManager {
     const match = slug.match(/-(\d+)-(MOVIE|TV)$/);
     return match ? (match[2] as MediaType) : 'TV'; // Default to TV if not found
   }
+
+  public extractFromSlug(slug: string): {
+    tmdbId: number;
+    mediaType: MediaType;
+    title: string;
+  } {
+    const match = slug.match(/-(\d+)-(MOVIE|TV)$/);
+    if (!match) {
+      throw new Error('Invalid slug format');
+    }
+
+    const tmdbId = this.extractTmdbIdFromSlug(slug);
+    const mediaType = this.getMediaTypeFromSlug(slug);
+    const title = slug.split('-').slice(0, -2).join('-');
+
+    return { tmdbId, mediaType, title };
+  }
 }

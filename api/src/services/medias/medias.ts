@@ -13,8 +13,6 @@ export const media: QueryResolvers['media'] = async ({ slug }) => {
 };
 
 export const medias: QueryResolvers['medias'] = async ({ query }) => {
-  // let results: TmdbSearchMultiResponse;
-
   const tmdb = new TheMovieDb();
 
   const results: TmdbSearchMultiResponse = await tmdb.searchMulti({
@@ -23,16 +21,22 @@ export const medias: QueryResolvers['medias'] = async ({ query }) => {
     // language: (req.query.language as string) ?? req.locale,
   });
 
-  // const media = await Media.getRelatedMedia(
-  //   results.results.map(result => result.id)
-  // );
   return mapSearchResults(results.results);
-  // return res.status(200).json({
-  //   page: results.page,
-  //   totalPages: results.total_pages,
-  //   totalResults: results.total_results,
-  //   results: mapSearchResults(results.results, media),
-  // });
+};
+
+export const similarMedias: QueryResolvers['similarMedias'] = async ({
+  slug,
+}) => {
+  const tmdb = new TheMovieDb();
+  const mediaManager = new MediaManager();
+  const { mediaType, tmdbId } = mediaManager.extractFromSlug(slug);
+
+  const similarMedias = await tmdb.getSimilarMedias({
+    mediaId: tmdbId,
+    mediaType,
+  });
+
+  return mapSearchResults(similarMedias.results);
 };
 
 export const Media: MediaRelationResolvers = {
