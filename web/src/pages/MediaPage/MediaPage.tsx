@@ -11,7 +11,7 @@ interface MediaPageProps {
 const MediaPage = ({ slug }: MediaPageProps) => {
   return (
     <>
-      <div className="container mx-auto px-4 py-8">
+      <div>
         <Link
           to={routes.home()}
           className="mb-6 inline-flex items-center text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-200"

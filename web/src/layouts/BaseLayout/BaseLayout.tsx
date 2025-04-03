@@ -9,7 +9,7 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
   return (
     <>
       <Header />
-      {children}
+      <div className="container mx-auto px-20 py-8">{children}</div>
       <NewActivity />
     </>
   );

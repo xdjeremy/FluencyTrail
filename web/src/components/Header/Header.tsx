@@ -13,7 +13,7 @@ const Header = () => {
   return (
     <SearchNavigationProvider>
       <header className="bg-background sticky top-0 z-50 w-full border-b px-4">
-        <div className="container mx-auto flex h-16 items-center justify-between">
+        <div className="container mx-auto flex h-16 items-center justify-between px-20">
           <div className="flex items-center gap-6">
             <Link to={routes.home()} className="flex items-center gap-2">
               <Book className="text-brand-600 h-6 w-6" />

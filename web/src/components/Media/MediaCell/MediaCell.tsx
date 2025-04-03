@@ -30,7 +30,7 @@ export const QUERY: TypedDocumentNode<FindMediaQuery, FindMediaQueryVariables> =
         id
         title
         mediaType
-        createdAt
+        releaseDate
         posterUrl
         slug
       }

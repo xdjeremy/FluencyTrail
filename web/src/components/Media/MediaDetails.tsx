@@ -137,7 +137,7 @@ const MediaDetails = ({ media, similarMedias }: FindMediaQuery) => {
         <div>
           <h2 className="mb-4 text-xl font-semibold">Similar Media</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {similarMedias.map(item => (
+            {similarMedias.slice(0, 4).map(item => (
               <Link
                 to={routes.media({
                   slug: item.slug,
@@ -166,7 +166,8 @@ const MediaDetails = ({ media, similarMedias }: FindMediaQuery) => {
                       </span>
                     </div>
                     <h3 className="text-sm font-medium text-white">
-                      {item.title}
+                      {item.title} (
+                      {formatDate(new Date(item.releaseDate), 'yyyy')})
                     </h3>
                     {/* <div className="mt-1 flex flex-wrap gap-1">
                       {item.genre.slice(0, 2).map(genre => (
