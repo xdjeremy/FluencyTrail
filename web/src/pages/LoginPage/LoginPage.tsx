@@ -85,7 +85,6 @@ const LoginPage = () => {
                 to={routes.signup()}
                 className="text-brand-600 hover:text-brand-800"
                 aria-disabled={isLoading}
-                onClick={e => isLoading && e.preventDefault()}
               >
                 create a new one for free
               </Link>
