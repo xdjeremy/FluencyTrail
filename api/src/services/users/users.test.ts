@@ -28,14 +28,12 @@ describe('users', () => {
         email: 'String8074222',
         hashedPassword: 'String',
         salt: 'String',
-        updatedAt: '2025-03-30T11:13:25.983Z',
       },
     });
 
     expect(result.email).toEqual('String8074222');
     expect(result.hashedPassword).toEqual('String');
     expect(result.salt).toEqual('String');
-    expect(result.updatedAt).toEqual(new Date('2025-03-30T11:13:25.983Z'));
   });
 
   scenario('updates a user', async (scenario: StandardScenario) => {

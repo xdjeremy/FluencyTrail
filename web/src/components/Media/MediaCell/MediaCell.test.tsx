@@ -1,6 +1,7 @@
 import { render } from '@redwoodjs/testing/web';
 
-import { Empty, Failure, Loading } from './MediaCell';
+import { Empty, Failure, Loading, Success } from './MediaCell';
+import { standard } from './MediaCell.mock';
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float and DateTime types.
@@ -23,7 +24,12 @@ describe('MediaCell', () => {
 
   it('renders Failure successfully', async () => {
     expect(() => {
-      render(<Failure id={'42'} error={new Error('Oh no')} />);
+      render(
+        <Failure
+          error={new Error('Oh no')}
+          slug="komi-cant-communicate-123876-TV"
+        />
+      );
     }).not.toThrow();
   });
 
@@ -32,4 +38,16 @@ describe('MediaCell', () => {
   //
   // 1. import { screen } from '@redwoodjs/testing/web'
   // 2. Add test: expect(screen.getByText('Hello, world')).toBeInTheDocument()
+
+  it('renders Success successfully', async () => {
+    expect(() => {
+      render(
+        <Success
+          slug="komi-cant-communicate-123876-TV"
+          similarMedias={standard().similarMedias}
+          media={standard().media}
+        />
+      );
+    }).not.toThrow();
+  });
 });
