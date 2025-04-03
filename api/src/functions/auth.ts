@@ -132,14 +132,14 @@ export const handler = async (
       username,
       hashedPassword,
       salt,
-      userAttributes: _userAttributes,
+      userAttributes: userAttributes,
     }) => {
       return db.user.create({
         data: {
           email: username,
           hashedPassword: hashedPassword,
           salt: salt,
-          // name: userAttributes.name
+          name: userAttributes.name,
         },
       });
     },

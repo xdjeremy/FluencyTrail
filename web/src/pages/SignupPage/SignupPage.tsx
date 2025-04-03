@@ -7,6 +7,7 @@ import { toast } from '@redwoodjs/web/toast';
 import { useAuth } from 'src/auth';
 
 import SignupForm from './SignupForm';
+import { SignupSchemaType } from './SignupForm/SignupSchema';
 
 const SignupPage = () => {
   const { isAuthenticated, signUp } = useAuth();
@@ -23,10 +24,11 @@ const SignupPage = () => {
     usernameRef.current?.focus();
   }, []);
 
-  const onSubmit = async (data: Record<string, string>) => {
+  const onSubmit = async (data: SignupSchemaType) => {
     const response = await signUp({
-      username: data.username,
+      username: data.email,
       password: data.password,
+      name: data.name,
     });
 
     if (response.message) {

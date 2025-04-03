@@ -8,7 +8,7 @@ const OAuthSignup = ({ isLoading }: { isLoading: boolean }) => {
           <div className="w-full border-t border-neutral-200 dark:border-neutral-800"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-white px-4 text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
+          <span className="bg-background px-4 text-neutral-500">
             Or continue with
           </span>
         </div>
