@@ -1,10 +1,12 @@
 import type {
-  QueryResolvers,
-  MutationResolvers,
   ActivityRelationResolvers,
+  MutationResolvers,
+  QueryResolvers,
 } from 'types/graphql';
 
 import { db } from 'src/lib/db';
+
+import MediaManager from '../medias/mediamanager';
 
 export const activities: QueryResolvers['activities'] = () => {
   return db.activity.findMany();
@@ -16,13 +18,20 @@ export const activity: QueryResolvers['activity'] = ({ id }) => {
   });
 };
 
-export const createActivity: MutationResolvers['createActivity'] = ({
+export const createActivity: MutationResolvers['createActivity'] = async ({
   input,
 }) => {
+  const mediaManager = new MediaManager();
+  const media = await mediaManager.getMediaBySlug(input.mediaSlug);
+
   return db.activity.create({
     data: {
-      ...input,
+      activityType: input.activityType,
+      notes: input.notes,
+      duration: input.duration,
+      date: input.date,
       userId: context.currentUser.id,
+      mediaId: media?.id,
     },
   });
 };

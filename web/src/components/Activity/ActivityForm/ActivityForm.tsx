@@ -1,14 +1,11 @@
 import { format } from 'date-fns';
 import { CalendarIcon, Check, ChevronsUpDown, Save } from 'lucide-react';
-import type { EditActivityById, UpdateActivityInput } from 'types/graphql';
+import type {
+  CreateActivityInput,
+  CreateActivityMutation,
+} from 'types/graphql';
 
-import {
-  Form,
-  NumberField,
-  SubmitHandler,
-  useForm,
-  type RWGqlError,
-} from '@redwoodjs/forms';
+import { Form, NumberField, useForm, type RWGqlError } from '@redwoodjs/forms';
 
 import { Button } from 'src/components/ui/button';
 import { Calendar } from 'src/components/ui/calendar';
@@ -46,12 +43,11 @@ import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/Activity
 import { cn } from 'src/utils/cn';
 
 import { activityTypes } from './constants';
-
-type FormActivity = NonNullable<EditActivityById['activity']>;
+import ActivityMediaSelect from './fields/MediaSelect';
 
 interface ActivityFormProps {
-  activity?: EditActivityById['activity'];
-  onSave: (data: UpdateActivityInput, id?: FormActivity['id']) => void;
+  activity?: CreateActivityMutation['createActivity'];
+  onSave: (data: CreateActivityInput) => void;
   error: RWGqlError;
   loading: boolean;
 }
@@ -59,17 +55,18 @@ interface ActivityFormProps {
 const ActivityForm = (props: ActivityFormProps) => {
   const { isActivityModalOpen, setActivityModalOpen } = useActivityModal();
 
-  const form = useForm<FormActivity>({
+  const form = useForm({
     defaultValues: {
       notes: '',
       activityType: 'WATCHING',
       date: new Date().toISOString(),
       duration: 15,
+      mediaSlug: '',
     },
   });
 
-  const onSubmit: SubmitHandler<FormActivity> = data => {
-    props.onSave(data, props?.activity?.id);
+  const onSubmit = data => {
+    props.onSave(data);
   };
 
   return (
@@ -128,6 +125,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                 </FormItem>
               )}
             />
+            <ActivityMediaSelect />
             <FormField
               control={form.control}
               name="activityType"

@@ -4,6 +4,8 @@ export const schema = gql`
     userId: Int!
     user: User!
     activityType: ActivityType!
+    mediaId: String
+    media: Media
     notes: String
     duration: Int
     date: DateTime!
@@ -28,6 +30,7 @@ export const schema = gql`
   }
 
   input CreateActivityInput {
+    mediaSlug: String
     activityType: ActivityType!
     notes: String
     duration: Int

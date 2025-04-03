@@ -22,8 +22,8 @@ const CREATE_ACTIVITY_MUTATION: TypedDocumentNode<
     createActivity(input: $input) {
       activityType
       date
-      duration
       notes
+      duration
     }
   }
 `;
@@ -37,7 +37,6 @@ const NewActivity = () => {
       onCompleted: () => {
         toast.success('Activity created');
         setActivityModalOpen(false);
-        // navigate(routes.activities());
       },
       onError: error => {
         toast.error(error.message);
