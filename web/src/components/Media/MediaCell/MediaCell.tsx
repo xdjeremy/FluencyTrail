@@ -26,6 +26,14 @@ export const QUERY: TypedDocumentNode<FindMediaQuery, FindMediaQueryVariables> =
           runtime
         }
       }
+      similarMedias: similarMedias(slug: $slug) {
+        id
+        title
+        mediaType
+        createdAt
+        posterUrl
+        slug
+      }
     }
   `;
 
@@ -41,6 +49,7 @@ export const Failure = ({
 
 export const Success = ({
   media,
+  similarMedias,
 }: CellSuccessProps<FindMediaQuery, FindMediaQueryVariables>) => {
-  return <MediaDetails media={media} />;
+  return <MediaDetails media={media} similarMedias={similarMedias} />;
 };

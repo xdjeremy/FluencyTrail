@@ -2,11 +2,13 @@ import { formatDate } from 'date-fns';
 import { Book, Calendar, Eye, Film, Tv } from 'lucide-react';
 import { FindMediaQuery, MediaType } from 'types/graphql';
 
+import { Link, routes } from '@redwoodjs/router';
+
 import { imgProxy } from 'src/utils/img-proxy';
 
 import { Button } from '../ui/button';
 
-const MediaDetails = ({ media }: FindMediaQuery) => {
+const MediaDetails = ({ media, similarMedias }: FindMediaQuery) => {
   const getMediaIcon = (type: MediaType) => {
     switch (type) {
       case 'MOVIE':
@@ -34,15 +36,13 @@ const MediaDetails = ({ media }: FindMediaQuery) => {
       <div className="md:col-span-1">
         <div className="relative aspect-[2/3] overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-800">
           <img
-            // src={media.coverImage || '/placeholder.svg'}
-            // alt={media.title}
             src={imgProxy({
               url: media.posterUrl,
               width: 608,
               height: 912,
               fit: 'cover',
             })}
-            alt="placeholder"
+            alt={media.title}
             className="object-cover"
           />
         </div>
@@ -137,28 +137,38 @@ const MediaDetails = ({ media }: FindMediaQuery) => {
         <div>
           <h2 className="mb-4 text-xl font-semibold">Similar Media</h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-            {/* {findSimilarMedia(media).map(item => (
-              <Link href={`/media/${item.id}`} key={item.id} className="group">
+            {similarMedias.map(item => (
+              <Link
+                to={routes.media({
+                  slug: item.slug,
+                })}
+                key={item.id}
+                className="group"
+              >
                 <div className="group-hover:border-brand-500 dark:group-hover:border-brand-400 relative aspect-[2/3] overflow-hidden rounded-lg border border-neutral-200 transition-all duration-200 dark:border-neutral-800">
-                  <Image
-                    src={item.coverImage || '/placeholder.svg'}
+                  <img
+                    src={imgProxy({
+                      url: `https://image.tmdb.org/t/p/w500${item.posterUrl}`,
+                      height: 763,
+                      width: 508,
+                      fit: 'fill',
+                    })}
                     alt={item.title}
-                    fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                     <div className="mb-1 flex items-center gap-1.5">
                       <div className="bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300 flex h-6 w-6 items-center justify-center rounded-full">
-                        {getMediaIcon(item.type)}
+                        {getMediaIcon(item.mediaType)}
                       </div>
                       <span className="text-xs text-white">
-                        {getMediaTypeLabel(item.type)}
+                        {getMediaTypeLabel(item.mediaType)}
                       </span>
                     </div>
                     <h3 className="text-sm font-medium text-white">
                       {item.title}
                     </h3>
-                    <div className="mt-1 flex flex-wrap gap-1">
+                    {/* <div className="mt-1 flex flex-wrap gap-1">
                       {item.genre.slice(0, 2).map(genre => (
                         <span
                           key={genre}
@@ -167,11 +177,11 @@ const MediaDetails = ({ media }: FindMediaQuery) => {
                           {genre}
                         </span>
                       ))}
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </Link>
-            ))} */}
+            ))}
           </div>
         </div>
       </div>
