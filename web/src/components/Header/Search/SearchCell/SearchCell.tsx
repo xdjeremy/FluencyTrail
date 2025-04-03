@@ -86,7 +86,7 @@ export const Success = ({
     e => {
       e.preventDefault();
       if (medias.length && open) {
-        handleSelect(medias[selectedIndex].id);
+        handleSelect({ slug: medias[selectedIndex].slug });
       }
     },
     { enableOnFormTags: true, enabled: open }

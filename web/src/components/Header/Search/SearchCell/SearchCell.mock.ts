@@ -10,6 +10,7 @@ export const standard = (/* vars, { ctx, req } */): SearchMediaByQuery => ({
       mediaType: 'MOVIE',
       description: 'The first episode of the Star Wars saga.',
       releaseDate: '1977-05-25',
+      slug: 'star-wars-episode-iv-a-new-hope-42-MOVIE',
     },
     {
       __typename: 'Media' as const,
@@ -18,6 +19,7 @@ export const standard = (/* vars, { ctx, req } */): SearchMediaByQuery => ({
       mediaType: 'MOVIE',
       description: 'The second episode of the Star Wars saga.',
       releaseDate: '1980-05-21',
+      slug: 'star-wars-episode-v-the-empire-strikes-back-43-MOVIE',
     },
     {
       __typename: 'Media' as const,
@@ -26,6 +28,7 @@ export const standard = (/* vars, { ctx, req } */): SearchMediaByQuery => ({
       mediaType: 'MOVIE',
       description: 'The third episode of the Star Wars saga.',
       releaseDate: '1983-05-25',
+      slug: 'star-wars-episode-vi-return-of-the-jedi-44-MOVIE',
     },
   ],
 });

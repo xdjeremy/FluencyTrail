@@ -1,9 +1,8 @@
 import type { FindUsers, FindUsersVariables } from 'types/graphql';
 
-import { Link, routes } from '@redwoodjs/router';
 import type {
-  CellSuccessProps,
   CellFailureProps,
+  CellSuccessProps,
   TypedDocumentNode,
 } from '@redwoodjs/web';
 
@@ -30,9 +29,9 @@ export const Empty = () => {
   return (
     <div className="rw-text-center">
       No users yet.{' '}
-      <Link to={routes.newUser()} className="rw-link">
+      {/* <Link to={routes.newUser()} className="rw-link">
         Create one?
-      </Link>
+      </Link> */}
     </div>
   );
 };

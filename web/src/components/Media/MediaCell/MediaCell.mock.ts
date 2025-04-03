@@ -19,4 +19,15 @@ export const standard = (/* vars, { ctx, req } */): FindMediaQuery => ({
       genres: ['Comedy', 'Sci-Fi'],
     },
   },
+  similarMedias: [
+    {
+      __typename: 'Media' as const,
+      id: '43',
+      title: 'The Hitchhiker 2',
+      mediaType: 'MOVIE',
+      slug: 'the-hitchhiker-43-MOVIE',
+      posterUrl: 'https://placehold.co/600x1200/png?text=Monds',
+      releaseDate: '2005-04-29',
+    },
+  ],
 });

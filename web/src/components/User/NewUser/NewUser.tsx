@@ -1,12 +1,11 @@
 import type {
-  CreateUserMutation,
   CreateUserInput,
+  CreateUserMutation,
   CreateUserMutationVariables,
 } from 'types/graphql';
 
-import { navigate, routes } from '@redwoodjs/router';
-import { useMutation } from '@redwoodjs/web';
 import type { TypedDocumentNode } from '@redwoodjs/web';
+import { useMutation } from '@redwoodjs/web';
 import { toast } from '@redwoodjs/web/toast';
 
 import UserForm from 'src/components/User/UserForm';
@@ -26,7 +25,7 @@ const NewUser = () => {
   const [createUser, { loading, error }] = useMutation(CREATE_USER_MUTATION, {
     onCompleted: () => {
       toast.success('User created');
-      navigate(routes.users());
+      // navigate(routes.users());
     },
     onError: error => {
       toast.error(error.message);

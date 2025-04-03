@@ -29,9 +29,6 @@ export const failure: StoryObj<typeof Failure> = {
 };
 
 export const success: StoryObj<typeof Success> = {
-  args: {
-    id: '42',
-  },
   render: args => {
     return Success ? <Success {...standard()} {...args} /> : <></>;
   },

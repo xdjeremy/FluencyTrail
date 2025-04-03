@@ -4,9 +4,8 @@ import type {
   FindUsers,
 } from 'types/graphql';
 
-import { Link, routes } from '@redwoodjs/router';
-import { useMutation } from '@redwoodjs/web';
 import type { TypedDocumentNode } from '@redwoodjs/web';
+import { useMutation } from '@redwoodjs/web';
 import { toast } from '@redwoodjs/web/toast';
 
 import { QUERY } from 'src/components/User/UsersCell';
@@ -73,7 +72,7 @@ const UsersList = ({ users }: FindUsers) => {
               <td>{timeTag(user.updatedAt)}</td>
               <td>
                 <nav className="rw-table-actions">
-                  <Link
+                  {/* <Link
                     to={routes.user({ id: user.id })}
                     title={'Show user ' + user.id + ' detail'}
                     className="rw-button rw-button-small"
@@ -86,7 +85,7 @@ const UsersList = ({ users }: FindUsers) => {
                     className="rw-button rw-button-small rw-button-blue"
                   >
                     Edit
-                  </Link>
+                  </Link> */}
                   <button
                     type="button"
                     title={'Delete user ' + user.id}

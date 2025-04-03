@@ -12,6 +12,6 @@ type Story = StoryObj<typeof MediaPage>;
 
 export const Primary: Story = {
   args: {
-    id: 'john-wick-1234',
+    // id: 'john-wick-1234',
   },
 };
