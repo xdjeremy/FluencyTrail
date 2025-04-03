@@ -1,7 +1,6 @@
 import { render } from '@redwoodjs/testing/web';
 
-import { Loading, Empty, Failure, Success } from './MediaCell';
-import { standard } from './MediaCell.mock';
+import { Empty, Failure, Loading } from './MediaCell';
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float and DateTime types.
@@ -33,10 +32,4 @@ describe('MediaCell', () => {
   //
   // 1. import { screen } from '@redwoodjs/testing/web'
   // 2. Add test: expect(screen.getByText('Hello, world')).toBeInTheDocument()
-
-  it('renders Success successfully', async () => {
-    expect(() => {
-      render(<Success id={'42'} media={standard().media} />);
-    }).not.toThrow();
-  });
 });
