@@ -2,6 +2,8 @@ import { formatDate } from 'date-fns';
 import { Book, Calendar, Eye, Film, Tv } from 'lucide-react';
 import { FindMediaQuery, MediaType } from 'types/graphql';
 
+import { imgProxy } from 'src/utils/img-proxy';
+
 import { Button } from '../ui/button';
 
 const MediaDetails = ({ media }: FindMediaQuery) => {
@@ -34,7 +36,12 @@ const MediaDetails = ({ media }: FindMediaQuery) => {
           <img
             // src={media.coverImage || '/placeholder.svg'}
             // alt={media.title}
-            src={media.posterUrl}
+            src={imgProxy({
+              url: media.posterUrl,
+              width: 608,
+              height: 912,
+              fit: 'cover',
+            })}
             alt="placeholder"
             className="object-cover"
           />
