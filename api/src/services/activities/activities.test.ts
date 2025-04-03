@@ -39,6 +39,7 @@ describe('activities', () => {
         notes: scenario.activity.two.notes,
         duration: scenario.activity.two.duration,
         date: scenario.activity.two.date,
+        mediaSlug: 'Slug',
       },
     });
 
