@@ -4,14 +4,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Book, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { SubmitHandler, useForm } from '@redwoodjs/forms';
+import { Form, SubmitHandler, useForm } from '@redwoodjs/forms';
 import { Link, navigate, routes } from '@redwoodjs/router';
 import { Metadata } from '@redwoodjs/web';
 
 import { useAuth } from 'src/auth';
 import { Button } from 'src/components/ui/button';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -67,7 +66,11 @@ const LoginPage = () => {
     <>
       <Metadata title="Login" />
       <div className={isLoading ? 'pointer-events-none' : ''}>
-        <Form {...form}>
+        <Form
+          formMethods={form}
+          onSubmit={onSubmit}
+          error={form.formState.errors}
+        >
           <div className="mx-auto flex w-full max-w-md flex-col items-center px-5 md:px-0">
             <div className="mb-6 flex justify-center">
               <Book className="h-12 w-12" />
@@ -88,10 +91,7 @@ const LoginPage = () => {
               </Link>
             </p>
 
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="w-full space-y-6"
-            >
+            <div className="w-full space-y-6">
               <FormField
                 control={form.control}
                 name="email"
@@ -156,7 +156,7 @@ const LoginPage = () => {
                 )}
                 Log in
               </Button>
-            </form>
+            </div>
 
             <div className="mt-8 w-full">
               <div className="relative">
