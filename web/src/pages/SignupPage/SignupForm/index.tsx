@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Book, Loader2 } from 'lucide-react';
 
@@ -28,10 +26,10 @@ import { SignupSchema, SignupSchemaType } from './SignupSchema';
 
 interface SignupFormProps {
   onSubmit?: (data: SignupSchemaType) => void;
+  isLoading?: boolean;
 }
 
-const SignupForm = ({ onSubmit }: SignupFormProps) => {
-  const [isLoading, _setIsLoading] = useState(false);
+const SignupForm = ({ onSubmit, isLoading }: SignupFormProps) => {
   const form = useForm<SignupSchemaType>({
     resolver: zodResolver(SignupSchema),
     defaultValues: {

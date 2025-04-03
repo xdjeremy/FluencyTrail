@@ -1,9 +1,12 @@
 import type { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
-import { DbAuthHandler } from '@redwoodjs/auth-dbauth-api';
 import type {
   DbAuthHandlerOptions,
   UserType,
+} from '@redwoodjs/auth-dbauth-api';
+import {
+  DbAuthHandler,
+  PasswordValidationError,
 } from '@redwoodjs/auth-dbauth-api';
 
 import { cookieName } from 'src/lib/auth';
@@ -147,14 +150,37 @@ export const handler = async (
     // Include any format checks for password here. Return `true` if the
     // password is valid, otherwise throw a `PasswordValidationError`.
     // Import the error along with `DbAuthHandler` from `@redwoodjs/api` above.
-    passwordValidation: _password => {
+    passwordValidation: password => {
+      if (password.length < 8) {
+        throw new PasswordValidationError(
+          'Password must be at least 8 characters'
+        );
+      }
+
+      if (!password.match(/[A-Z]/)) {
+        throw new PasswordValidationError(
+          'Password must contain at least one uppercase letter'
+        );
+      }
+
+      if (!password.match(/[a-z]/)) {
+        throw new PasswordValidationError(
+          'Password must contain at least one lowercase letter'
+        );
+      }
+      if (!password.match(/[0-9]/)) {
+        throw new PasswordValidationError(
+          'Password must contain at least one number'
+        );
+      }
+
       return true;
     },
 
     errors: {
       // `field` will be either "username" or "password"
       fieldMissing: '${field} is required',
-      usernameTaken: 'Username `${username}` already in use',
+      usernameTaken: 'Incorrect username or password',
     },
   };
 

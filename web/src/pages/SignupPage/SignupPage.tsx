@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { navigate, routes } from '@redwoodjs/router';
 import { Metadata } from '@redwoodjs/web';
@@ -11,6 +11,7 @@ import { SignupSchemaType } from './SignupForm/SignupSchema';
 
 const SignupPage = () => {
   const { isAuthenticated, signUp } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -25,6 +26,7 @@ const SignupPage = () => {
   }, []);
 
   const onSubmit = async (data: SignupSchemaType) => {
+    setIsLoading(true);
     const response = await signUp({
       username: data.email,
       password: data.password,
@@ -32,8 +34,10 @@ const SignupPage = () => {
     });
 
     if (response.message) {
+      setIsLoading(false);
       toast(response.message);
     } else if (response.error) {
+      setIsLoading(false);
       toast.error(response.error);
     } else {
       // user is signed in automatically
@@ -45,7 +49,7 @@ const SignupPage = () => {
     <>
       <Metadata title="Signup" />
       <div className="mx-auto max-w-md">
-        <SignupForm onSubmit={onSubmit} />
+        <SignupForm onSubmit={onSubmit} isLoading={isLoading} />
       </div>
     </>
   );
