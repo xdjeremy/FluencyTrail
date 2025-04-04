@@ -15,15 +15,18 @@ generator client {
 }
 
 model User {
-  id                  Int       @id @default(autoincrement())
-  email               String    @unique
-  name                String?
-  hashedPassword      String
-  salt                String
-  resetToken          String?
-  resetTokenExpiresAt DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                              Int       @id @default(autoincrement())
+  email                           String    @unique
+  name                            String?
+  hashedPassword                  String
+  salt                            String
+  resetToken                      String?
+  resetTokenExpiresAt             DateTime?
+  emailVerified                   Boolean   @default(false)
+  emailVerificationToken          String?
+  emailVerificationTokenExpiresAt DateTime?
+  createdAt                       DateTime  @default(now())
+  updatedAt                       DateTime  @updatedAt
 
   Activity Activity[]
 }

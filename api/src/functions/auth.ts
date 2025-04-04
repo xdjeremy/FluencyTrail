@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import type { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
 import type {
@@ -11,6 +13,8 @@ import {
 
 import { cookieName } from 'src/lib/auth';
 import { db } from 'src/lib/db';
+import { sendConfirmationEmail } from 'src/lib/emailTemplates/confirmEmail';
+import { logger } from 'src/lib/logger';
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -131,20 +135,33 @@ export const handler = async (
     //
     // If this returns anything else, it will be returned by the
     // `signUp()` function in the form of: `{ message: 'String here' }`.
-    handler: ({
+    handler: async ({
       username,
       hashedPassword,
       salt,
       userAttributes: userAttributes,
     }) => {
-      return db.user.create({
+      const confirmationToken = crypto.randomBytes(32).toString('hex');
+      const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+      const user = db.user.create({
         data: {
           email: username,
           hashedPassword: hashedPassword,
           salt: salt,
           name: userAttributes.name,
+          emailVerificationToken: confirmationToken,
+          emailVerificationTokenExpiresAt: tokenExpiry,
         },
       });
+
+      const confirmationUrl = `${process.env.APP_URL}/confirm-email?token=${confirmationToken}`;
+      sendConfirmationEmail(username, confirmationUrl, userAttributes.name);
+      logger.info(
+        `Confirmation email sent to ${username} with token ${confirmationToken}`
+      );
+
+      return user;
     },
 
     // Include any format checks for password here. Return `true` if the
