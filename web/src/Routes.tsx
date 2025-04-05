@@ -35,6 +35,11 @@ const Routes = () => {
             page={ResetPasswordPage}
             name="resetPassword"
           />
+          <Route
+            path="/confirm-email"
+            page={ConfirmEmailPage}
+            name="confirmEmail"
+          />
         </Set>
         <Route notfound page={NotFoundPage} />
       </Set>

@@ -10,6 +10,8 @@ type AuthLayoutProps = {
 };
 
 const AuthLayout = ({ children }: AuthLayoutProps) => {
+  // TODO: add auth check and remove auth check from the routes under this layout
+
   return (
     <div className="min-h-screen p-4">
       <div className="w-full">
