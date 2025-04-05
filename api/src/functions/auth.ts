@@ -141,9 +141,11 @@ export const handler = async (
       salt,
       userAttributes: userAttributes,
     }) => {
+      // Generate a confirmation token and expiry date
       const confirmationToken = crypto.randomBytes(32).toString('hex');
       const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
+      // Create user in the database
       const user = db.user.create({
         data: {
           email: username,
@@ -155,12 +157,14 @@ export const handler = async (
         },
       });
 
+      // Send confirmation email
       const confirmationUrl = `${process.env.APP_URL}/confirm-email?token=${confirmationToken}`;
       sendConfirmationEmail(username, confirmationUrl, userAttributes.name);
       logger.info(
         `Confirmation email sent to ${username} with token ${confirmationToken}`
       );
 
+      // TODO: do not return the user object here, return a message instead
       return user;
     },
 
