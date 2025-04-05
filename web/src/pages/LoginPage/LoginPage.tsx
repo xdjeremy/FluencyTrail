@@ -9,6 +9,7 @@ import { Link, navigate, routes } from '@redwoodjs/router';
 import { Metadata } from '@redwoodjs/web';
 
 import { useAuth } from 'src/auth';
+import Message from 'src/components/Forms/Message';
 import { Button } from 'src/components/ui/button';
 import {
   FormControl,
@@ -24,6 +25,7 @@ import { LoginSchema, LoginSchemaType } from './LoginSchema';
 const LoginPage = () => {
   const { isAuthenticated, logIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState<string>('');
 
   const form = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
@@ -51,10 +53,8 @@ const LoginPage = () => {
       password: data.password,
     });
 
-    if (response.message) {
-      toast(response.message);
-    } else if (response.error) {
-      toast.error(response.error);
+    if (response.error) {
+      setServerError(response.error);
     } else {
       toast.success('Welcome back!');
     }
@@ -89,8 +89,12 @@ const LoginPage = () => {
                 create a new one for free
               </Link>
             </p>
-
             <div className="w-full space-y-6">
+              {serverError && (
+                <Message variant="destructive" icon="destructive">
+                  {serverError}
+                </Message>
+              )}
               <FormField
                 control={form.control}
                 name="email"
