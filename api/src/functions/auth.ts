@@ -2,6 +2,7 @@ import crypto from 'crypto';
 
 import type { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
+import { validate } from '@redwoodjs/api';
 import type {
   DbAuthHandlerOptions,
   UserType,
@@ -72,16 +73,20 @@ export const handler = async (
     // by the `logIn()` function from `useAuth()` in the form of:
     // `{ message: 'Error message' }`
     handler: user => {
+      if (!user.emailVerified) {
+        throw new Error('Please verify your email address before logging in.');
+      }
+
       return user;
     },
 
     errors: {
       usernameOrPasswordMissing: 'Both username and password are required',
-      usernameNotFound: 'Username ${username} not found',
+      usernameNotFound: 'Invalid username or password',
       // For security reasons you may want to make this the same as the
       // usernameNotFound error so that a malicious user can't use the error
       // to narrow down if it's the username or password that's incorrect
-      incorrectPassword: 'Incorrect password for ${username}',
+      incorrectPassword: 'Invalid username or password',
     },
 
     // How long a user will remain logged in, in seconds
@@ -141,12 +146,32 @@ export const handler = async (
       salt,
       userAttributes: userAttributes,
     }) => {
+      // validate inputs
+      validate(username, {
+        presence: {
+          message: 'Email is required',
+        },
+        email: {
+          message: 'Invalid email address',
+        },
+      });
+      validate(userAttributes.name, {
+        presence: {
+          message: 'Name is required',
+        },
+        length: {
+          min: 2,
+          max: 100,
+          message: 'Name must be between 2 and 100 characters',
+        },
+      });
+
       // Generate a confirmation token and expiry date
       const confirmationToken = crypto.randomBytes(32).toString('hex');
       const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
       // Create user in the database
-      const user = db.user.create({
+      const user = await db.user.create({
         data: {
           email: username,
           hashedPassword: hashedPassword,
@@ -155,17 +180,20 @@ export const handler = async (
           emailVerificationToken: confirmationToken,
           emailVerificationTokenExpiresAt: tokenExpiry,
         },
+        select: {
+          email: true,
+          name: true,
+        },
       });
 
       // Send confirmation email
       const confirmationUrl = `${process.env.APP_URL}/confirm-email?token=${confirmationToken}`;
-      sendConfirmationEmail(username, confirmationUrl, userAttributes.name);
+      await sendConfirmationEmail(user.email, confirmationUrl, user.name);
       logger.info(
         `Confirmation email sent to ${username} with token ${confirmationToken}`
       );
 
-      // TODO: do not return the user object here, return a message instead
-      return user;
+      return 'Confirmation email sent. Please check your inbox.';
     },
 
     // Include any format checks for password here. Return `true` if the

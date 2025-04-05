@@ -10,7 +10,8 @@ type AuthLayoutProps = {
 };
 
 const AuthLayout = ({ children }: AuthLayoutProps) => {
-  // TODO: add auth check and remove auth check from the routes under this layout
+  // Do not add Auth checks here, there are routes that do not require auth
+  // e.g. confirm email, forgot password, etc.
 
   return (
     <div className="min-h-screen p-4">
