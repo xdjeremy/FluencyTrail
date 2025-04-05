@@ -1,8 +1,11 @@
+import { ActivityType, Media } from '@prisma/client';
 import type {
   ActivityRelationResolvers,
   MutationResolvers,
   QueryResolvers,
 } from 'types/graphql';
+
+import { validate, validateWith } from '@redwoodjs/api';
 
 import { db } from 'src/lib/db';
 
@@ -21,8 +24,52 @@ export const activity: QueryResolvers['activity'] = ({ id }) => {
 export const createActivity: MutationResolvers['createActivity'] = async ({
   input,
 }) => {
+  // validation
+  validate(input.date, 'Date', {
+    presence: true,
+    custom: {
+      with() {
+        const date = new Date(input.date);
+        return date <= new Date();
+      },
+      message: 'Date cannot be in the future',
+    },
+  });
+  validate(input.activityType, 'Activity Type', {
+    presence: true,
+    inclusion: {
+      in: Object.values(ActivityType),
+    },
+  });
+  validate(input.duration, 'Duration', {
+    presence: true,
+    numericality: {
+      greaterThanOrEqualTo: 1,
+      lessThanOrEqualTo: 1440,
+      message: 'Duration must be between 1 and 1440 minutes (24 hours)',
+    },
+  });
+  validate(input.notes, 'Notes', {
+    length: {
+      maximum: 300,
+      message: 'Notes must be 300 characters or less',
+    },
+  });
+
+  let media: Media | null;
+
   const mediaManager = new MediaManager();
-  const media = await mediaManager.getMediaBySlug(input.mediaSlug);
+  await validateWith(async () => {
+    // if media is NOT provided, skip validation
+    if (!input.mediaSlug) {
+      return true;
+    }
+
+    media = await mediaManager.getMediaBySlug(input.mediaSlug);
+    if (!media) {
+      throw 'Media not found';
+    }
+  });
 
   return db.activity.create({
     data: {

@@ -1,11 +1,18 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon, Check, ChevronsUpDown, Save } from 'lucide-react';
 import type {
+  ActivityType, // <-- Import ActivityType enum
   CreateActivityInput,
   CreateActivityMutation,
 } from 'types/graphql';
 
-import { Form, NumberField, useForm, type RWGqlError } from '@redwoodjs/forms';
+import {
+  Form,
+  SubmitHandler,
+  useForm,
+  type RWGqlError,
+} from '@redwoodjs/forms';
 
 import { Button } from 'src/components/ui/button';
 import { Calendar } from 'src/components/ui/calendar';
@@ -33,7 +40,7 @@ import {
   FormLabel,
   FormMessage,
 } from 'src/components/ui/form';
-import { Input, inputVariants } from 'src/components/ui/input';
+import { Input } from 'src/components/ui/input';
 import {
   Popover,
   PopoverContent,
@@ -42,6 +49,7 @@ import {
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
 import { cn } from 'src/utils/cn';
 
+import { ActivitySchema, ActivitySchemaType } from './ActivitySchema';
 import { activityTypes } from './constants';
 import ActivityMediaSelect from './fields/MediaSelect';
 
@@ -55,18 +63,26 @@ interface ActivityFormProps {
 const ActivityForm = (props: ActivityFormProps) => {
   const { isActivityModalOpen, setActivityModalOpen } = useActivityModal();
 
-  const form = useForm({
+  const form = useForm<ActivitySchemaType>({
+    resolver: zodResolver(ActivitySchema),
     defaultValues: {
       notes: '',
       activityType: 'WATCHING',
-      date: new Date().toISOString(),
+      date: new Date(),
       duration: 15,
       mediaSlug: '',
     },
   });
 
-  const onSubmit = data => {
-    props.onSave(data);
+  const onSubmit: SubmitHandler<ActivitySchemaType> = data => {
+    // Create a new object with the correct type, casting activityType and formatting date
+    const saveData: CreateActivityInput = {
+      ...data,
+      activityType: data.activityType as ActivityType, // <-- Explicit cast
+      date: data.date.toISOString(), // <-- Convert Date to ISO string
+      duration: Number(data.duration), // <-- Explicitly convert duration to number
+    };
+    props.onSave(saveData); // <-- Use the correctly typed object
   };
 
   return (
@@ -198,7 +214,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                 <FormItem className="grid grid-cols-4 items-center gap-4">
                   <FormLabel className="text-right">Duration* (min)</FormLabel>
                   <FormControl className="col-span-3">
-                    <NumberField className={cn(inputVariants())} {...field} />
+                    <Input type="number" {...field} />
                     {/* <Input placeholder="15" type="number" {...field} /> */}
                   </FormControl>
                   <FormMessage />
