@@ -1,9 +1,9 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Book, Loader2 } from 'lucide-react';
 
-import { Form, useForm } from '@redwoodjs/forms';
+import { Form, UseFormReturn } from '@redwoodjs/forms';
 import { Link, routes } from '@redwoodjs/router';
 
+import { Alert, AlertDescription } from 'src/components/ui/alert';
 import { Button } from 'src/components/ui/button';
 import {
   Card,
@@ -22,25 +22,23 @@ import {
   SignupPasswordField,
   SignupTermsField,
 } from './SignupFields';
-import { SignupSchema, SignupSchemaType } from './SignupSchema';
+import { SignupSchemaType } from './SignupSchema';
 
 interface SignupFormProps {
   onSubmit?: (data: SignupSchemaType) => void;
   isLoading?: boolean;
+  isSuccess: boolean;
+  serverError?: string;
+  form: UseFormReturn<SignupSchemaType>;
 }
 
-const SignupForm = ({ onSubmit, isLoading }: SignupFormProps) => {
-  const form = useForm<SignupSchemaType>({
-    resolver: zodResolver(SignupSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      terms: false,
-    },
-  });
-
+const SignupForm = ({
+  onSubmit,
+  isLoading,
+  isSuccess,
+  serverError,
+  form,
+}: SignupFormProps) => {
   return (
     <Card className="border-neutral-200 shadow-sm dark:border-neutral-800">
       <CardHeader className="space-y-1 pb-6">
@@ -58,6 +56,22 @@ const SignupForm = ({ onSubmit, isLoading }: SignupFormProps) => {
       </CardHeader>
       <CardContent>
         <Form formMethods={form} className="space-y-4" onSubmit={onSubmit}>
+          {isSuccess && (
+            <Alert className="border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/50">
+              <AlertDescription className="text-xs text-neutral-600 dark:text-neutral-400">
+                Please check your inbox and click the verification link to
+                complete your registration. If you don&apos;t see it, check your
+                spam folder.
+              </AlertDescription>
+            </Alert>
+          )}
+          {serverError && (
+            <Alert className="border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/50 dark:text-red-400">
+              <AlertDescription className="text-xs">
+                {serverError}
+              </AlertDescription>
+            </Alert>
+          )}
           <SignupNameField isLoading={isLoading} />
           <SignupEmailField isLoading={isLoading} />
           <SignupPasswordField isLoading={isLoading} />

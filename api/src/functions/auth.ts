@@ -229,7 +229,7 @@ export const handler = async (
     errors: {
       // `field` will be either "username" or "password"
       fieldMissing: '${field} is required',
-      usernameTaken: 'Incorrect username or password',
+      usernameTaken: 'Email is already taken',
     },
   };
 

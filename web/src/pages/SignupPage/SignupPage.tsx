@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import { useForm } from '@redwoodjs/forms';
 import { navigate, routes } from '@redwoodjs/router';
 import { Metadata } from '@redwoodjs/web';
 import { toast } from '@redwoodjs/web/toast';
@@ -7,12 +10,26 @@ import { toast } from '@redwoodjs/web/toast';
 import { useAuth } from 'src/auth';
 
 import SignupForm from './SignupForm';
-import { SignupSchemaType } from './SignupForm/SignupSchema';
+import { SignupSchema, SignupSchemaType } from './SignupForm/SignupSchema';
 
 const SignupPage = () => {
   const { isAuthenticated, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [serverError, setServerError] = useState<string>('');
 
+  const form = useForm<SignupSchemaType>({
+    resolver: zodResolver(SignupSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      terms: false,
+    },
+  });
+
+  // redirect to home page if user is already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate(routes.home());
@@ -26,6 +43,8 @@ const SignupPage = () => {
   }, []);
 
   const onSubmit = async (data: SignupSchemaType) => {
+    setServerError('');
+    setIsSuccess(false);
     setIsLoading(true);
     const response = await signUp({
       username: data.email,
@@ -33,23 +52,32 @@ const SignupPage = () => {
       name: data.name,
     });
 
-    if (response.message) {
+    console.log('response', response);
+
+    // handle errors
+    if (response.error) {
       setIsLoading(false);
-      toast(response.message);
-    } else if (response.error) {
-      setIsLoading(false);
-      toast.error(response.error);
-    } else {
-      // user is signed in automatically
-      toast.success('Welcome!');
+      setServerError(response.error);
+      return;
     }
+
+    setIsLoading(false);
+    setIsSuccess(true);
+    toast(response.message);
+    form.reset();
   };
 
   return (
     <>
       <Metadata title="Signup" />
       <div className="mx-auto max-w-md">
-        <SignupForm onSubmit={onSubmit} isLoading={isLoading} />
+        <SignupForm
+          onSubmit={onSubmit}
+          isLoading={isLoading}
+          isSuccess={isSuccess}
+          serverError={serverError}
+          form={form}
+        />
       </div>
     </>
   );
