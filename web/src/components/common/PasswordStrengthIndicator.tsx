@@ -19,7 +19,6 @@ export function PasswordStrengthIndicator({
     hasUppercase: false,
     hasLowercase: false,
     hasNumber: false,
-    hasSpecial: false,
   });
 
   useEffect(() => {
@@ -29,7 +28,6 @@ export function PasswordStrengthIndicator({
       hasUppercase: /[A-Z]/.test(password),
       hasLowercase: /[a-z]/.test(password),
       hasNumber: /[0-9]/.test(password),
-      hasSpecial: /[^A-Za-z0-9]/.test(password),
     };
 
     setCriteria(newCriteria);
@@ -42,28 +40,25 @@ export function PasswordStrengthIndicator({
   const getStrengthText = () => {
     if (!password) return '';
     if (strength === 0) return '';
-    if (strength === 1) return 'Very Weak';
-    if (strength === 2) return 'Weak';
-    if (strength === 3) return 'Fair';
-    if (strength === 4) return 'Good';
+    if (strength === 1) return 'Weak';
+    if (strength === 2) return 'Fair';
+    if (strength === 3) return 'Good';
     return 'Strong';
   };
 
   const getStrengthColor = () => {
     if (!password) return 'bg-neutral-200 dark:bg-neutral-700';
     if (strength === 1) return 'bg-red-500';
-    if (strength === 2) return 'bg-orange-500';
-    if (strength === 3) return 'bg-yellow-500';
-    if (strength === 4) return 'bg-green-500';
+    if (strength === 2) return 'bg-yellow-500';
+    if (strength === 3) return 'bg-green-500';
     return 'bg-brand-600 dark:bg-brand-400';
   };
 
   const getStrengthTextColor = () => {
     if (!password) return 'text-neutral-500 dark:text-neutral-400';
     if (strength === 1) return 'text-red-500';
-    if (strength === 2) return 'text-orange-500';
-    if (strength === 3) return 'text-yellow-500';
-    if (strength === 4) return 'text-green-500';
+    if (strength === 2) return 'text-yellow-500';
+    if (strength === 3) return 'text-green-500';
     return 'text-brand-600 dark:text-brand-400';
   };
 
@@ -79,7 +74,7 @@ export function PasswordStrengthIndicator({
           <span className={getStrengthTextColor()}>{getStrengthText()}</span>
         </div>
         <Progress
-          value={(strength / 5) * 100}
+          value={(strength / 4) * 100}
           className="h-1.5 bg-neutral-200 dark:bg-neutral-700"
           indicatorClassName={getStrengthColor()}
         />
@@ -149,22 +144,6 @@ export function PasswordStrengthIndicator({
               }
             >
               One number
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            {criteria.hasSpecial ? (
-              <Check className="h-3.5 w-3.5 text-green-500" />
-            ) : (
-              <X className="h-3.5 w-3.5 text-neutral-400" />
-            )}
-            <span
-              className={
-                criteria.hasSpecial
-                  ? 'text-green-700 dark:text-green-400'
-                  : 'text-neutral-500 dark:text-neutral-400'
-              }
-            >
-              One special character
             </span>
           </div>
         </div>
