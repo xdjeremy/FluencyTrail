@@ -40,7 +40,7 @@ const SignupForm = ({
   form,
 }: SignupFormProps) => {
   return (
-    <Card className="border-neutral-200 shadow-sm dark:border-neutral-800">
+    <Card className="shadow-sm">
       <CardHeader className="space-y-1 pb-6">
         <div className="mb-4 flex justify-center">
           <div className="bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300 flex h-12 w-12 items-center justify-center rounded-full">
@@ -89,7 +89,7 @@ const SignupForm = ({
         </Form>
         <OAuthSignup isLoading={isLoading} />
       </CardContent>
-      <CardFooter className="flex flex-col space-y-4 border-t border-neutral-200 pt-6 dark:border-neutral-800">
+      <CardFooter className="flex flex-col space-y-4 border-t pt-6">
         <div className="text-center text-sm">
           <span className="text-neutral-600 dark:text-neutral-400">
             Already have an account?

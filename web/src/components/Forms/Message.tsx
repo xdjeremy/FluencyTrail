@@ -10,8 +10,7 @@ import { Alert, AlertDescription } from '../ui/alert';
 const messageVariants = cva('', {
   variants: {
     variant: {
-      default:
-        'border-neutral-200 bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800/50',
+      default: 'bg-neutral-50 dark:bg-neutral-800/50',
       success:
         'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/30',
       destructive:

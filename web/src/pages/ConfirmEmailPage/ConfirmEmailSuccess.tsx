@@ -17,7 +17,6 @@ import {
 const ConfirmEmailSuccess = () => {
   const [redirectCountdown, setRedirectCountdown] = useState(5);
 
-  // TODO: Implement a countdown timer
   useEffect(() => {
     const countdown = setInterval(() => {
       setRedirectCountdown(prev => {
@@ -33,7 +32,7 @@ const ConfirmEmailSuccess = () => {
     return () => clearInterval(countdown);
   }, []);
   return (
-    <Card className="mx-auto mt-20 w-full max-w-md border-neutral-200 shadow-sm dark:border-neutral-800">
+    <Card className="mx-auto mt-20 w-full max-w-md shadow-sm">
       <CardHeader className="space-y-1 pb-6">
         <div className="mb-4 flex justify-center">
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">

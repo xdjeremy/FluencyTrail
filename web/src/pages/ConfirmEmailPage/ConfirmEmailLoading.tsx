@@ -10,7 +10,7 @@ import {
 
 const ConfirmEmailLoading = () => {
   return (
-    <Card className="mx-auto mt-20 w-full max-w-md border-neutral-200 shadow-sm dark:border-neutral-800">
+    <Card className="mx-auto mt-20 w-full max-w-md shadow-sm">
       <CardHeader className="space-y-1 pb-6">
         <div className="mb-4 flex justify-center">
           <div

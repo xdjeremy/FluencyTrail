@@ -40,7 +40,7 @@ export const SignupNameField = ({ isLoading }: SignupFieldsProps) => {
             <Input
               placeholder="Enter your name"
               {...field}
-              className="h-11 border-neutral-200 dark:border-neutral-800"
+              className="h-11"
               disabled={isLoading}
             />
           </FormControl>
@@ -66,7 +66,7 @@ export const SignupEmailField = ({ isLoading }: SignupFieldsProps) => {
               type="email"
               placeholder="you@example.com"
               {...field}
-              className="h-11 border-neutral-200 dark:border-neutral-800"
+              className="h-11"
               disabled={isLoading}
             />
           </FormControl>
@@ -181,7 +181,7 @@ export const SignupPasswordField = ({ isLoading }: SignupFieldsProps) => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Create a password"
                 {...field}
-                className="h-11 border-neutral-200 pr-10 dark:border-neutral-800"
+                className="h-11"
                 disabled={isLoading}
               />
               <button
@@ -256,7 +256,7 @@ export const SignupConfirmPasswordField = ({
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Confirm your password"
                 {...field}
-                className="h-11 border-neutral-200 pr-10 dark:border-neutral-800"
+                className="h-11"
                 disabled={isLoading}
               />
               <button
@@ -290,7 +290,7 @@ export const SignupTermsField = ({ isLoading }: SignupFieldsProps) => {
       control={form.control}
       name="terms"
       render={({ field }) => (
-        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-neutral-200 p-4 dark:border-neutral-800">
+        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
           <FormControl>
             <Checkbox
               checked={field.value}

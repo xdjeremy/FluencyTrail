@@ -85,7 +85,7 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ resetToken }) => {
   // Double safety incase we did not catch this in the parent component
   if (!resetToken) return null;
   return (
-    <Card className="mx-auto mt-20 w-full max-w-md border-neutral-200 shadow-sm dark:border-neutral-800">
+    <Card className="mx-auto mt-20 w-full max-w-md shadow-sm">
       <CardHeader className="space-y-1 pb-6">
         <div className="mb-4 flex justify-center">
           <div className="bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300 flex h-16 w-16 items-center justify-center rounded-full">
@@ -156,7 +156,7 @@ const ResetPasswordForm: FC<ResetPasswordFormProps> = ({ resetToken }) => {
         )}
       </CardContent>
 
-      <CardFooter className="flex flex-col space-y-4 border-t border-neutral-200 pt-6 dark:border-neutral-800">
+      <CardFooter className="flex flex-col space-y-4 border-t pt-6">
         {resetState === 'success' ? (
           <Button
             className="bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400 w-full text-white dark:text-neutral-900"

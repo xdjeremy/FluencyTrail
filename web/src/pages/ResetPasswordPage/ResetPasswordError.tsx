@@ -15,7 +15,7 @@ import {
 
 const ResetPasswordError = ({ errorMessage }: { errorMessage: string }) => {
   return (
-    <Card className="mx-auto mt-20 w-full max-w-md border-neutral-200 shadow-sm dark:border-neutral-800">
+    <Card className="mx-auto mt-20 w-full max-w-md shadow-sm">
       <CardHeader className="space-y-1 pb-6">
         <div className="mb-4 flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
@@ -37,7 +37,7 @@ const ResetPasswordError = ({ errorMessage }: { errorMessage: string }) => {
         </Message>
       </CardContent>
 
-      <CardFooter className="flex flex-col space-y-4 border-t border-neutral-200 pt-6 dark:border-neutral-800">
+      <CardFooter className="flex flex-col space-y-4 border-t pt-6">
         <Button
           className="bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400 w-full text-white dark:text-neutral-900"
           asChild

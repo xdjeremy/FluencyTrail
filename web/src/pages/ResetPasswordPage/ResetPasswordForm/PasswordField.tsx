@@ -38,7 +38,7 @@ const ResetPasswordField: FC<PasswordFieldProps> = ({ isLoading }) => {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your new password"
                 {...field}
-                className="h-11 border-neutral-200 pr-10 dark:border-neutral-800"
+                className="h-11 pr-10"
                 disabled={isLoading}
               />
               <button
@@ -80,7 +80,7 @@ const ResetConfirmPasswordField: FC<PasswordFieldProps> = ({ isLoading }) => {
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Confirm your new password"
                 {...field}
-                className="h-11 border-neutral-200 pr-10 dark:border-neutral-800"
+                className="h-11 pr-10"
                 disabled={isLoading}
               />
               <button
