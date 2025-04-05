@@ -15,6 +15,7 @@ import {
 import { cookieName } from 'src/lib/auth';
 import { db } from 'src/lib/db';
 import { sendConfirmationEmail } from 'src/lib/emailTemplates/confirmEmail';
+import { sendForgotPasswordEmail } from 'src/lib/emailTemplates/forgotPasswordEmail';
 import { logger } from 'src/lib/logger';
 
 export const handler = async (
@@ -39,12 +40,18 @@ export const handler = async (
     // so don't include anything you wouldn't want prying eyes to see. The
     // `user` here has been sanitized to only include the fields listed in
     // `allowedUserFields` so it should be safe to return as-is.
-    handler: (user, _resetToken) => {
+    handler: async (user, resetToken) => {
       // TODO: Send user an email/message with a link to reset their password,
       // including the `resetToken`. The URL should look something like:
       // `http://localhost:8910/reset-password?resetToken=${resetToken}`
 
-      return user;
+      const resetUrl = `${process.env.APP_URL}/reset-password?resetToken=${resetToken}`;
+      await sendForgotPasswordEmail(user.email, user.name, resetUrl);
+      logger.info(
+        `Password reset email sent to ${user.email} with token ${resetToken}`
+      );
+
+      return 'Password reset email sent. Please check your inbox.';
     },
 
     // How long the resetToken is valid for, in seconds (default is 24 hours)
@@ -54,9 +61,9 @@ export const handler = async (
       // for security reasons you may want to be vague here rather than expose
       // the fact that the email address wasn't found (prevents fishing for
       // valid email addresses)
-      usernameNotFound: 'Username not found',
+      usernameNotFound: 'Account not found',
       // if the user somehow gets around client validation
-      usernameRequired: 'Username is required',
+      usernameRequired: 'Email address is required',
     },
   };
 
@@ -103,7 +110,7 @@ export const handler = async (
     },
 
     // If `false` then the new password MUST be different from the current one
-    allowReusedPassword: true,
+    allowReusedPassword: false,
 
     errors: {
       // the resetToken is valid, but expired
@@ -257,7 +264,7 @@ export const handler = async (
     // client when invoking a handler that returns a user (like forgotPassword
     // and signup). This list should be as small as possible to be sure not to
     // leak any sensitive information to the client.
-    allowedUserFields: ['id', 'email'],
+    allowedUserFields: ['id', 'email', 'name'],
 
     // Specifies attributes on the cookie that dbAuth sets in order to remember
     // who is logged in. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies

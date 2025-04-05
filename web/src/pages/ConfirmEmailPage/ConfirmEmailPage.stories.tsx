@@ -13,8 +13,6 @@ export default meta;
 
 type Story = StoryObj<typeof ConfirmEmailPage>;
 
-export const Primary: Story = {};
-
 export const Loading: Story = {
   render: () => <ConfirmEmailLoading />,
 };

@@ -135,7 +135,6 @@ const LoginPage = () => {
                   to={routes.forgotPassword()}
                   className="text-brand-600 hover:text-brand-800 text-sm"
                   aria-disabled={isLoading}
-                  onClick={e => isLoading && e.preventDefault()}
                 >
                   Forgot password?
                 </Link>
