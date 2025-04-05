@@ -52,8 +52,6 @@ const SignupPage = () => {
       name: data.name,
     });
 
-    console.log('response', response);
-
     // handle errors
     if (response.error) {
       setIsLoading(false);
