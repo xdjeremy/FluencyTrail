@@ -32,6 +32,7 @@ const messageVariants = cva('', {
 interface MessageProps {
   variant?: VariantProps<typeof messageVariants>['variant'];
   icon?: VariantProps<typeof messageVariants>['icon'];
+  textClassName?: string;
   children?: ReactNode;
 }
 
@@ -48,11 +49,18 @@ const renderIcon = (iconType: VariantProps<typeof messageVariants>['icon']) => {
   }
 };
 
-const Message: FC<MessageProps> = ({ icon, variant, children }) => {
+const Message: FC<MessageProps> = ({
+  icon,
+  variant,
+  textClassName,
+  children,
+}) => {
   return (
     <Alert className={cn(messageVariants({ variant }))}>
       {renderIcon(icon)}
-      <AlertDescription>{children}</AlertDescription>
+      <AlertDescription className={cn(textClassName)}>
+        {children}
+      </AlertDescription>
     </Alert>
   );
 };

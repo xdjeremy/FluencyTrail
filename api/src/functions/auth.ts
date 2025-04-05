@@ -106,7 +106,7 @@ export const handler = async (
     // in. Return `false` otherwise, and in the Reset Password page redirect the
     // user to the login page.
     handler: _user => {
-      return true;
+      return false;
     },
 
     // If `false` then the new password MUST be different from the current one
@@ -114,11 +114,11 @@ export const handler = async (
 
     errors: {
       // the resetToken is valid, but expired
-      resetTokenExpired: 'resetToken is expired',
+      resetTokenExpired: 'Password reset URL is expired',
       // no user was found with the given resetToken
-      resetTokenInvalid: 'resetToken is invalid',
+      resetTokenInvalid: 'Password reset URL is invalid',
       // the resetToken was not present in the URL
-      resetTokenRequired: 'resetToken is required',
+      resetTokenRequired: 'Password reset token is required',
       // new password is the same as the old password (apparently they did not forget it)
       reusedPassword: 'Must choose a new password',
     },
