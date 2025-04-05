@@ -1,6 +1,9 @@
 import { useEffect } from 'react';
 
+import { navigate, routes } from '@redwoodjs/router';
 import { Metadata, useMutation } from '@redwoodjs/web';
+
+import { useAuth } from 'src/auth';
 
 import ConfirmEmailError from './ConfirmEmailError';
 import ConfirmEmailLoading from './ConfirmEmailLoading';
@@ -16,9 +19,16 @@ const CONFIRM_EMAIL_MUTATION = gql`
 `;
 
 const ConfirmEmailPage = ({ token }: { token: string }) => {
+  const { isAuthenticated } = useAuth();
   const [confirmEmail, { error, loading, called }] = useMutation(
     CONFIRM_EMAIL_MUTATION
   );
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(routes.home());
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     confirmEmail({
