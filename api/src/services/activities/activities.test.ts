@@ -39,7 +39,7 @@ describe('activities', () => {
         notes: scenario.activity.two.notes,
         duration: scenario.activity.two.duration,
         date: scenario.activity.two.date,
-        mediaSlug: 'Slug',
+        mediaSlug: 'teasing-master-takagisan-235913-TV',
       },
     });
 
@@ -49,6 +49,30 @@ describe('activities', () => {
     expect(result.duration).toEqual(scenario.activity.two.duration);
     expect(result.date).toEqual(scenario.activity.two.date);
   });
+
+  scenario(
+    'creates activity with minimum required fields',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+      });
+
+      const result = await createActivity({
+        input: {
+          activityType: scenario.activity.one.activityType,
+          date: scenario.activity.one.date,
+          duration: scenario.activity.one.duration,
+        },
+      });
+
+      expect(result.userId).toEqual(scenario.activity.one.userId);
+      expect(result.activityType).toEqual(scenario.activity.one.activityType);
+      expect(result.date).toEqual(scenario.activity.one.date);
+      expect(result.duration).toEqual(scenario.activity.one.duration);
+      expect(result.notes).toEqual(null);
+      expect(result.mediaId).toEqual(null);
+    }
+  );
 
   scenario('updates a activity', async (scenario: StandardScenario) => {
     const original = (await activity({
