@@ -19,7 +19,7 @@ const Header = () => {
   return (
     <SearchNavigationProvider>
       <header className="bg-background sticky top-0 z-50 w-full border-b px-4">
-        <div className="container mx-auto flex h-16 items-center justify-between px-20">
+        <div className="container mx-auto flex h-16 items-center justify-between lg:px-20">
           <div className="flex items-center gap-6">
             <Link to={routes.home()} className="flex items-center gap-2">
               <Book className="text-brand-600 h-6 w-6" />
@@ -28,7 +28,7 @@ const Header = () => {
               </span>
             </Link>
 
-            <nav className="hidden items-center gap-6 md:flex">
+            <nav className="hidden items-center gap-6 lg:flex">
               <Link
                 to={routes.home()}
                 className="text-brand-600 hover:text-brand-800 text-sm font-medium transition-colors"
@@ -70,7 +70,7 @@ const Header = () => {
               <UserDropdown />
             ) : (
               // if user is NOT logged in
-              <div className="hidden items-center gap-2 md:flex">
+              <div className="hidden items-center gap-2 lg:flex">
                 {loading ? (
                   <Skeleton
                     className="h-10 w-10 rounded-full"
@@ -89,7 +89,7 @@ const Header = () => {
               </div>
             )}
 
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <MobileMenu
                 trigger={
                   <Button variant="ghost" size="icon">
