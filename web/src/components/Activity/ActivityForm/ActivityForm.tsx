@@ -74,6 +74,8 @@ const ActivityForm = (props: ActivityFormProps) => {
     },
   });
 
+  // TODO: add loading state
+
   const onSubmit: SubmitHandler<ActivitySchemaType> = data => {
     // Create a new object with the correct type, casting activityType and formatting date
     const saveData: CreateActivityInput = {

@@ -94,6 +94,25 @@ describe('activities', () => {
     }
   );
 
+  scenario(
+    'create an activity with invalid date',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+      });
+
+      await expect(() =>
+        createActivity({
+          input: {
+            activityType: scenario.activity.one.activityType,
+            date: 'invalid-date',
+            duration: scenario.activity.one.duration,
+          },
+        })
+      ).rejects.toThrow('Invalid date');
+    }
+  );
+
   scenario('updates a activity', async (scenario: StandardScenario) => {
     const original = (await activity({
       id: scenario.activity.one.id,

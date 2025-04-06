@@ -28,11 +28,44 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
   validate(input.date, 'Date', {
     presence: true,
     custom: {
-      with() {
-        const date = new Date(input.date);
-        return date <= new Date();
+      with: () => {
+        // The value being validated (input.date) is implicitly available here.
+        const dateValue = input.date;
+
+        // Attempt to parse the date string
+        const inputDate = new Date(dateValue);
+
+        // Check 1: Is it a valid date?
+        // The Date constructor returns 'Invalid Date' (which is NaN) for invalid strings.
+        if (isNaN(inputDate.getTime())) {
+          // Throw an error if the date string is invalid
+          throw new Error(
+            'Please provide a valid date format (e.g., YYYY-MM-DD).'
+          );
+        }
+
+        // Check 2: Is the date in the future?
+        // Get the current date (start of today in UTC for fair comparison)
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+
+        // Get the input date (start of the day in UTC)
+        // We create a new Date object from the original string again,
+        // or use the already parsed date, ensuring we compare dates only.
+        const inputDateOnly = new Date(dateValue);
+        inputDateOnly.setUTCHours(0, 0, 0, 0);
+
+        if (inputDateOnly > today) {
+          // Throw an error if the date is in the future
+          throw new Error('Activity date cannot be in the future.');
+        }
+
+        // If validation fails, an error is thrown above.
+        // If it reaches here, validation passes. No return needed.
       },
-      message: 'Date cannot be in the future',
+      // Note: The message property here is less critical when 'with' throws specific errors,
+      // but can serve as a fallback or general description.
+      message: 'Invalid date provided.',
     },
   });
   validate(input.activityType, 'Activity Type', {
