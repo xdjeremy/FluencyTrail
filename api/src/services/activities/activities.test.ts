@@ -31,6 +31,7 @@ describe('activities', () => {
   scenario('creates a activity', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.activity.two.userId,
+      name: 'John Doe',
     });
 
     const result = await createActivity({
@@ -55,6 +56,7 @@ describe('activities', () => {
     async (scenario: StandardScenario) => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
+        name: 'John Doe',
       });
 
       const result = await createActivity({
@@ -79,6 +81,7 @@ describe('activities', () => {
     async (scenario: StandardScenario) => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
+        name: 'John Doe',
       });
 
       await expect(() =>
@@ -99,6 +102,7 @@ describe('activities', () => {
     async (scenario: StandardScenario) => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
+        name: 'John Doe',
       });
 
       await expect(() =>
@@ -120,6 +124,7 @@ describe('activities', () => {
     async (scenario: StandardScenario) => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
+        name: 'John Doe',
       });
 
       const tomorrow = new Date();
@@ -143,6 +148,7 @@ describe('activities', () => {
     async (scenario: StandardScenario) => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
+        name: 'John Doe',
       });
 
       await expect(() =>
@@ -164,6 +170,7 @@ describe('activities', () => {
     async (scenario: StandardScenario) => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
+        name: 'John Doe',
       });
 
       await expect(() =>

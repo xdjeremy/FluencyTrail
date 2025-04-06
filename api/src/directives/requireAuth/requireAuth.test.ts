@@ -15,6 +15,7 @@ describe('requireAuth directive', () => {
       context: {
         currentUser: {
           id: 1,
+          name: 'Lebron McGretzky',
           roles: ['admin'],
         },
       },
