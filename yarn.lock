@@ -15161,6 +15161,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"initials@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "initials@npm:3.1.2"
+  checksum: 10c0/1b382414a12cb455b1c0121b400f17a99cd24171be1a1c4ff988b3a61195812105f9adbde35b37d889f8a749766539b67e482e914e6abcda37d45d007a4ca090
+  languageName: node
+  linkType: hard
+
 "inquirer@npm:^8.0.0, inquirer@npm:^8.2.0":
   version: 8.2.6
   resolution: "inquirer@npm:8.2.6"
@@ -23352,6 +23359,7 @@ __metadata:
     cmdk: "npm:^1.1.1"
     date-fns: "npm:^4.1.0"
     humanize-string: "npm:2.1.0"
+    initials: "npm:^3.1.2"
     lucide-react: "npm:^0.485.0"
     next-themes: "npm:^0.4.6"
     postcss: "npm:^8.5.3"

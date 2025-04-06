@@ -1,3 +1,4 @@
+import initials from 'initials';
 import { LogOut } from 'lucide-react';
 
 import { useAuth } from 'src/auth';
@@ -15,7 +16,7 @@ import {
 } from '../ui/dropdown-menu';
 
 const UserDropdown = () => {
-  const { logOut } = useAuth();
+  const { logOut, currentUser } = useAuth();
 
   return (
     <div
@@ -30,12 +31,9 @@ const UserDropdown = () => {
             data-testid="user-header-profile-icon"
           >
             <Avatar>
-              <AvatarImage
-                src="https://placehold.co/600x400"
-                className="h-10 w-10"
-              />
+              <AvatarImage src="" className="h-10 w-10" />
               <AvatarFallback className="bg-brand-100 text-brand-800 dark:bg-brand-800 dark:text-brand-200">
-                AJ
+                {initials(currentUser?.name)}
               </AvatarFallback>
             </Avatar>
           </Button>
