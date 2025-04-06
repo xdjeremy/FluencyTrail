@@ -1,5 +1,7 @@
 import { LogOut } from 'lucide-react';
 
+import { useAuth } from 'src/auth';
+
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import {
@@ -13,6 +15,8 @@ import {
 } from '../ui/dropdown-menu';
 
 const UserDropdown = () => {
+  const { logOut } = useAuth();
+
   return (
     <div
       className="hidden items-center gap-2 md:flex"
@@ -54,7 +58,10 @@ const UserDropdown = () => {
             </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer text-red-500 focus:text-red-500 dark:text-red-400 dark:focus:text-red-400">
+          <DropdownMenuItem
+            onClick={logOut}
+            className="cursor-pointer text-red-500 focus:text-red-500 dark:text-red-400 dark:focus:text-red-400"
+          >
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>
