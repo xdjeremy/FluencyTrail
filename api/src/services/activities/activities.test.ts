@@ -74,6 +74,26 @@ describe('activities', () => {
     }
   );
 
+  scenario(
+    'create activity with invaid slug',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+      });
+
+      await expect(() =>
+        createActivity({
+          input: {
+            activityType: scenario.activity.one.activityType,
+            date: scenario.activity.one.date,
+            duration: scenario.activity.one.duration,
+            mediaSlug: 'invalid-slug',
+          },
+        })
+      ).rejects.toThrow('Media not found');
+    }
+  );
+
   scenario('updates a activity', async (scenario: StandardScenario) => {
     const original = (await activity({
       id: scenario.activity.one.id,
