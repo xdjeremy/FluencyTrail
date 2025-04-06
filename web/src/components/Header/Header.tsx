@@ -90,7 +90,6 @@ const Header = () => {
             )}
 
             <div className="md:hidden">
-              {/* TODO: implement here as well */}
               <MobileMenu
                 trigger={
                   <Button variant="ghost" size="icon">
