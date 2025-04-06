@@ -67,7 +67,7 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
 
     media = await mediaManager.getMediaBySlug(input.mediaSlug);
     if (!media) {
-      throw 'Media not found';
+      throw new Error('Media not found');
     }
   });
 
