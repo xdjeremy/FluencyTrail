@@ -8,6 +8,7 @@
     "@redwoodjs/graphql-server": "8.6.0",
     "axios": "^1.8.4",
     "axios-rate-limit": "^1.4.0",
+    "date-fns": "^4.1.0",
     "node-cache": "^5.1.2",
     "nodemailer": "^6.10.0"
   },

@@ -9584,6 +9584,7 @@ __metadata:
     "@types/nodemailer": "npm:^6"
     axios: "npm:^1.8.4"
     axios-rate-limit: "npm:^1.4.0"
+    date-fns: "npm:^4.1.0"
     node-cache: "npm:^5.1.2"
     nodemailer: "npm:^6.10.0"
   languageName: unknown

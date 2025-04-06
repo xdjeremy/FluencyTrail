@@ -95,7 +95,7 @@ describe('activities', () => {
   );
 
   scenario(
-    'create an activity with invalid date',
+    'create an activity with invalid date format', // Renamed for clarity
     async (scenario: StandardScenario) => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
@@ -105,14 +105,82 @@ describe('activities', () => {
         createActivity({
           input: {
             activityType: scenario.activity.one.activityType,
-            date: 'invalid-date',
+            date: 'invalid-date-string', // More descriptive invalid string
             duration: scenario.activity.one.duration,
           },
         })
-      ).rejects.toThrow('Invalid date');
+      ).rejects.toThrow(
+        'Please provide a valid date format (e.g., YYYY-MM-DD).' // Updated error message
+      );
     }
   );
 
+  scenario(
+    'create an activity with a future date',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+      });
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const futureDateString = tomorrow.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+
+      await expect(() =>
+        createActivity({
+          input: {
+            activityType: scenario.activity.one.activityType,
+            date: futureDateString,
+            duration: scenario.activity.one.duration,
+          },
+        })
+      ).rejects.toThrow('Activity date cannot be in the future.');
+    }
+  );
+
+  scenario(
+    'create an activity with an invalid month',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+      });
+
+      await expect(() =>
+        createActivity({
+          input: {
+            activityType: scenario.activity.one.activityType,
+            date: '2023-13-01', // Invalid month
+            duration: scenario.activity.one.duration,
+          },
+        })
+      ).rejects.toThrow(
+        'Please provide a valid date format (e.g., YYYY-MM-DD).'
+      );
+    }
+  );
+
+  scenario(
+    'create an activity with an invalid leap date',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+      });
+
+      await expect(() =>
+        createActivity({
+          input: {
+            activityType: scenario.activity.one.activityType,
+            date: '2023-02-29', // Feb 29 on a non-leap year
+            duration: scenario.activity.one.duration,
+          },
+        })
+      ).rejects.toThrow(
+        'Please provide a valid date format (e.g., YYYY-MM-DD).'
+      );
+    }
+  );
+
+  // --- Update and Delete tests remain unchanged ---
   scenario('updates a activity', async (scenario: StandardScenario) => {
     const original = (await activity({
       id: scenario.activity.one.id,
