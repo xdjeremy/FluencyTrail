@@ -2,14 +2,20 @@ import { Book, Menu } from 'lucide-react';
 
 import { Link, routes } from '@redwoodjs/router';
 
+import { useAuth } from 'src/auth';
+
 import DarkModeToggle from '../DarkModeToggle/DarkModeToggle';
 import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 
 import MobileMenu from './MobileMenu';
 import SearchBox from './Search/SearchBox';
 import { SearchNavigationProvider } from './Search/useSearchNavigation';
+import UserDropdown from './UserDropdown';
 
 const Header = () => {
+  const { isAuthenticated, loading } = useAuth();
+
   return (
     <SearchNavigationProvider>
       <header className="bg-background sticky top-0 z-50 w-full border-b px-4">
@@ -54,20 +60,34 @@ const Header = () => {
             <SearchBox />
             <DarkModeToggle />
 
-            {/* {user ? (
-            // if user is logged in
-            <UserDropdown />
-          ) : (
-            // if user is NOT logged in
-            <div className="hidden items-center gap-2 md:flex">
-              <Button variant="outline" asChild>
-                <Link href="/login">Log in</Link>
-              </Button>
-              <Button variant="brand" asChild>
-                <Link href="/register">Sign up</Link>
-              </Button>
-            </div>
-          )} */}
+            {/*
+                Initially the page load as "isAuthenticated" = false
+                We have to show a loading skeleton while the useAuth hook
+                is still running
+             */}
+            {isAuthenticated ? (
+              // if user is logged in
+              <UserDropdown />
+            ) : (
+              // if user is NOT logged in
+              <div className="hidden items-center gap-2 md:flex">
+                {loading ? (
+                  <Skeleton
+                    className="h-10 w-10 rounded-full"
+                    data-testid="user-header-profile-icon"
+                  />
+                ) : (
+                  <>
+                    <Button variant="outline" asChild>
+                      <Link to={routes.login()}>Log in</Link>
+                    </Button>
+                    <Button variant="brand" asChild>
+                      <Link to={routes.signup()}>Sign up</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
 
             <div className="md:hidden">
               <MobileMenu

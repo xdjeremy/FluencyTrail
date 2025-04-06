@@ -35,6 +35,7 @@ const LoginPage = () => {
     },
   });
 
+  // TODO: add loading state so the user won't see the login page if they are already logged in
   useEffect(() => {
     if (isAuthenticated) {
       navigate(routes.home());
