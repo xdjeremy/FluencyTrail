@@ -3,6 +3,7 @@ import {
   endOfDay, // Added endOfDay
   parse,
   startOfDay,
+  subDays,
   subYears,
 } from 'date-fns';
 import { formatInTimeZone, toZonedTime } from 'date-fns-tz'; // Import timezone formatter and helpers
@@ -185,6 +186,75 @@ export const completedToday: QueryResolvers['completedToday'] = async () => {
   });
 
   return count > 0;
+};
+
+export const totalTime: QueryResolvers['totalTime'] = async () => {
+  const userId = context.currentUser.id;
+
+  const activities = await db.activity.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      duration: true,
+    },
+  });
+
+  // Calculate total time
+  const totalTime = activities.reduce((sum, activity) => {
+    return sum + (activity.duration || 0);
+  }, 0);
+
+  // Calcuate percentage change from last week
+  const lastWeekActivities = await db.activity.findMany({
+    where: {
+      userId,
+      date: {
+        gte: subDays(new Date(), 14),
+        lte: subDays(new Date(), 7), // Use endOfDay to include the current day
+      },
+    },
+    select: {
+      duration: true,
+    },
+  });
+  const lastWeekTotalTime = lastWeekActivities.reduce((sum, activity) => {
+    return sum + (activity.duration || 0);
+  }, 0);
+
+  const thisWeekActivities = await db.activity.findMany({
+    where: {
+      userId,
+      date: {
+        gte: subDays(new Date(), 7),
+        lte: endOfDay(new Date()), // Use endOfDay to include the current day
+      },
+    },
+    select: {
+      duration: true,
+    },
+  });
+  const thisWeekTotalTime = thisWeekActivities.reduce((sum, activity) => {
+    return sum + (activity.duration || 0);
+  }, 0);
+
+  console.log('Total time:', totalTime);
+  console.log('Last week total time:', lastWeekTotalTime);
+  console.log('This week total time:', thisWeekTotalTime);
+
+  // Calculate the percentage change from last week to this week
+  const vsLastWeek =
+    lastWeekTotalTime === 0
+      ? thisWeekTotalTime > 0
+        ? 100
+        : 0 // If no activity last week but activity this week, that's 100% increase
+      : ((thisWeekTotalTime - lastWeekTotalTime) / lastWeekTotalTime) * 100;
+
+  // Round to nearest integer
+  return {
+    totalTime,
+    vsLastWeek: Math.round(vsLastWeek),
+  };
 };
 
 export const createActivity: MutationResolvers['createActivity'] = async ({

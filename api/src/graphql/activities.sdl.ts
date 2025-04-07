@@ -34,12 +34,18 @@ export const schema = gql`
     bestStreak: Int!
   }
 
+  type TotalTime {
+    totalTime: Int!
+    vsLastWeek: Int!
+  }
+
   type Query {
     activities: [Activity!]! @requireAuth
     activity(id: String!): Activity @requireAuth
     heatMap: [HeatMap!]! @requireAuth
     streak: Streak! @requireAuth
     completedToday: Boolean! @requireAuth
+    totalTime: TotalTime! @requireAuth
   }
 
   input CreateActivityInput {
