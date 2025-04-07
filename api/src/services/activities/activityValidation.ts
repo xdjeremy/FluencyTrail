@@ -1,15 +1,18 @@
 import { ActivityType, Media } from '@prisma/client';
 import { parse, isValid, isAfter, startOfToday } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz'; // Import timezone formatter
 import type { CreateActivityInput } from 'types/graphql';
 
-import { validate, validateWith } from '@redwoodjs/api';
+import { validate, validateWith } from '@redwoodjs/api'; // Remove context import
+import type { CurrentUser } from '@redwoodjs/auth'; // Import CurrentUser type
 
 // Assuming MediaManager is correctly located relative to this new file path
 // Adjust the import path if necessary
 import MediaManager from '../medias/mediamanager';
 
 export const validateActivityInput = async (
-  input: CreateActivityInput
+  input: CreateActivityInput,
+  currentUser: CurrentUser // Accept currentUser as argument
 ): Promise<{ media: Media | null }> => {
   // Date Validation
   validate(input.date, 'Date', {
@@ -37,10 +40,33 @@ export const validateActivityInput = async (
           throw new Error('Date must be a string (YYYY-MM-DD) or Date object.');
         }
 
-        if (isAfter(checkDate, startOfToday())) {
-          throw new Error('Activity date cannot be in the future.');
+        // Timezone-aware future date check
+        const userTimeZone = currentUser?.timezone || 'UTC'; // Use passed-in currentUser
+
+        if (typeof dateValue === 'string') {
+          // Use parsedDate from above
+          const todayStrInUserTz = formatInTimeZone(
+            new Date(),
+            userTimeZone,
+            'yyyy-MM-dd'
+          );
+          const todayObjInUserTz = parse(
+            todayStrInUserTz,
+            'yyyy-MM-dd',
+            new Date()
+          );
+          if (isAfter(parsedDate, todayObjInUserTz)) {
+            throw new Error('Activity date cannot be in the future.');
+          }
+        } else if (dateValue instanceof Date) {
+          // Still recommend using string input, but apply basic UTC check for Date objects
+          if (isAfter(checkDate, startOfToday())) {
+            throw new Error(
+              'Activity date cannot be in the future (Date object check).'
+            );
+          }
         }
-      },
+      }, // End of custom.with function
     },
   });
 

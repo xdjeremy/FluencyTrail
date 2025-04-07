@@ -43,13 +43,14 @@ export const heatMap: QueryResolvers['heatMap'] = async () => {
   });
 
   // Determine the user's timezone, fallback to UTC if not set
+  // TODO: Defaults to auto timezone detection
   const userTimeZone = context.currentUser?.timezone || 'UTC';
 
   // Aggregate durations by date using user's timezone
   const aggregatedData: { [date: string]: number } = {};
   activities.forEach(activity => {
     // Format the date according to the user's timezone
-    const dateStr = formatInTimeZone(activity.date, userTimeZone, 'yyyy-MM-dd');
+    const dateStr = formatInTimeZone(activity.date, userTimeZone, 'yyyy/MM/dd');
     if (aggregatedData[dateStr]) {
       aggregatedData[dateStr] += activity.duration;
     } else {
@@ -69,8 +70,8 @@ export const heatMap: QueryResolvers['heatMap'] = async () => {
 export const createActivity: MutationResolvers['createActivity'] = async ({
   input,
 }) => {
-  // Call the consolidated validation function
-  const { media } = await validateActivityInput(input);
+  // Call the consolidated validation function, passing currentUser
+  const { media } = await validateActivityInput(input, context.currentUser);
 
   // Determine the final Date object for Prisma
   let finalDateForDb: Date;
