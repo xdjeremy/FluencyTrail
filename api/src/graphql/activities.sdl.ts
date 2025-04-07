@@ -39,6 +39,7 @@ export const schema = gql`
     activity(id: String!): Activity @requireAuth
     heatMap: [HeatMap!]! @requireAuth
     streak: Streak! @requireAuth
+    completedToday: Boolean! @requireAuth
   }
 
   input CreateActivityInput {

@@ -2,6 +2,7 @@
 import { Metadata } from '@redwoodjs/web';
 
 import HeatMapCell from 'src/components/Home/HeatMapCell';
+import StreakCell from 'src/components/Home/StreakCell';
 
 const HomePage = () => {
   return (
@@ -27,6 +28,10 @@ const HomePage = () => {
         <section>
           <HeatMapCell />
         </section>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <StreakCell />
+        </div>
       </div>
     </>
   );

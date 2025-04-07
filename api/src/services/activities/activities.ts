@@ -1,8 +1,9 @@
 import {
-  parse,
-  subYears,
   differenceInCalendarDays,
+  endOfDay, // Added endOfDay
+  parse,
   startOfDay,
+  subYears,
 } from 'date-fns';
 import { formatInTimeZone, toZonedTime } from 'date-fns-tz'; // Import timezone formatter and helpers
 import type {
@@ -151,6 +152,39 @@ export const streak: QueryResolvers['streak'] = async () => {
   }
 
   return { currentStreak, bestStreak };
+};
+
+export const completedToday: QueryResolvers['completedToday'] = async () => {
+  const userId = context.currentUser.id;
+  const userTimeZone = context.currentUser?.timezone || 'UTC'; // Default to UTC
+
+  // Get current time and convert to user's timezone
+  const now = new Date();
+  const nowInUserTz = toZonedTime(now, userTimeZone);
+
+  // Calculate the start and end of the current day in the user's timezone
+  const startOfToday = startOfDay(nowInUserTz);
+  const endOfToday = endOfDay(nowInUserTz);
+
+  // Prisma stores dates in UTC, so we need to compare against the UTC equivalents
+  // of the user's start/end of day.
+  // Note: startOfDay/endOfDay return dates in the *local* system time, but representing
+  // the correct wall-clock time in the target timezone. We don't need to convert them back to UTC
+  // explicitly for Prisma comparison if the DB connection handles timezone correctly,
+  // but it's safer to be explicit if unsure. Prisma typically expects ISO strings or Date objects
+  // which it treats as UTC. Let's use the Date objects directly.
+
+  const count = await db.activity.count({
+    where: {
+      userId: userId,
+      date: {
+        gte: startOfToday, // Greater than or equal to the start of the day in user's TZ
+        lte: endOfToday, // Less than or equal to the end of the day in user's TZ
+      },
+    },
+  });
+
+  return count > 0;
 };
 
 export const createActivity: MutationResolvers['createActivity'] = async ({
