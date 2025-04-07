@@ -82,7 +82,7 @@ const StreakCardFailure = ({
 }: CellFailureProps<GetStreakQueryVariables>) => (
   <Card className="bg-brand-50 dark:bg-brand-50 h-[108px]">
     <CardContent className="py-2">
-      <p className="text-destructive teext-sm">{error.message}</p>
+      <p className="text-destructive text-sm">{error.message}</p>
     </CardContent>
   </Card>
 );
