@@ -27,7 +27,7 @@ const TotalTimeCard = ({ totalTime }: GetTotalTimeQuery) => {
           <div>
             <div className="mb-1 flex items-center gap-2">
               <Clock className="text-brand-600 dark:text-brand-400 h-5 w-5" />
-              <h3 className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+              <h3 className="text-sm font-medium text-neutral-600 dark:text-neutral-800">
                 Total Immersion Time
               </h3>
             </div>
@@ -51,7 +51,7 @@ const TotalTimeCard = ({ totalTime }: GetTotalTimeQuery) => {
                 {isPositiveChange ? '+' : ''}
                 {totalTime.vsLastWeek}%
               </span>
-              <span className="text-neutral-500 dark:text-neutral-400">
+              <span className="text-neutral-500 dark:text-neutral-800">
                 vs. last week
               </span>
             </div>
