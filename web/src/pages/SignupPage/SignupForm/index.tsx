@@ -1,4 +1,4 @@
-import { Book, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 import { Form, UseFormReturn } from '@redwoodjs/forms';
 import { Link, routes } from '@redwoodjs/router';
@@ -13,6 +13,8 @@ import {
   CardHeader,
   CardTitle,
 } from 'src/components/ui/card';
+
+import logo from '../fluencytrail-logo-two-lines.svg';
 
 import OAuthSignup from './OAuthSignup';
 import {
@@ -44,9 +46,7 @@ const SignupForm = ({
     <Card className="shadow-sm">
       <CardHeader className="space-y-1 pb-6">
         <div className="mb-4 flex justify-center">
-          <div className="bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300 flex h-12 w-12 items-center justify-center rounded-full">
-            <Book className="h-6 w-6" />
-          </div>
+          <img src={logo} alt="FluencyTrail" className="h-16 w-auto" />
         </div>
         <CardTitle className="text-center text-2xl font-bold">
           Create your account

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Book, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Form, SubmitHandler, useForm } from '@redwoodjs/forms';
@@ -20,6 +20,7 @@ import {
 } from 'src/components/ui/form';
 import { Input } from 'src/components/ui/input';
 
+import logo from './fluencytrail-logo-two-lines.svg';
 import { LoginSchema, LoginSchemaType } from './LoginSchema';
 
 const LoginPage = () => {
@@ -74,7 +75,8 @@ const LoginPage = () => {
         >
           <div className="mx-auto flex w-full max-w-md flex-col items-center px-5 md:px-0">
             <div className="mb-6 flex justify-center">
-              <Book className="h-12 w-12" />
+              <img src={logo} alt="FluencyTrail" className="h-16" />
+              {/* <Book className="h-12 w-12" /> */}
             </div>
 
             <h1 className="mb-1 text-center text-2xl font-semibold">

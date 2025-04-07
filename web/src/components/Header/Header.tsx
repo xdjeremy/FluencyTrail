@@ -1,4 +1,4 @@
-import { Book, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 import { Link, routes } from '@redwoodjs/router';
 
@@ -8,6 +8,7 @@ import DarkModeToggle from '../DarkModeToggle/DarkModeToggle';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 
+import Logo from './fluencytrail-logo-two-lines.svg';
 import MobileMenu from './MobileMenu';
 import SearchBox from './Search/SearchBox';
 import { SearchNavigationProvider } from './Search/useSearchNavigation';
@@ -22,10 +23,7 @@ const Header = () => {
         <div className="container mx-auto flex h-16 items-center justify-between lg:px-20">
           <div className="flex items-center gap-6">
             <Link to={routes.home()} className="flex items-center gap-2">
-              <Book className="text-brand-600 h-6 w-6" />
-              <span className="hidden text-xl font-semibold sm:inline-block">
-                FluencyTrail
-              </span>
+              <img src={Logo} alt="FluencyTrail" className="h-12" />
             </Link>
 
             <nav className="hidden items-center gap-6 lg:flex">
