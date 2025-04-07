@@ -12,6 +12,8 @@ import { useAuth } from 'src/auth';
 import SignupForm from './SignupForm';
 import { SignupSchema, SignupSchemaType } from './SignupForm/SignupSchema';
 
+// TODO: add timezone
+
 const SignupPage = () => {
   const { isAuthenticated, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
