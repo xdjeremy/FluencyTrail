@@ -24,9 +24,15 @@ export const schema = gql`
     OTHER
   }
 
+  type HeatMap {
+    date: String
+    count: Int
+  }
+
   type Query {
     activities: [Activity!]! @requireAuth
     activity(id: String!): Activity @requireAuth
+    heatMap: [HeatMap!]! @requireAuth
   }
 
   input CreateActivityInput {

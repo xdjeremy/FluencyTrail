@@ -1,4 +1,4 @@
-import { parse } from 'date-fns'; // Keep only parse
+import { parse, subYears } from 'date-fns'; // Keep only parse
 import type {
   ActivityRelationResolvers,
   MutationResolvers,
@@ -23,6 +23,42 @@ export const activity: QueryResolvers['activity'] = ({ id }) => {
   return db.activity.findUnique({
     where: { id },
   });
+};
+
+export const heatMap: QueryResolvers['heatMap'] = async () => {
+  const oneYearAgo = subYears(new Date(), 1);
+
+  const activities = await db.activity.findMany({
+    where: {
+      userId: context.currentUser.id,
+      date: {
+        gte: oneYearAgo,
+      },
+    },
+    select: {
+      date: true,
+      duration: true,
+    },
+  });
+
+  // Aggregate durations by date
+  const aggregatedData: { [date: string]: number } = {};
+  activities.forEach(activity => {
+    const dateStr = activity.date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+    if (aggregatedData[dateStr]) {
+      aggregatedData[dateStr] += activity.duration;
+    } else {
+      aggregatedData[dateStr] = activity.duration;
+    }
+  });
+
+  // Transform the aggregated data into the desired format
+  const heatMapData = Object.entries(aggregatedData).map(([date, count]) => ({
+    date,
+    count,
+  }));
+
+  return heatMapData;
 };
 
 export const createActivity: MutationResolvers['createActivity'] = async ({

@@ -40,6 +40,7 @@
     "@redwoodjs/forms": "8.6.0",
     "@redwoodjs/router": "8.6.0",
     "@redwoodjs/web": "8.6.0",
+    "@uiw/react-heat-map": "^2.3.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
