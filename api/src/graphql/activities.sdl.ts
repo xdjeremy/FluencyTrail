@@ -25,14 +25,20 @@ export const schema = gql`
   }
 
   type HeatMap {
-    date: String
-    count: Int
+    date: String!
+    count: Int!
+  }
+
+  type Streak {
+    currentStreak: Int!
+    bestStreak: Int!
   }
 
   type Query {
     activities: [Activity!]! @requireAuth
     activity(id: String!): Activity @requireAuth
     heatMap: [HeatMap!]! @requireAuth
+    streak: Streak! @requireAuth
   }
 
   input CreateActivityInput {

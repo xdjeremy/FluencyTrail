@@ -1,5 +1,10 @@
-import { parse, subYears } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz'; // Import timezone formatter
+import {
+  parse,
+  subYears,
+  differenceInCalendarDays,
+  startOfDay,
+} from 'date-fns';
+import { formatInTimeZone, toZonedTime } from 'date-fns-tz'; // Import timezone formatter and helpers
 import type {
   ActivityRelationResolvers,
   MutationResolvers,
@@ -65,6 +70,87 @@ export const heatMap: QueryResolvers['heatMap'] = async () => {
   }));
 
   return heatMapData;
+};
+
+export const streak: QueryResolvers['streak'] = async () => {
+  const userId = context.currentUser.id;
+  const userTimeZone = context.currentUser?.timezone || 'UTC'; // Default to UTC if not set
+
+  const activities = await db.activity.findMany({
+    where: { userId },
+    select: { date: true },
+    orderBy: { date: 'asc' },
+  });
+
+  if (activities.length === 0) {
+    return { currentStreak: 0, bestStreak: 0 };
+  }
+
+  // Normalize dates to the start of the day in the user's timezone and get unique dates
+  const uniqueActivityDays = [
+    ...new Set(
+      activities.map(activity => {
+        // Convert DB UTC time to user's timezone, then get start of that day
+        const zonedDate = toZonedTime(activity.date, userTimeZone);
+        const startOfZonedDay = startOfDay(zonedDate);
+        // Convert back to a comparable format (e.g., timestamp or ISO string without time)
+        // Using getTime() for simple comparison
+        return startOfZonedDay.getTime();
+      })
+    ),
+  ].sort((a, b) => a - b); // Ensure timestamps are sorted numerically
+
+  let currentStreak = 0;
+  let bestStreak = 0;
+  let lastActivityDayTimestamp = 0;
+
+  if (uniqueActivityDays.length > 0) {
+    currentStreak = 1; // Start with 1 if there's at least one activity day
+    bestStreak = 1;
+    lastActivityDayTimestamp = uniqueActivityDays[0];
+
+    for (let i = 1; i < uniqueActivityDays.length; i++) {
+      const currentDayTimestamp = uniqueActivityDays[i];
+      // Convert timestamps back to Date objects for comparison
+      const lastDay = new Date(lastActivityDayTimestamp);
+      const currentDay = new Date(currentDayTimestamp);
+
+      // Calculate difference in calendar days
+      const diff = differenceInCalendarDays(currentDay, lastDay);
+
+      if (diff === 1) {
+        currentStreak++;
+      } else if (diff > 1) {
+        // Reset streak if the gap is more than 1 day
+        currentStreak = 1;
+      }
+      // If diff is 0 (multiple activities on the same day), streak doesn't change
+
+      bestStreak = Math.max(bestStreak, currentStreak);
+      lastActivityDayTimestamp = currentDayTimestamp; // Update last activity day
+    }
+  }
+
+  // Check if the streak is current (ends today or yesterday)
+  if (lastActivityDayTimestamp > 0) {
+    const nowInUserTz = toZonedTime(new Date(), userTimeZone);
+    const lastActivityDayInUserTz = new Date(lastActivityDayTimestamp); // Already represents start of day in user's TZ
+
+    const diffFromToday = differenceInCalendarDays(
+      nowInUserTz,
+      lastActivityDayInUserTz
+    );
+
+    // If the last activity day is not today (diff=0) or yesterday (diff=1), reset current streak
+    if (diffFromToday > 1) {
+      currentStreak = 0;
+    }
+  } else {
+    // No activities means no current streak
+    currentStreak = 0;
+  }
+
+  return { currentStreak, bestStreak };
 };
 
 export const createActivity: MutationResolvers['createActivity'] = async ({
