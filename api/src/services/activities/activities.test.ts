@@ -1,4 +1,6 @@
 import type { Activity } from '@prisma/client';
+import { addDays, format, parse } from 'date-fns'; // Import addDays and format
+import { formatInTimeZone } from 'date-fns-tz'; // Import timezone formatter
 
 import {
   activities,
@@ -32,6 +34,7 @@ describe('activities', () => {
     mockCurrentUser({
       id: scenario.activity.two.userId,
       name: 'John Doe',
+      timezone: 'UTC', // Mock timezone for date validation
     });
 
     const result = await createActivity({
@@ -57,6 +60,7 @@ describe('activities', () => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
         name: 'John Doe',
+        timezone: 'UTC',
       });
 
       const result = await createActivity({
@@ -82,6 +86,7 @@ describe('activities', () => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
         name: 'John Doe',
+        timezone: 'UTC',
       });
 
       await expect(() =>
@@ -103,6 +108,7 @@ describe('activities', () => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
         name: 'John Doe',
+        timezone: 'UTC',
       });
 
       await expect(() =>
@@ -125,11 +131,15 @@ describe('activities', () => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
         name: 'John Doe',
+        timezone: 'UTC', // Mocked user timezone
       });
 
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      const futureDateString = tomorrow.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+      // Generate tomorrow's date string relative to UTC
+      const now = new Date();
+      const todayUTCString = formatInTimeZone(now, 'UTC', 'yyyy-MM-dd');
+      const todayUTCDate = parse(todayUTCString, 'yyyy-MM-dd', new Date());
+      const tomorrowUTCDate = addDays(todayUTCDate, 1);
+      const futureDateString = format(tomorrowUTCDate, 'yyyy-MM-dd');
 
       await expect(() =>
         createActivity({
@@ -149,6 +159,7 @@ describe('activities', () => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
         name: 'John Doe',
+        timezone: 'UTC',
       });
 
       await expect(() =>
@@ -171,6 +182,7 @@ describe('activities', () => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
         name: 'John Doe',
+        timezone: 'UTC',
       });
 
       await expect(() =>

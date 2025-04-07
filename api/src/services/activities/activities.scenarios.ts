@@ -16,6 +16,7 @@ export const standard = defineScenario<Prisma.ActivityCreateArgs>({
             name: 'String',
             hashedPassword: 'String',
             salt: 'String',
+            timezone: 'UTC', // Add required timezone
             updatedAt: '2025-03-30T11:11:31.024Z',
           },
         },
@@ -33,6 +34,7 @@ export const standard = defineScenario<Prisma.ActivityCreateArgs>({
             name: 'String',
             hashedPassword: 'String',
             salt: 'String',
+            timezone: 'UTC', // Add required timezone
             updatedAt: '2025-03-30T11:11:31.027Z',
           },
         },
