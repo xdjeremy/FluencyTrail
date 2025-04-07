@@ -36,7 +36,9 @@ export const getCurrentUser = async (session: Decoded) => {
 
   return await db.user.findUnique({
     where: { id: session.id },
-    select: { id: true, name: true },
+    // Select the fields you want accessible in context.currentUser
+    // Be careful not to expose sensitive fields publicly!
+    select: { id: true, name: true, timezone: true },
   });
 };
 

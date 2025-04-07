@@ -1,4 +1,5 @@
-import { parse, subYears } from 'date-fns'; // Keep only parse
+import { parse, subYears } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz'; // Import timezone formatter
 import type {
   ActivityRelationResolvers,
   MutationResolvers,
@@ -41,10 +42,14 @@ export const heatMap: QueryResolvers['heatMap'] = async () => {
     },
   });
 
-  // Aggregate durations by date
+  // Determine the user's timezone, fallback to UTC if not set
+  const userTimeZone = context.currentUser?.timezone || 'UTC';
+
+  // Aggregate durations by date using user's timezone
   const aggregatedData: { [date: string]: number } = {};
   activities.forEach(activity => {
-    const dateStr = activity.date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+    // Format the date according to the user's timezone
+    const dateStr = formatInTimeZone(activity.date, userTimeZone, 'yyyy-MM-dd');
     if (aggregatedData[dateStr]) {
       aggregatedData[dateStr] += activity.duration;
     } else {
