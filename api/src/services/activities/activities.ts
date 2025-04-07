@@ -190,67 +190,55 @@ export const completedToday: QueryResolvers['completedToday'] = async () => {
 
 export const totalTime: QueryResolvers['totalTime'] = async () => {
   const userId = context.currentUser.id;
+  const now = new Date();
 
-  const activities = await db.activity.findMany({
-    where: {
-      userId,
-    },
-    select: {
-      duration: true,
-    },
-  });
+  // Define date ranges precisely
+  const endOfToday = endOfDay(now);
+  const startOfThisWeek = startOfDay(subDays(now, 6)); // Start of 7 days ago (inclusive of today)
+  const endOfLastWeek = startOfDay(subDays(now, 7)); // End of the day 8 days ago (exclusive start of last week)
+  const startOfLastWeek = startOfDay(subDays(now, 13)); // Start of 14 days ago
 
-  // Calculate total time
-  const totalTime = activities.reduce((sum, activity) => {
-    return sum + (activity.duration || 0);
-  }, 0);
+  // Use Prisma aggregate for efficient summation
+  const [totalDurationSum, thisWeekDurationSum, lastWeekDurationSum] =
+    await Promise.all([
+      db.activity.aggregate({
+        _sum: { duration: true },
+        where: { userId },
+      }),
+      db.activity.aggregate({
+        _sum: { duration: true },
+        where: {
+          userId,
+          date: {
+            gte: startOfThisWeek,
+            lte: endOfToday,
+          },
+        },
+      }),
+      db.activity.aggregate({
+        _sum: { duration: true },
+        where: {
+          userId,
+          date: {
+            gte: startOfLastWeek,
+            lt: endOfLastWeek, // Use 'lt' (less than) to avoid overlap with startOfThisWeek if run exactly at midnight
+          },
+        },
+      }),
+    ]);
 
-  // Calcuate percentage change from last week
-  const lastWeekActivities = await db.activity.findMany({
-    where: {
-      userId,
-      date: {
-        gte: subDays(new Date(), 14),
-        lte: subDays(new Date(), 7), // Use endOfDay to include the current day
-      },
-    },
-    select: {
-      duration: true,
-    },
-  });
-  const lastWeekTotalTime = lastWeekActivities.reduce((sum, activity) => {
-    return sum + (activity.duration || 0);
-  }, 0);
-
-  const thisWeekActivities = await db.activity.findMany({
-    where: {
-      userId,
-      date: {
-        gte: subDays(new Date(), 7),
-        lte: endOfDay(new Date()), // Use endOfDay to include the current day
-      },
-    },
-    select: {
-      duration: true,
-    },
-  });
-  const thisWeekTotalTime = thisWeekActivities.reduce((sum, activity) => {
-    return sum + (activity.duration || 0);
-  }, 0);
-
-  console.log('Total time:', totalTime);
-  console.log('Last week total time:', lastWeekTotalTime);
-  console.log('This week total time:', thisWeekTotalTime);
+  const totalTime = totalDurationSum._sum.duration || 0;
+  const thisWeekTotalTime = thisWeekDurationSum._sum.duration || 0;
+  const lastWeekTotalTime = lastWeekDurationSum._sum.duration || 0;
 
   // Calculate the percentage change from last week to this week
   const vsLastWeek =
     lastWeekTotalTime === 0
       ? thisWeekTotalTime > 0
-        ? 100
-        : 0 // If no activity last week but activity this week, that's 100% increase
+        ? 100 // Infinite increase represented as 100%
+        : 0 // No change from 0 to 0
       : ((thisWeekTotalTime - lastWeekTotalTime) / lastWeekTotalTime) * 100;
 
-  // Round to nearest integer
   return {
     totalTime,
     vsLastWeek: Math.round(vsLastWeek),
