@@ -9,7 +9,12 @@ import type {
   TypedDocumentNode,
 } from '@redwoodjs/web';
 
-import TotalTimeCard from './TotalTimeCard';
+import {
+  TotalTimeCard,
+  TotalTimeCardEmpty,
+  TotalTimeCardError,
+  TotalTimeCardLoading,
+} from './TotalTimeCard';
 
 export const QUERY: TypedDocumentNode<
   GetTotalTimeQuery,
@@ -23,14 +28,14 @@ export const QUERY: TypedDocumentNode<
   }
 `;
 
-export const Loading = () => <div>Loading...</div>;
+export const Loading = () => <TotalTimeCardLoading />;
 
-export const Empty = () => <div>Empty</div>;
+export const Empty = () => <TotalTimeCardEmpty />;
 
 export const Failure = ({
   error,
 }: CellFailureProps<GetTotalTimeQueryVariables>) => (
-  <div style={{ color: 'red' }}>Error: {error?.message}</div>
+  <TotalTimeCardError error={error} />
 );
 
 export const Success = ({
