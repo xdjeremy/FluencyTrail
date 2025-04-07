@@ -1,12 +1,17 @@
 import type { GetStreakQuery, GetStreakQueryVariables } from 'types/graphql';
 
 import type {
-  CellSuccessProps,
   CellFailureProps,
+  CellSuccessProps,
   TypedDocumentNode,
 } from '@redwoodjs/web';
 
-import StreakCard from './StreakCard';
+import {
+  StreakCard,
+  StreakCardEmpty,
+  StreakCardFailure,
+  StreakCardLoading,
+} from './StreakCard';
 
 export const QUERY: TypedDocumentNode<GetStreakQuery, GetStreakQueryVariables> =
   gql`
@@ -19,14 +24,14 @@ export const QUERY: TypedDocumentNode<GetStreakQuery, GetStreakQueryVariables> =
     }
   `;
 
-export const Loading = () => <div>Loading...</div>;
+export const Loading = () => <StreakCardLoading />;
 
-export const Empty = () => <div>Empty</div>;
+export const Empty = () => <StreakCardEmpty />;
 
 export const Failure = ({
   error,
 }: CellFailureProps<GetStreakQueryVariables>) => (
-  <div style={{ color: 'red' }}>Error: {error?.message}</div>
+  <StreakCardFailure error={error} />
 );
 
 export const Success = ({

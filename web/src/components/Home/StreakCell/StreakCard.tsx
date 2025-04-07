@@ -1,7 +1,7 @@
 import { Flame, Trophy } from 'lucide-react';
 import { GetStreakQuery, GetStreakQueryVariables } from 'types/graphql';
 
-import { CellSuccessProps } from '@redwoodjs/web';
+import { CellFailureProps, CellSuccessProps } from '@redwoodjs/web';
 
 import { Card, CardContent } from 'src/components/ui/card';
 
@@ -10,7 +10,7 @@ const StreakCard = ({
   completedToday,
 }: CellSuccessProps<GetStreakQuery, GetStreakQueryVariables>) => {
   return (
-    <Card className="border-brand-200 bg-brand-50 dark:border-brand-800 dark:bg-brand-950">
+    <Card className="bg-brand-50 dark:bg-brand-50">
       <CardContent className="p-0">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
@@ -26,7 +26,7 @@ const StreakCard = ({
               )}
             </div>
             <div>
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-800">
                 Current Streak
               </p>
               <div className="flex items-baseline gap-1">
@@ -37,7 +37,7 @@ const StreakCard = ({
                   days
                 </p>
               </div>
-              <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+              <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-700">
                 {completedToday
                   ? "You've completed your goal for today!"
                   : "Complete today's goal to continue your streak"}
@@ -48,7 +48,7 @@ const StreakCard = ({
           <div className="flex flex-col items-end">
             <div className="flex items-center gap-1.5">
               <Trophy className="h-4 w-4 text-yellow-500" />
-              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm font-medium text-neutral-600 dark:text-neutral-800">
                 Best Streak
               </p>
             </div>
@@ -65,4 +65,26 @@ const StreakCard = ({
   );
 };
 
-export default StreakCard;
+const StreakCardLoading = () => (
+  <Card className="bg-brand-50 dark:bg-brand-50 h-[108px]">
+    <CardContent className="p-0"></CardContent>
+  </Card>
+);
+
+const StreakCardEmpty = () => (
+  <Card className="bg-brand-50 dark:bg-brand-50 h-[108px]">
+    <CardContent className="p-0"></CardContent>
+  </Card>
+);
+
+const StreakCardFailure = ({
+  error,
+}: CellFailureProps<GetStreakQueryVariables>) => (
+  <Card className="bg-brand-50 dark:bg-brand-50 h-[108px]">
+    <CardContent className="py-2">
+      <p className="text-destructive teext-sm">{error.message}</p>
+    </CardContent>
+  </Card>
+);
+
+export { StreakCard, StreakCardEmpty, StreakCardFailure, StreakCardLoading };
