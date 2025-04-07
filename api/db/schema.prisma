@@ -25,7 +25,7 @@ model User {
   emailVerified                   Boolean   @default(false)
   emailVerificationToken          String?
   emailVerificationTokenExpiresAt DateTime?
-  timezone                        String? // Added timezone field
+  timezone                        String // Make timezone non-nullable
   createdAt                       DateTime  @default(now())
   updatedAt                       DateTime  @updatedAt
 

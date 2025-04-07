@@ -11,12 +11,16 @@ import {
   DbAuthHandler,
   PasswordValidationError,
 } from '@redwoodjs/auth-dbauth-api';
+import { UserInputError } from '@redwoodjs/graphql-server'; // Import UserInputError
 
 import { cookieName } from 'src/lib/auth';
 import { db } from 'src/lib/db';
 import { sendConfirmationEmail } from 'src/lib/emailTemplates/confirmEmail';
 import { sendForgotPasswordEmail } from 'src/lib/emailTemplates/forgotPasswordEmail';
 import { logger } from 'src/lib/logger';
+
+// Get valid timezones once at module load
+const validTimezones = new Set(Intl.supportedValuesOf('timeZone'));
 
 export const handler = async (
   event: APIGatewayProxyEvent,
@@ -125,6 +129,7 @@ export const handler = async (
 
   interface UserAttributes {
     name: string;
+    timezone: string; // Add timezone attribute
   }
 
   const signupOptions: DbAuthHandlerOptions<
@@ -150,7 +155,7 @@ export const handler = async (
       username,
       hashedPassword,
       salt,
-      userAttributes: userAttributes,
+      userAttributes: { name, timezone }, // Destructure name and timezone
     }) => {
       // validate inputs
       validate(username, {
@@ -161,7 +166,8 @@ export const handler = async (
           message: 'Invalid email address',
         },
       });
-      validate(userAttributes.name, {
+      validate(name, {
+        // Use the destructured 'name' variable
         presence: {
           message: 'Name is required',
         },
@@ -171,6 +177,15 @@ export const handler = async (
           message: 'Name must be between 2 and 100 characters',
         },
       });
+      validate(timezone, {
+        // Validate timezone presence
+        presence: { message: 'Timezone is required' },
+      });
+
+      // Validate timezone value against known IANA identifiers
+      if (!validTimezones.has(timezone)) {
+        throw new UserInputError('Invalid timezone selected');
+      }
 
       // Generate a confirmation token and expiry date
       const confirmationToken = crypto.randomBytes(32).toString('hex');
@@ -182,13 +197,15 @@ export const handler = async (
           email: username,
           hashedPassword: hashedPassword,
           salt: salt,
-          name: userAttributes.name,
+          name: name, // Use destructured name
+          timezone: timezone, // Add timezone
           emailVerificationToken: confirmationToken,
           emailVerificationTokenExpiresAt: tokenExpiry,
         },
         select: {
           email: true,
           name: true,
+          timezone: true, // Select timezone
         },
       });
 
@@ -263,7 +280,7 @@ export const handler = async (
     // client when invoking a handler that returns a user (like forgotPassword
     // and signup). This list should be as small as possible to be sure not to
     // leak any sensitive information to the client.
-    allowedUserFields: ['id', 'email', 'name'],
+    allowedUserFields: ['id', 'email', 'name', 'timezone'], // Add timezone here too
 
     // Specifies attributes on the cookie that dbAuth sets in order to remember
     // who is logged in. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies

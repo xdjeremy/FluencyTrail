@@ -1,12 +1,21 @@
 import { useState } from 'react';
 
-import { Eye, EyeOff } from 'lucide-react';
+import { Check, ChevronsUpDown, Eye, EyeOff } from 'lucide-react';
 
 import { useFormContext } from '@redwoodjs/forms';
 import { Link } from '@redwoodjs/router';
 
 import { PasswordStrengthIndicator } from 'src/components/common/PasswordStrengthIndicator';
+import { Button } from 'src/components/ui/button';
 import { Checkbox } from 'src/components/ui/checkbox';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from 'src/components/ui/command';
 import {
   FormControl,
   FormDescription,
@@ -16,6 +25,12 @@ import {
   FormMessage,
 } from 'src/components/ui/form';
 import { Input } from 'src/components/ui/input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from 'src/components/ui/popover';
+import { cn } from 'src/utils/cn';
 
 interface SignupFieldsProps {
   isLoading: boolean;
@@ -203,6 +218,81 @@ export const SignupTermsField = ({ isLoading }: SignupFieldsProps) => {
               We&apos;ll never share your information with third parties.
             </FormDescription>
           </div>
+        </FormItem>
+      )}
+    />
+  );
+};
+
+// Get timezone list - consider memoizing if performance becomes an issue
+const timezones = Intl.supportedValuesOf('timeZone').map(tz => ({
+  value: tz,
+  label: tz.replace(/_/g, ' '), // Replace underscores for better readability
+}));
+
+export const SignupTimezoneField = ({ isLoading }: SignupFieldsProps) => {
+  const [open, setOpen] = useState(false);
+  const form = useFormContext();
+
+  return (
+    <FormField
+      control={form.control}
+      name="timezone"
+      render={({ field }) => (
+        <FormItem className="flex flex-col">
+          <FormLabel>Timezone</FormLabel>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <FormControl>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className={cn(
+                    'w-full justify-between',
+                    !field.value && 'text-muted-foreground'
+                  )}
+                  disabled={isLoading}
+                >
+                  {field.value
+                    ? timezones.find(tz => tz.value === field.value)?.label
+                    : 'Select timezone...'}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </FormControl>
+            </PopoverTrigger>
+            <PopoverContent className="max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width] p-0">
+              <Command>
+                <CommandInput placeholder="Search timezone..." />
+                <CommandList>
+                  <CommandEmpty>No timezone found.</CommandEmpty>
+                  <CommandGroup>
+                    {timezones.map(tz => (
+                      <CommandItem
+                        value={tz.label} // Use label for searching
+                        key={tz.value}
+                        onSelect={() => {
+                          field.onChange(tz.value);
+                          setOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            'mr-2 h-4 w-4',
+                            tz.value === field.value
+                              ? 'opacity-100'
+                              : 'opacity-0'
+                          )}
+                        />
+                        {tz.label}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          <FormMessage />
         </FormItem>
       )}
     />

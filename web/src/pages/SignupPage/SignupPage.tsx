@@ -12,8 +12,6 @@ import { useAuth } from 'src/auth';
 import SignupForm from './SignupForm';
 import { SignupSchema, SignupSchemaType } from './SignupForm/SignupSchema';
 
-// TODO: add timezone
-
 const SignupPage = () => {
   const { isAuthenticated, signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +26,7 @@ const SignupPage = () => {
       password: '',
       confirmPassword: '',
       terms: false,
+      timezone: '', // Add timezone default value
     },
   });
 
@@ -52,6 +51,7 @@ const SignupPage = () => {
       username: data.email,
       password: data.password,
       name: data.name,
+      timezone: data.timezone, // Pass timezone to signUp
     });
 
     // handle errors

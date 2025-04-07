@@ -21,8 +21,9 @@ import {
   SignupNameField,
   SignupPasswordField,
   SignupTermsField,
+  SignupTimezoneField,
 } from './SignupFields';
-import { SignupSchemaType } from './SignupSchema';
+import { SignupSchemaType } from './SignupSchema'; // Import the new component
 
 interface SignupFormProps {
   onSubmit?: (data: SignupSchemaType) => void;
@@ -74,10 +75,11 @@ const SignupForm = ({
           )}
           <SignupNameField isLoading={isLoading} />
           <SignupEmailField isLoading={isLoading} />
+          <SignupTimezoneField isLoading={isLoading} />
           <SignupPasswordField isLoading={isLoading} />
           <SignupConfirmPasswordField isLoading={isLoading} />
+          {/* Add the timezone field */}
           <SignupTermsField isLoading={isLoading} />
-
           <Button
             type="submit"
             className="bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400 h-11 w-full text-white dark:text-neutral-900"

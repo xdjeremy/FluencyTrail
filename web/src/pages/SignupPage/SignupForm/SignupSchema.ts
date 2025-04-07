@@ -18,6 +18,7 @@ const SignupSchema = z
     terms: z.boolean().refine(val => val === true, {
       message: 'You must agree to the terms and conditions',
     }),
+    timezone: z.string().min(1, 'Please select your timezone'),
   })
   .refine(data => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
