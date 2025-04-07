@@ -6,7 +6,12 @@ import type {
   TypedDocumentNode,
 } from '@redwoodjs/web';
 
-import HeatMapCard from './HeatMapCard';
+import {
+  HeatMapCard,
+  HeatMapEmpty,
+  HeatMapError,
+  HeatMapLoading,
+} from './HeatMapCard';
 
 export const QUERY: TypedDocumentNode<GetHeatMap, GetHeatMapVariables> = gql`
   query GetHeatMap {
@@ -17,12 +22,12 @@ export const QUERY: TypedDocumentNode<GetHeatMap, GetHeatMapVariables> = gql`
   }
 `;
 
-export const Loading = () => <div>Loading...</div>;
+export const Loading = () => <HeatMapLoading />;
 
-export const Empty = () => <div>Empty</div>;
+export const Empty = () => <HeatMapEmpty />;
 
 export const Failure = ({ error }: CellFailureProps<GetHeatMapVariables>) => (
-  <div style={{ color: 'red' }}>Error: {error?.message}</div>
+  <HeatMapError error={error} />
 );
 
 export const Success = ({
