@@ -47,7 +47,7 @@ const SEARCH_MEDIA_QUERY: TypedDocumentNode<
   }
 `;
 
-const ActivityMediaSelect = () => {
+const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
   const [searchValue, setSearchValue] = useState('');
   const debouncedSearch = useDebounce(searchValue, 500);
   const form = useFormContext();
@@ -76,6 +76,7 @@ const ActivityMediaSelect = () => {
                     'col-span-3 justify-between',
                     !field.value && 'text-muted-foreground'
                   )}
+                  disabled={isLoading}
                 >
                   {field.value
                     ? data?.media.find(media => media.slug === field.value)

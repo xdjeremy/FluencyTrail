@@ -3,7 +3,13 @@ import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { toZonedTime } from 'date-fns-tz';
-import { CalendarIcon, Check, ChevronsUpDown, Save } from 'lucide-react';
+import {
+  CalendarIcon,
+  Check,
+  ChevronsUpDown,
+  Loader2,
+  Save,
+} from 'lucide-react';
 import type {
   ActivityType, // <-- Import ActivityType enum
   CreateActivityInput,
@@ -131,6 +137,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                             'col-span-3',
                             !field.value && 'text-muted-foreground'
                           )}
+                          disabled={props.loading}
                         >
                           {field.value ? (
                             format(new Date(field.value), 'PPP')
@@ -161,7 +168,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                 </FormItem>
               )}
             />
-            <ActivityMediaSelect />
+            <ActivityMediaSelect isLoading={props.loading} />
             <FormField
               control={form.control}
               name="activityType"
@@ -178,6 +185,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                             'col-span-3 justify-between lowercase',
                             !field.value && 'text-muted-foreground'
                           )}
+                          disabled={props.loading}
                         >
                           {field.value
                             ? activityTypes.find(
@@ -234,7 +242,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                 <FormItem className="grid grid-cols-4 items-center gap-4">
                   <FormLabel className="text-right">Duration* (min)</FormLabel>
                   <FormControl className="col-span-3">
-                    <Input type="number" {...field} />
+                    <Input type="number" {...field} disabled={props.loading} />
                     {/* <Input placeholder="15" type="number" {...field} /> */}
                   </FormControl>
                   <FormMessage />
@@ -250,6 +258,7 @@ const ActivityForm = (props: ActivityFormProps) => {
                   <FormControl className="col-span-3">
                     <Input
                       placeholder="Optional notes about this activity"
+                      disabled={props.loading}
                       {...field}
                     />
                   </FormControl>
@@ -262,8 +271,14 @@ const ActivityForm = (props: ActivityFormProps) => {
             <Button
               type="submit"
               className="bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400 text-white dark:text-neutral-900"
+              disabled={props.loading}
             >
-              <Save className="mr-1 h-4 w-4" /> Save Activity
+              {props.loading ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="mr-1 h-4 w-4" />
+              )}
+              Save Activity
             </Button>
           </DialogFooter>
         </Form>
