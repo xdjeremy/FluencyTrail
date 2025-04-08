@@ -1,5 +1,8 @@
+import { useEffect } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 import { CalendarIcon, Check, ChevronsUpDown, Save } from 'lucide-react';
 import type {
   ActivityType, // <-- Import ActivityType enum
@@ -14,6 +17,7 @@ import {
   type RWGqlError,
 } from '@redwoodjs/forms';
 
+import { useAuth } from 'src/auth';
 import { Button } from 'src/components/ui/button';
 import { Calendar } from 'src/components/ui/calendar';
 import {
@@ -62,6 +66,7 @@ interface ActivityFormProps {
 
 const ActivityForm = (props: ActivityFormProps) => {
   const { isActivityModalOpen, setActivityModalOpen } = useActivityModal();
+  const { currentUser } = useAuth();
 
   const form = useForm<ActivitySchemaType>({
     resolver: zodResolver(ActivitySchema),
@@ -73,6 +78,14 @@ const ActivityForm = (props: ActivityFormProps) => {
       mediaSlug: '',
     },
   });
+
+  // Update the date with timezone when currentUser is available
+  useEffect(() => {
+    if (currentUser?.timezone) {
+      const zonedDate = toZonedTime(new Date(), currentUser.timezone);
+      form.setValue('date', zonedDate);
+    }
+  }, [currentUser, form]);
 
   // TODO: add loading state
 
@@ -136,7 +149,9 @@ const ActivityForm = (props: ActivityFormProps) => {
                         }
                         onSelect={field.onChange}
                         disabled={date =>
-                          date > new Date() || date < new Date('1900-01-01')
+                          date >
+                            toZonedTime(new Date(), currentUser.timezone) ||
+                          date < new Date('1900-01-01')
                         }
                         initialFocus
                       />
