@@ -1,6 +1,6 @@
 import { ActivityType, Media } from '@prisma/client';
-import { parse, isValid, isAfter, startOfToday } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz'; // Import timezone formatter
+import { isValid } from 'date-fns'; // Removed parse and format
+import { formatInTimeZone } from 'date-fns-tz'; // Removed utcToZonedTime/toZonedTime as it's not needed here
 import type { CreateActivityInput } from 'types/graphql';
 
 import { validate, validateWith } from '@redwoodjs/api'; // Remove context import
@@ -19,52 +19,36 @@ export const validateActivityInput = async (
     presence: true,
     custom: {
       with: () => {
-        const dateValue = input.date;
-        let parsedDate: Date;
-        let checkDate: Date;
+        const dateValue = input.date; // This should now be a Date object from the scalar
 
-        if (typeof dateValue === 'string') {
-          parsedDate = parse(dateValue, 'yyyy-MM-dd', new Date());
-          checkDate = parsedDate;
-          if (!isValid(parsedDate)) {
-            throw new Error(
-              'Please provide a valid date format (e.g., YYYY-MM-DD).'
-            );
-          }
-        } else if (dateValue instanceof Date) {
-          checkDate = dateValue;
-          if (!isValid(checkDate)) {
-            throw new Error('Invalid Date object provided.');
-          }
-        } else {
-          throw new Error('Date must be a string (YYYY-MM-DD) or Date object.');
+        // Check if it's a valid Date object
+        if (!(dateValue instanceof Date) || !isValid(dateValue)) {
+          // The Date scalar should handle basic validation, but check just in case
+          throw new Error('Invalid Date object received.');
         }
 
         // Timezone-aware future date check
         const userTimeZone = currentUser?.timezone || 'UTC'; // Use passed-in currentUser
 
-        if (typeof dateValue === 'string') {
-          // Use parsedDate from above
-          const todayStrInUserTz = formatInTimeZone(
-            new Date(),
-            userTimeZone,
-            'yyyy-MM-dd'
-          );
-          const todayObjInUserTz = parse(
-            todayStrInUserTz,
-            'yyyy-MM-dd',
-            new Date()
-          );
-          if (isAfter(parsedDate, todayObjInUserTz)) {
-            throw new Error('Activity date cannot be in the future.');
-          }
-        } else if (dateValue instanceof Date) {
-          // Still recommend using string input, but apply basic UTC check for Date objects
-          if (isAfter(checkDate, startOfToday())) {
-            throw new Error(
-              'Activity date cannot be in the future (Date object check).'
-            );
-          }
+        // Format the incoming Date object (likely UTC midnight) into 'yyyy-MM-dd'
+        // *as it would appear in the user's timezone*.
+        // Note: formatInTimeZone handles the conversion correctly.
+        const inputDateStrInUserTz = formatInTimeZone(
+          dateValue,
+          userTimeZone,
+          'yyyy-MM-dd'
+        );
+
+        // Get today's date string *in the user's timezone*
+        const todayStrInUserTz = formatInTimeZone(
+          new Date(), // Current moment
+          userTimeZone,
+          'yyyy-MM-dd' // Format as date string in user's TZ
+        );
+
+        // Compare the date strings representing the calendar date in the user's timezone
+        if (inputDateStrInUserTz > todayStrInUserTz) {
+          throw new Error('Activity date cannot be in the future.');
         }
       }, // End of custom.with function
     },

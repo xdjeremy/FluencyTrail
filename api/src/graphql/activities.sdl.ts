@@ -53,7 +53,7 @@ export const schema = gql`
     activityType: ActivityType!
     notes: String
     duration: Int
-    date: DateTime!
+    date: Date! # Changed from DateTime! to Date!
   }
 
   input UpdateActivityInput {

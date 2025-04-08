@@ -78,10 +78,13 @@ const ActivityForm = (props: ActivityFormProps) => {
 
   const onSubmit: SubmitHandler<ActivitySchemaType> = data => {
     // Create a new object with the correct type, casting activityType and formatting date
+    // Format the date as 'yyyy-MM-dd' string before sending
+    const formattedDate = format(data.date, 'yyyy-MM-dd');
+
     const saveData: CreateActivityInput = {
       ...data,
       activityType: data.activityType as ActivityType, // <-- Explicit cast
-      date: data.date.toISOString(), // <-- Convert Date to ISO string
+      date: formattedDate, // <-- Use the formatted date string
       duration: Number(data.duration), // <-- Explicitly convert duration to number
     };
     props.onSave(saveData); // <-- Use the correctly typed object

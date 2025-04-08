@@ -2,6 +2,7 @@ import {
   differenceInCalendarDays,
   endOfDay, // Added endOfDay
   isValid, // Added isValid import
+  format, // Added format import
   startOfDay,
   subDays,
   subYears,
@@ -268,31 +269,23 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
   let finalDateForDb: Date;
   const userTimeZone = context.currentUser?.timezone || 'UTC'; // Ensure timezone is available
 
-  // Handle both string ('yyyy-MM-dd') and Date object inputs based on validation
-  if (typeof input.date === 'string') {
-    // If it's a string, convert it using the user's timezone
-    try {
-      finalDateForDb = TimezoneConverter.userDateToUtc(
-        input.date,
-        userTimeZone
-      );
-    } catch (error) {
-      // Handle potential errors from the converter
-      throw new Error(`Failed to process date string: ${error.message}`);
-    }
-  } else if (input.date instanceof Date) {
-    // If it's already a Date object, assume it's the intended UTC timestamp
-    // (e.g., from scenarios or internal sources).
-    // Add validation check just in case.
-    if (!isValid(input.date)) {
-      throw new Error('Invalid Date object provided for date field.');
-    }
-    finalDateForDb = input.date;
-  } else {
-    // Should be caught by validation, but include defensive check
+  // input.date should be a Date object (UTC midnight) from the Date scalar
+  if (!(input.date instanceof Date) || !isValid(input.date)) {
+    // Defensive check, though validation should catch this
     throw new Error(
-      'Unexpected type for date field after validation. Expected yyyy-MM-dd string or Date object.'
+      'Invalid or unexpected date type received after validation.'
     );
+  }
+
+  try {
+    // Format the Date object (UTC midnight) back to 'yyyy-MM-dd' string
+    const dateString = format(input.date, 'yyyy-MM-dd');
+    // Convert the date string to the correct UTC timestamp representing
+    // the start of the day in the user's timezone.
+    finalDateForDb = TimezoneConverter.userDateToUtc(dateString, userTimeZone);
+  } catch (error) {
+    // Handle potential errors from formatting or the converter
+    throw new Error(`Failed to process date for database: ${error.message}`);
   }
 
   return db.activity.create({
