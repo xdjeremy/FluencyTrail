@@ -1,12 +1,15 @@
 import type { Activity } from '@prisma/client';
-import { addDays, format, parse } from 'date-fns'; // Import addDays and format
-import { formatInTimeZone } from 'date-fns-tz'; // Import timezone formatter
+import { addDays } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
+
+import { TimezoneConverter } from 'src/lib/TimezoneConverter';
 
 import {
   activities,
   activity,
   createActivity,
   deleteActivity,
+  heatMap,
   updateActivity,
 } from './activities';
 import type { StandardScenario } from './activities.scenarios';
@@ -37,21 +40,34 @@ describe('activities', () => {
       timezone: 'UTC', // Mock timezone for date validation
     });
 
+    // Convert the ISO string from scenario to a Date object, simulating GraphQL scalar
+    const inputDate = new Date(scenario.activity.two.date);
+
     const result = await createActivity({
       input: {
         activityType: scenario.activity.two.activityType,
         notes: scenario.activity.two.notes,
         duration: scenario.activity.two.duration,
-        date: scenario.activity.two.date,
+        date: inputDate,
         mediaSlug: 'teasing-master-takagisan-235913-TV',
       },
     });
+
+    // The service should store the UTC timestamp for midnight in the mocked timezone (UTC)
+    const expectedDate = TimezoneConverter.userDateToUtc(
+      formatInTimeZone(
+        new Date(scenario.activity.two.date),
+        'UTC',
+        'yyyy-MM-dd'
+      ),
+      'UTC'
+    );
 
     expect(result.userId).toEqual(scenario.activity.two.userId);
     expect(result.activityType).toEqual(scenario.activity.two.activityType);
     expect(result.notes).toEqual(scenario.activity.two.notes);
     expect(result.duration).toEqual(scenario.activity.two.duration);
-    expect(result.date).toEqual(scenario.activity.two.date);
+    expect(result.date.getTime()).toEqual(expectedDate.getTime());
   });
 
   scenario(
@@ -63,17 +79,30 @@ describe('activities', () => {
         timezone: 'UTC',
       });
 
+      // Convert the ISO string from scenario to a Date object
+      const inputDate = new Date(scenario.activity.one.date);
+
       const result = await createActivity({
         input: {
           activityType: scenario.activity.one.activityType,
-          date: scenario.activity.one.date,
+          date: inputDate,
           duration: scenario.activity.one.duration,
         },
       });
 
+      // Calculate expected UTC midnight timestamp for the input date
+      const expectedDate = TimezoneConverter.userDateToUtc(
+        formatInTimeZone(
+          new Date(scenario.activity.one.date),
+          'UTC',
+          'yyyy-MM-dd'
+        ),
+        'UTC'
+      );
+
       expect(result.userId).toEqual(scenario.activity.one.userId);
       expect(result.activityType).toEqual(scenario.activity.one.activityType);
-      expect(result.date).toEqual(scenario.activity.one.date);
+      expect(result.date.getTime()).toEqual(expectedDate.getTime());
       expect(result.duration).toEqual(scenario.activity.one.duration);
       expect(result.notes).toEqual(null);
       expect(result.mediaId).toEqual(null);
@@ -89,11 +118,14 @@ describe('activities', () => {
         timezone: 'UTC',
       });
 
+      // Convert the ISO string from scenario to a Date object
+      const inputDate = new Date(scenario.activity.one.date);
+
       await expect(() =>
         createActivity({
           input: {
             activityType: scenario.activity.one.activityType,
-            date: scenario.activity.one.date,
+            date: inputDate,
             duration: scenario.activity.one.duration,
             mediaSlug: 'invalid-slug',
           },
@@ -103,7 +135,7 @@ describe('activities', () => {
   );
 
   scenario(
-    'create an activity with invalid date format', // Renamed for clarity
+    'create an activity with invalid date format',
     async (scenario: StandardScenario) => {
       mockCurrentUser({
         id: scenario.activity.one.userId,
@@ -111,17 +143,17 @@ describe('activities', () => {
         timezone: 'UTC',
       });
 
+      const invalidDate = new Date('invalid'); // Will result in Invalid Date
+
       await expect(() =>
         createActivity({
           input: {
             activityType: scenario.activity.one.activityType,
-            date: 'invalid-date-string', // More descriptive invalid string
+            date: invalidDate,
             duration: scenario.activity.one.duration,
           },
         })
-      ).rejects.toThrow(
-        'Please provide a valid date format (e.g., YYYY-MM-DD).' // Updated error message
-      );
+      ).rejects.toThrow('Invalid Date object received.');
     }
   );
 
@@ -134,18 +166,16 @@ describe('activities', () => {
         timezone: 'UTC', // Mocked user timezone
       });
 
-      // Generate tomorrow's date string relative to UTC
+      // Create a Date object for tomorrow at UTC midnight
       const now = new Date();
-      const todayUTCString = formatInTimeZone(now, 'UTC', 'yyyy-MM-dd');
-      const todayUTCDate = parse(todayUTCString, 'yyyy-MM-dd', new Date());
-      const tomorrowUTCDate = addDays(todayUTCDate, 1);
-      const futureDateString = format(tomorrowUTCDate, 'yyyy-MM-dd');
+      const tomorrow = addDays(now, 1);
+      tomorrow.setUTCHours(0, 0, 0, 0); // Ensure UTC midnight
 
       await expect(() =>
         createActivity({
           input: {
             activityType: scenario.activity.one.activityType,
-            date: futureDateString,
+            date: tomorrow,
             duration: scenario.activity.one.duration,
           },
         })
@@ -162,17 +192,18 @@ describe('activities', () => {
         timezone: 'UTC',
       });
 
+      // Create an invalid Date object (month 13)
+      const invalidDate = new Date('2023-13-01T00:00:00.000Z');
+
       await expect(() =>
         createActivity({
           input: {
             activityType: scenario.activity.one.activityType,
-            date: '2023-13-01', // Invalid month
+            date: invalidDate,
             duration: scenario.activity.one.duration,
           },
         })
-      ).rejects.toThrow(
-        'Please provide a valid date format (e.g., YYYY-MM-DD).'
-      );
+      ).rejects.toThrow('Invalid Date object received.');
     }
   );
 
@@ -185,17 +216,19 @@ describe('activities', () => {
         timezone: 'UTC',
       });
 
-      await expect(() =>
-        createActivity({
-          input: {
-            activityType: scenario.activity.one.activityType,
-            date: '2023-02-29', // Feb 29 on a non-leap year
-            duration: scenario.activity.one.duration,
-          },
-        })
-      ).rejects.toThrow(
-        'Please provide a valid date format (e.g., YYYY-MM-DD).'
-      );
+      // Note: new Date('2023-02-29') creates a valid Date (March 1st 2023)
+      // because JavaScript automatically adjusts invalid dates
+      const leapDate = new Date('2023-02-29T00:00:00.000Z');
+      const result = await createActivity({
+        input: {
+          activityType: scenario.activity.one.activityType,
+          date: leapDate,
+          duration: scenario.activity.one.duration,
+        },
+      });
+
+      // The date should have been automatically adjusted to March 1st
+      expect(result.date.toISOString()).toBe('2023-03-01T00:00:00.000Z');
     }
   );
 
@@ -220,4 +253,52 @@ describe('activities', () => {
 
     expect(result).toEqual(null);
   });
+
+  scenario(
+    'correctly handles dates in heatmap',
+    async (scenario: StandardScenario) => {
+      const userTimeZone = 'Asia/Manila';
+      const userId = scenario.activity.one.userId;
+
+      mockCurrentUser({
+        id: userId,
+        name: 'Timezone Tester',
+        timezone: userTimeZone,
+      });
+
+      // Create an activity with today's date
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0); // Ensure consistent time portion
+
+      await createActivity({
+        input: {
+          activityType: 'READING',
+          date: today,
+          duration: 30,
+        },
+      });
+
+      // Get heatmap data and assert its shape
+      type HeatMapEntry = {
+        date: string;
+        count: number;
+      };
+      const heatMapResult = await heatMap();
+
+      // Get expected date string for today in Asia/Manila
+      const expectedDateString = formatInTimeZone(
+        today,
+        userTimeZone,
+        'yyyy/MM/dd'
+      );
+
+      // Find today's entry in the heatmap results
+      const todayEntry = (heatMapResult as HeatMapEntry[]).find(
+        entry => entry.date === expectedDateString
+      );
+
+      expect(todayEntry).toBeTruthy();
+      expect(todayEntry?.count).toBe(30); // Duration we set
+    }
+  );
 });
