@@ -1,12 +1,13 @@
 import {
   differenceInCalendarDays,
   endOfDay, // Added endOfDay
-  parse,
+  isValid, // Added isValid import
   startOfDay,
   subDays,
   subYears,
 } from 'date-fns';
-import { formatInTimeZone, toZonedTime } from 'date-fns-tz'; // Import timezone formatter and helpers
+// Removed formatInTimeZone import, keep toZonedTime for other functions
+import { toZonedTime } from 'date-fns-tz';
 import type {
   ActivityRelationResolvers,
   MutationResolvers,
@@ -16,6 +17,7 @@ import type {
 // Removed validate, validateWith
 
 import { db } from 'src/lib/db';
+import { TimezoneConverter } from 'src/lib/TimezoneConverter'; // Import the new converter
 
 // Removed MediaManager import
 
@@ -50,20 +52,31 @@ export const heatMap: QueryResolvers['heatMap'] = async () => {
   });
 
   // Determine the user's timezone, fallback to UTC if not set
-  // TODO: Defaults to auto timezone detection
   const userTimeZone = context.currentUser?.timezone || 'UTC';
 
   // Aggregate durations by date using user's timezone
   const aggregatedData: { [date: string]: number } = {};
   activities.forEach(activity => {
-    // Format the date according to the user's timezone
-    const dateStr = formatInTimeZone(activity.date, userTimeZone, 'yyyy/MM/dd');
+    // Format the date according to the user's timezone using the converter
+    const dateStr = TimezoneConverter.utcToUserFormat(
+      activity.date,
+      userTimeZone,
+      'yyyy/MM/dd'
+    );
     if (aggregatedData[dateStr]) {
       aggregatedData[dateStr] += activity.duration;
     } else {
       aggregatedData[dateStr] = activity.duration;
     }
   });
+  console.log(
+    // Keep this commented or remove if no longer needed for debugging
+    TimezoneConverter.utcToUserFormat(
+      new Date('2025-04-07T00:00:00.000Z'),
+      userTimeZone,
+      'yyyy/MM/dd'
+    )
+  );
 
   // Transform the aggregated data into the desired format
   const heatMapData = Object.entries(aggregatedData).map(([date, count]) => ({
@@ -251,18 +264,34 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
   // Call the consolidated validation function, passing currentUser
   const { media } = await validateActivityInput(input, context.currentUser);
 
-  // Determine the final Date object for Prisma
+  // Determine the final Date object for Prisma using the TimezoneConverter
   let finalDateForDb: Date;
+  const userTimeZone = context.currentUser?.timezone || 'UTC'; // Ensure timezone is available
+
+  // Handle both string ('yyyy-MM-dd') and Date object inputs based on validation
   if (typeof input.date === 'string') {
-    // Parse the validated string again
-    finalDateForDb = parse(input.date, 'yyyy-MM-dd', new Date());
+    // If it's a string, convert it using the user's timezone
+    try {
+      finalDateForDb = TimezoneConverter.userDateToUtc(
+        input.date,
+        userTimeZone
+      );
+    } catch (error) {
+      // Handle potential errors from the converter
+      throw new Error(`Failed to process date string: ${error.message}`);
+    }
   } else if (input.date instanceof Date) {
-    // Use the validated Date object directly
+    // If it's already a Date object, assume it's the intended UTC timestamp
+    // (e.g., from scenarios or internal sources).
+    // Add validation check just in case.
+    if (!isValid(input.date)) {
+      throw new Error('Invalid Date object provided for date field.');
+    }
     finalDateForDb = input.date;
   } else {
-    // Should be caught by validation, but defensive
+    // Should be caught by validation, but include defensive check
     throw new Error(
-      'Unexpected type for date field during database preparation.'
+      'Unexpected type for date field after validation. Expected yyyy-MM-dd string or Date object.'
     );
   }
 
