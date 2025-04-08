@@ -2,13 +2,12 @@ import {
   differenceInCalendarDays,
   endOfDay, // Added endOfDay
   isValid, // Added isValid import
-  format, // Added format import
   startOfDay,
   subDays,
   subYears,
 } from 'date-fns';
-// Removed formatInTimeZone import, keep toZonedTime for other functions
-import { toZonedTime } from 'date-fns-tz';
+// Import both timezone functions we need
+import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
 import type {
   ActivityRelationResolvers,
   MutationResolvers,
@@ -64,20 +63,13 @@ export const heatMap: QueryResolvers['heatMap'] = async () => {
       userTimeZone,
       'yyyy/MM/dd'
     );
+
     if (aggregatedData[dateStr]) {
       aggregatedData[dateStr] += activity.duration;
     } else {
       aggregatedData[dateStr] = activity.duration;
     }
   });
-  console.log(
-    // Keep this commented or remove if no longer needed for debugging
-    TimezoneConverter.utcToUserFormat(
-      new Date('2025-04-07T00:00:00.000Z'),
-      userTimeZone,
-      'yyyy/MM/dd'
-    )
-  );
 
   // Transform the aggregated data into the desired format
   const heatMapData = Object.entries(aggregatedData).map(([date, count]) => ({
@@ -278,8 +270,8 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
   }
 
   try {
-    // Format the Date object (UTC midnight) back to 'yyyy-MM-dd' string
-    const dateString = format(input.date, 'yyyy-MM-dd');
+    // Format the Date object explicitly in UTC to get correct 'yyyy-MM-dd' string
+    const dateString = formatInTimeZone(input.date, 'UTC', 'yyyy-MM-dd');
     // Convert the date string to the correct UTC timestamp representing
     // the start of the day in the user's timezone.
     finalDateForDb = TimezoneConverter.userDateToUtc(dateString, userTimeZone);

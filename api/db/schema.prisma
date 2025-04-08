@@ -39,7 +39,7 @@ model Activity {
   mediaId      String?
   notes        String?
   duration     Int?
-  date         DateTime     @default(now()) @db.Date
+  date         DateTime     @default(now())
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
