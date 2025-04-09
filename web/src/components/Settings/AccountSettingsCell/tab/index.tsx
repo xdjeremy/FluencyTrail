@@ -5,6 +5,7 @@ import { FindUserForProfileSettings } from 'types/graphql';
 import { Separator } from 'src/components/ui/separator';
 
 import AccountProfile from './AccountProfile';
+import Password from './Password';
 
 const AccountSettings = ({ user }: FindUserForProfileSettings) => {
   return (
@@ -17,6 +18,8 @@ const AccountSettings = ({ user }: FindUserForProfileSettings) => {
       </div>
       <Separator />
       <AccountProfile user={user} />
+      <Separator />
+      <Password />
     </div>
   );
 };

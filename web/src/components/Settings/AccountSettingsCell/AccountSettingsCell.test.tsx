@@ -1,7 +1,7 @@
-import { render } from '@redwoodjs/testing/web'
+import { render } from '@redwoodjs/testing/web';
 
-import { Loading, Empty, Failure, Success } from './AccountSettingsCell'
-import { standard } from './AccountSettingsCell.mock'
+import { Loading, Empty, Failure, Success } from './AccountSettingsCell';
+import { standard } from './AccountSettingsCell.mock';
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float and DateTime types.
@@ -12,21 +12,21 @@ import { standard } from './AccountSettingsCell.mock'
 describe('AccountSettingsCell', () => {
   it('renders Loading successfully', () => {
     expect(() => {
-      render(<Loading />)
-    }).not.toThrow()
-  })
+      render(<Loading />);
+    }).not.toThrow();
+  });
 
   it('renders Empty successfully', async () => {
     expect(() => {
-      render(<Empty />)
-    }).not.toThrow()
-  })
+      render(<Empty />);
+    }).not.toThrow();
+  });
 
   it('renders Failure successfully', async () => {
     expect(() => {
-      render(<Failure error={new Error('Oh no')} />)
-    }).not.toThrow()
-  })
+      render(<Failure error={new Error('Oh no')} />);
+    }).not.toThrow();
+  });
 
   // When you're ready to test the actual output of your component render
   // you could test that, for example, certain text is present:
@@ -36,7 +36,7 @@ describe('AccountSettingsCell', () => {
 
   it('renders Success successfully', async () => {
     expect(() => {
-      render(<Success accountSettings={standard().accountSettings} />)
-    }).not.toThrow()
-  })
-})
+      render(<Success accountSettings={standard().accountSettings} />);
+    }).not.toThrow();
+  });
+});

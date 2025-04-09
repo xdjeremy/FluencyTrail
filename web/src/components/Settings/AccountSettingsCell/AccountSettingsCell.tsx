@@ -25,6 +25,8 @@ export const QUERY: TypedDocumentNode<
   }
 `;
 
+// TODO: implement states
+
 export const Loading = () => <div>Loading...</div>;
 
 export const Empty = () => <div>Empty</div>;

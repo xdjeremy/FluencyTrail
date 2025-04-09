@@ -5,7 +5,8 @@ import type {
   User as UserType,
 } from 'types/graphql';
 
-import { validateWith } from '@redwoodjs/api';
+import { validate, validateWith } from '@redwoodjs/api';
+import { hashPassword } from '@redwoodjs/auth-dbauth-api';
 
 import { db } from 'src/lib/db';
 
@@ -61,8 +62,31 @@ export const confirmUserEmail: MutationResolvers['confirmUserEmail'] = async ({
 
 export const editUser: MutationResolvers['editUser'] = async ({ input }) => {
   const userId = context.currentUser.id;
+  const validTimezones = new Set(Intl.supportedValuesOf('timeZone'));
 
-  // TODO: add validation
+  validate(input.name, {
+    // Use the destructured 'name' variable
+    presence: {
+      message: 'Name is required',
+    },
+    length: {
+      min: 2,
+      max: 100,
+      message: 'Name must be between 2 and 100 characters',
+    },
+  });
+  validate(input.timezone, {
+    // Validate timezone presence
+    presence: { message: 'Timezone is required' },
+  });
+
+  // Validate timezone value against known IANA identifiers
+  if (!validTimezones.has(input.timezone)) {
+    throw new Error(
+      'Invalid timezone. Please provide a valid IANA timezone identifier. For example, "America/New_York" or "Europe/London"'
+    );
+  }
+
   return db.user.update({
     where: {
       id: userId,
@@ -70,6 +94,40 @@ export const editUser: MutationResolvers['editUser'] = async ({ input }) => {
     data: {
       name: input.name,
       timezone: input.timezone,
+    },
+  });
+};
+
+export const updateUserPassword: MutationResolvers['updateUserPassword'] = ({
+  input,
+}) => {
+  // Get current user
+  const userId = context.currentUser.id;
+
+  // Validate new password
+  validate(input.password, {
+    presence: { message: 'Password is required' },
+    length: {
+      min: 8,
+      message: 'Password must be at least 8 characters long',
+    },
+    format: {
+      pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/,
+      message:
+        'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+    },
+  });
+
+  const [hashedPassword, salt] = hashPassword(input.password);
+
+  // Update user password
+  return db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      hashedPassword,
+      salt,
     },
   });
 };

@@ -146,6 +146,7 @@ const AccountProfile = ({ user }: FindUserForProfileSettings) => {
             </FormItem>
           )}
         />
+        {/* FIXME: Error when opening popover */}
         <FormField
           control={form.control}
           name="timezone"

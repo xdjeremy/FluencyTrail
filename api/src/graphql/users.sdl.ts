@@ -20,8 +20,13 @@ export const schema = gql`
     timezone: String
   }
 
+  input UpdateUserPasswordInput {
+    password: String!
+  }
+
   type Mutation {
     confirmUserEmail(token: String!): User! @skipAuth
     editUser(input: EditUserInput!): User! @requireAuth
+    updateUserPassword(input: UpdateUserPasswordInput!): User! @requireAuth
   }
 `;
