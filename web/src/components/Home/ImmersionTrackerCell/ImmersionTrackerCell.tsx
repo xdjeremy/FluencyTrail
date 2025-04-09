@@ -9,7 +9,12 @@ import type {
   TypedDocumentNode,
 } from '@redwoodjs/web';
 
-import ImmersionTrackerCard from './ImmersionTrackerCard';
+import {
+  ImmersionCardEmpty,
+  ImmersionCardError,
+  ImmersionCardLoading,
+  ImmersionTrackerCard,
+} from './ImmersionTrackerCard';
 
 export const QUERY: TypedDocumentNode<
   FindActivitiesForRecentActivities,
@@ -29,14 +34,14 @@ export const QUERY: TypedDocumentNode<
   }
 `;
 
-export const Loading = () => <div>Loading...</div>;
+export const Loading = () => <ImmersionCardLoading />;
 
-export const Empty = () => <div>Empty</div>;
+export const Empty = () => <ImmersionCardEmpty />;
 
 export const Failure = ({
   error,
 }: CellFailureProps<FindActivitiesForRecentActivitiesVariables>) => (
-  <div style={{ color: 'red' }}>Error: {error?.message}</div>
+  <ImmersionCardError error={error.message} />
 );
 
 export const Success = ({
