@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import initials from 'initials';
-import { Check, ChevronsUpDown, Command, Loader2, Save } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   EditProfileMutation,
@@ -21,6 +21,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  Command,
   CommandList,
 } from 'src/components/ui/command';
 import {
@@ -146,7 +147,6 @@ const AccountProfile = ({ user }: FindUserForProfileSettings) => {
             </FormItem>
           )}
         />
-        {/* FIXME: Error when opening popover */}
         <FormField
           control={form.control}
           name="timezone"
