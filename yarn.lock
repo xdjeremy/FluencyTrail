@@ -21312,6 +21312,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-rewards@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "react-rewards@npm:2.1.0"
+  peerDependencies:
+    react: ">=15"
+    react-dom: ">=15"
+  checksum: 10c0/0e507e374c686f1e2bf30b208c6853338ebd0cc8c8338a1c78bcfaeecad8dcf78d3835b3883b1d52455c2f1927704c754e26fa92a1b5fc6f876fb92ae11cec7e
+  languageName: node
+  linkType: hard
+
 "react-server-dom-webpack@npm:19.0.0-rc-8269d55d-20240802":
   version: 19.0.0-rc-8269d55d-20240802
   resolution: "react-server-dom-webpack@npm:19.0.0-rc-8269d55d-20240802"
@@ -25063,6 +25073,7 @@ __metadata:
     react-day-picker: "npm:8.10.1"
     react-dom: "npm:18.3.1"
     react-hotkeys-hook: "npm:^4.6.1"
+    react-rewards: "npm:^2.1.0"
     sonner: "npm:^2.0.2"
     tailwind-merge: "npm:^3.0.2"
     tailwindcss: "npm:^3.4.17"

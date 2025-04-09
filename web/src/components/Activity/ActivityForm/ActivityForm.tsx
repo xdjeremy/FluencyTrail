@@ -93,8 +93,6 @@ const ActivityForm = (props: ActivityFormProps) => {
     }
   }, [currentUser, form]);
 
-  // TODO: add loading state
-
   const onSubmit: SubmitHandler<ActivitySchemaType> = data => {
     // Create a new object with the correct type, casting activityType and formatting date
     // Format the date as 'yyyy-MM-dd' string before sending

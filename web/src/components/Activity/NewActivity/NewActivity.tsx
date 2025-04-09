@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { useReward } from 'react-rewards';
 import { toast } from 'sonner';
 import type {
   CreateActivityInput,
@@ -30,6 +31,9 @@ const CREATE_ACTIVITY_MUTATION: TypedDocumentNode<
 
 const NewActivity = () => {
   const { setActivityModalOpen } = useActivityModal();
+  const { reward } = useReward('rewardId', 'confetti', {
+    elementCount: 100,
+  });
 
   const [createActivity, { loading, error }] = useMutation(
     CREATE_ACTIVITY_MUTATION,
@@ -37,6 +41,7 @@ const NewActivity = () => {
       onCompleted: () => {
         toast.success('Activity created');
         setActivityModalOpen(false);
+        reward();
       },
       onError: error => {
         toast.error(error.message);
@@ -57,6 +62,7 @@ const NewActivity = () => {
       >
         <Plus className="h-6 w-6" />
       </Button>
+      <span id="rewardId" className="fixed bottom-1/4 right-1/2" />
       <ActivityForm onSave={onSave} loading={loading} error={error} />
     </>
   );
