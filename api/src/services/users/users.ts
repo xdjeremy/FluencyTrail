@@ -132,6 +132,17 @@ export const updateUserPassword: MutationResolvers['updateUserPassword'] = ({
   });
 };
 
+export const deleteUser: MutationResolvers['deleteUser'] = async () => {
+  const userId = context.currentUser.id;
+
+  // delete user
+  return db.user.delete({
+    where: {
+      id: userId,
+    },
+  });
+};
+
 export const User: UserRelationResolvers = {
   Activity: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).Activity();

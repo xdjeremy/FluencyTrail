@@ -1,10 +1,9 @@
-import React from 'react';
-
 import { FindUserForProfileSettings } from 'types/graphql';
 
 import { Separator } from 'src/components/ui/separator';
 
 import AccountProfile from './AccountProfile';
+import DeleteAccount from './DeleteAccount';
 import Password from './Password';
 
 const AccountSettings = ({ user }: FindUserForProfileSettings) => {
@@ -20,6 +19,8 @@ const AccountSettings = ({ user }: FindUserForProfileSettings) => {
       <AccountProfile user={user} />
       <Separator />
       <Password />
+      <Separator />
+      <DeleteAccount />
     </div>
   );
 };

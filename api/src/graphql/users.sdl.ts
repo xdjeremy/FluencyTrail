@@ -28,5 +28,6 @@ export const schema = gql`
     confirmUserEmail(token: String!): User! @skipAuth
     editUser(input: EditUserInput!): User! @requireAuth
     updateUserPassword(input: UpdateUserPasswordInput!): User! @requireAuth
+    deleteUser: User! @requireAuth
   }
 `;
