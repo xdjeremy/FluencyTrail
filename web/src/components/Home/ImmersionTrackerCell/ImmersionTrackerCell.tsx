@@ -1,40 +1,49 @@
-import type {
-  FindImmersionTrackerQuery,
-  FindImmersionTrackerQueryVariables,
-} from 'types/graphql'
+import {
+  FindActivitiesForRecentActivities,
+  FindActivitiesForRecentActivitiesVariables,
+} from 'types/graphql';
 
 import type {
-  CellSuccessProps,
   CellFailureProps,
+  CellSuccessProps,
   TypedDocumentNode,
-} from '@redwoodjs/web'
+} from '@redwoodjs/web';
+
+import ImmersionTrackerCard from './ImmersionTrackerCard';
 
 export const QUERY: TypedDocumentNode<
-  FindImmersionTrackerQuery,
-  FindImmersionTrackerQueryVariables
+  FindActivitiesForRecentActivities,
+  FindActivitiesForRecentActivitiesVariables
 > = gql`
-  query FindImmersionTrackerQuery($id: Int!) {
-    immersionTracker: immersionTracker(id: $id) {
+  query FindActivitiesForRecentActivities {
+    activities: activities(itemsPerPage: 5, page: 1) {
       id
+      activityType
+      duration
+      notes
+      date
+      media {
+        title
+      }
     }
   }
-`
+`;
 
-export const Loading = () => <div>Loading...</div>
+export const Loading = () => <div>Loading...</div>;
 
-export const Empty = () => <div>Empty</div>
+export const Empty = () => <div>Empty</div>;
 
 export const Failure = ({
   error,
-}: CellFailureProps<FindImmersionTrackerQueryVariables>) => (
+}: CellFailureProps<FindActivitiesForRecentActivitiesVariables>) => (
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
-)
+);
 
 export const Success = ({
-  immersionTracker,
+  activities,
 }: CellSuccessProps<
-  FindImmersionTrackerQuery,
-  FindImmersionTrackerQueryVariables
+  FindActivitiesForRecentActivities,
+  FindActivitiesForRecentActivitiesVariables
 >) => {
-  return <div>{JSON.stringify(immersionTracker)}</div>
-}
+  return <ImmersionTrackerCard activities={activities} />;
+};

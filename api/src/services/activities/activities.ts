@@ -30,6 +30,7 @@ export const activities: QueryResolvers['activities'] = ({
   page = 1,
   userId = context.currentUser.id,
 }) => {
+  // TODO: convert date to user's timezone
   const offset = (page - 1) * itemsPerPage;
   return db.activity.findMany({
     take: itemsPerPage,

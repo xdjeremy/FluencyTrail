@@ -2,6 +2,7 @@
 import { Metadata } from '@redwoodjs/web';
 
 import HeatMapCell from 'src/components/Home/HeatMapCell';
+import ImmersionTrackerCell from 'src/components/Home/ImmersionTrackerCell';
 import StreakCell from 'src/components/Home/StreakCell';
 import TotalTimeCell from 'src/components/Home/TotalTimeCell';
 
@@ -34,6 +35,10 @@ const HomePage = () => {
           <StreakCell />
           <TotalTimeCell />
         </div>
+
+        <section className="rounded-lg border bg-white p-6 dark:bg-neutral-950">
+          <ImmersionTrackerCell />
+        </section>
       </div>
     </>
   );
