@@ -20,6 +20,7 @@ export const QUERY: TypedDocumentNode<
       id
       email
       name
+      timezone
     }
   }
 `;

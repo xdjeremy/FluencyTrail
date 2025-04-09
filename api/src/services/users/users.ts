@@ -15,7 +15,7 @@ import { db } from 'src/lib/db';
 
 export const user: QueryResolvers['user'] = ({ id }) => {
   // if there is no id provided, use the current user id
-  const userId = id || context.currentUser?.id;
+  const userId = id ? id : context.currentUser.id;
 
   // if there's really no id, throw an error
   if (!userId) {
@@ -23,7 +23,7 @@ export const user: QueryResolvers['user'] = ({ id }) => {
   }
 
   return db.user.findUnique({
-    where: { id },
+    where: { id: userId },
   });
 };
 
@@ -55,6 +55,21 @@ export const confirmUserEmail: MutationResolvers['confirmUserEmail'] = async ({
       emailVerified: true,
       emailVerificationToken: null,
       emailVerificationTokenExpiresAt: null,
+    },
+  });
+};
+
+export const editUser: MutationResolvers['editUser'] = async ({ input }) => {
+  const userId = context.currentUser.id;
+
+  // TODO: add validation
+  return db.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      name: input.name,
+      timezone: input.timezone,
     },
   });
 };

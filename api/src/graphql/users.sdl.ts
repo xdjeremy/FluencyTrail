@@ -15,7 +15,13 @@ export const schema = gql`
     user(id: Int): User @requireAuth
   }
 
+  input EditUserInput {
+    name: String
+    timezone: String
+  }
+
   type Mutation {
     confirmUserEmail(token: String!): User! @skipAuth
+    editUser(input: EditUserInput!): User! @requireAuth
   }
 `;

@@ -7,6 +7,7 @@ const ProfileFormSchema = z.object({
   email: z.string().email({
     message: 'Please enter a valid email address.',
   }),
+  timezone: z.string().min(1, 'Please select your timezone'),
 });
 
 export { ProfileFormSchema };

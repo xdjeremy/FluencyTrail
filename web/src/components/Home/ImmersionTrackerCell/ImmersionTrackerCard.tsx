@@ -115,9 +115,7 @@ const ImmersionCardLoading = () => (
 
 const ImmersionCardEmpty = () => (
   <div className="py-8 text-center text-neutral-500 dark:text-neutral-400">
-    <p>
-      No activities recorded yet. Start tracking your immersion practice! 8==D
-    </p>
+    <p>No activities recorded yet. Start tracking your immersion practice!</p>
   </div>
 );
 
