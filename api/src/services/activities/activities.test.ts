@@ -22,7 +22,15 @@ import type { StandardScenario } from './activities.scenarios';
 
 describe('activities', () => {
   scenario('returns all activities', async (scenario: StandardScenario) => {
-    const result = await activities();
+    mockCurrentUser({
+      id: scenario.activity.one.userId,
+      name: 'John Doe',
+      timezone: 'UTC', // Mock timezone for date validation
+    });
+    const result = await activities({
+      itemsPerPage: 10,
+      page: 1,
+    });
 
     expect(result.length).toEqual(Object.keys(scenario.activity).length);
   });

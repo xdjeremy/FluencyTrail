@@ -25,8 +25,18 @@ import { TimezoneConverter } from 'src/lib/TimezoneConverter'; // Import the new
 import { validateActivityInput } from './activityValidation';
 
 // --- Service Functions ---
-export const activities: QueryResolvers['activities'] = () => {
-  return db.activity.findMany();
+export const activities: QueryResolvers['activities'] = ({
+  itemsPerPage = 10,
+  page = 1,
+  userId = context.currentUser.id,
+}) => {
+  const offset = (page - 1) * itemsPerPage;
+  return db.activity.findMany({
+    take: itemsPerPage,
+    skip: offset,
+    orderBy: { date: 'desc' },
+    where: { userId },
+  });
 };
 
 export const activity: QueryResolvers['activity'] = ({ id }) => {

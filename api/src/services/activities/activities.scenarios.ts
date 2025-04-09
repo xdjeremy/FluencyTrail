@@ -29,13 +29,18 @@ export const standard = defineScenario<Prisma.ActivityCreateArgs>({
         duration: 15,
         notes: 'String',
         user: {
-          create: {
-            email: 'String1483700',
-            name: 'String',
-            hashedPassword: 'String',
-            salt: 'String',
-            timezone: 'UTC', // Add required timezone
-            updatedAt: '2025-03-30T11:11:31.027Z',
+          connectOrCreate: {
+            where: {
+              email: 'String2017493',
+            },
+            create: {
+              email: 'String2017493',
+              name: 'String',
+              hashedPassword: 'String',
+              salt: 'String',
+              timezone: 'UTC', // Add required timezone
+              updatedAt: '2025-03-30T11:11:31.025Z',
+            },
           },
         },
       },

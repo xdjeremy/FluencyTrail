@@ -40,7 +40,8 @@ export const schema = gql`
   }
 
   type Query {
-    activities: [Activity!]! @requireAuth
+    activities(itemsPerPage: Int, page: Int, userId: Int): [Activity!]!
+      @requireAuth
     activity(id: String!): Activity @requireAuth
     heatMap: [HeatMap!]! @requireAuth
     streak: Streak! @requireAuth
