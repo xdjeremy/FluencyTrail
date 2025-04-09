@@ -2,13 +2,20 @@ import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import {
+  UpdateUserPasswordMutation,
+  UpdateUserPasswordMutationVariables,
+} from 'types/graphql';
 
-import { Form, useForm } from '@redwoodjs/forms';
+import { Form, SubmitHandler, useForm } from '@redwoodjs/forms';
+import { TypedDocumentNode, useMutation } from '@redwoodjs/web';
 
 import { PasswordStrengthIndicator } from 'src/components/common/PasswordStrengthIndicator';
 import { Button } from 'src/components/ui/button';
 import {
   FormControl,
+  FormErrorMessage,
   FormField,
   FormItem,
   FormLabel,
@@ -20,6 +27,17 @@ import {
   PasswordFormSchema,
   PasswordFormSchemaType,
 } from './AccountSettingsSchema';
+
+const CHANGE_PASSWORD_MUTATION: TypedDocumentNode<
+  UpdateUserPasswordMutation,
+  UpdateUserPasswordMutationVariables
+> = gql`
+  mutation UpdateUserPasswordMutation($input: UpdateUserPasswordInput!) {
+    updateUserPassword(input: $input) {
+      id
+    }
+  }
+`;
 
 const Password = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -33,7 +51,27 @@ const Password = () => {
     },
   });
 
-  const loading = false; // Replace with actual loading state
+  const [changePassword, { loading, error }] = useMutation(
+    CHANGE_PASSWORD_MUTATION,
+    {
+      onCompleted: () => {
+        form.reset();
+        toast.success('Password changed successfully');
+      },
+    }
+  );
+
+  const onSave: SubmitHandler<PasswordFormSchemaType> = ({ newPassword }) => {
+    changePassword({
+      variables: {
+        input: {
+          password: newPassword,
+        },
+      },
+    });
+  };
+
+  // Watcher for the password strength indicator
   const newPassword = form.watch('newPassword');
 
   return (
@@ -45,7 +83,8 @@ const Password = () => {
         </p>
       </div>
 
-      <Form formMethods={form} className="space-y-6">
+      <Form onSubmit={onSave} formMethods={form} className="space-y-6">
+        <FormErrorMessage error={error} />
         <FormField
           control={form.control}
           name="newPassword"
