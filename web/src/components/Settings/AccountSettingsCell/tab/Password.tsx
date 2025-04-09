@@ -40,12 +40,14 @@ const CHANGE_PASSWORD_MUTATION: TypedDocumentNode<
 `;
 
 const Password = () => {
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm<PasswordFormSchemaType>({
     resolver: zodResolver(PasswordFormSchema),
     defaultValues: {
+      currentPassword: '',
       newPassword: '',
       confirmPassword: '',
     },
@@ -61,11 +63,15 @@ const Password = () => {
     }
   );
 
-  const onSave: SubmitHandler<PasswordFormSchemaType> = ({ newPassword }) => {
+  const onSave: SubmitHandler<PasswordFormSchemaType> = ({
+    currentPassword,
+    newPassword,
+  }) => {
     changePassword({
       variables: {
         input: {
-          password: newPassword,
+          currentPassword,
+          newPassword,
         },
       },
     });
@@ -85,6 +91,40 @@ const Password = () => {
 
       <Form onSubmit={onSave} formMethods={form} className="space-y-6">
         <FormErrorMessage error={error} />
+        <FormField
+          control={form.control}
+          name="currentPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Current Password</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Input
+                    {...field}
+                    type={showCurrentPassword ? 'text' : 'password'}
+                    disabled={loading}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  >
+                    {showNewPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                    <span className="sr-only">
+                      {showNewPassword ? 'Hide password' : 'Show password'}
+                    </span>
+                  </button>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="newPassword"

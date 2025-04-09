@@ -21,7 +21,8 @@ export const schema = gql`
   }
 
   input UpdateUserPasswordInput {
-    password: String!
+    currentPassword: String!
+    newPassword: String!
   }
 
   type Mutation {

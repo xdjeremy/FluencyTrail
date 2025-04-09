@@ -5,7 +5,7 @@ import type {
   User as UserType,
 } from 'types/graphql';
 
-import { validate, validateWith } from '@redwoodjs/api';
+import { validate, validateWith, validateWithSync } from '@redwoodjs/api';
 import { hashPassword } from '@redwoodjs/auth-dbauth-api';
 
 import { db } from 'src/lib/db';
@@ -98,39 +98,51 @@ export const editUser: MutationResolvers['editUser'] = async ({ input }) => {
   });
 };
 
-export const updateUserPassword: MutationResolvers['updateUserPassword'] = ({
-  input,
-}) => {
-  // Get current user
-  const userId = context.currentUser.id;
+export const updateUserPassword: MutationResolvers['updateUserPassword'] =
+  async ({ input: { currentPassword, newPassword } }) => {
+    const userId = context.currentUser.id;
 
-  // Validate new password
-  validate(input.password, {
-    presence: { message: 'Password is required' },
-    length: {
-      min: 8,
-      message: 'Password must be at least 8 characters long',
-    },
-    format: {
-      pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/,
-      message:
-        'Password must contain at least one uppercase letter, one lowercase letter, and one number',
-    },
-  });
+    // Get current user's password data
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { hashedPassword: true, salt: true },
+    });
 
-  const [hashedPassword, salt] = hashPassword(input.password);
+    validateWithSync(() => {
+      if (!user) {
+        throw new Error('User not found');
+      }
+    });
 
-  // Update user password
-  return db.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      hashedPassword,
-      salt,
-    },
-  });
-};
+    // Verify current password
+    validateWithSync(() => {
+      const [currentHash] = hashPassword(currentPassword, { salt: user.salt });
+      if (currentHash !== user.hashedPassword) {
+        throw new Error('Current password is incorrect');
+      }
+    });
+
+    // Validate new password
+    validate(newPassword, {
+      presence: { message: 'New password is required' },
+      length: {
+        min: 8,
+        message: 'Password must be at least 8 characters long',
+      },
+      format: {
+        pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])/,
+        message:
+          'Password must contain at least one uppercase letter, one lowercase letter, and one number',
+      },
+    });
+
+    const [hashedPassword, salt] = hashPassword(newPassword);
+
+    return db.user.update({
+      where: { id: userId },
+      data: { hashedPassword, salt },
+    });
+  };
 
 export const deleteUser: MutationResolvers['deleteUser'] = async () => {
   const userId = context.currentUser.id;
