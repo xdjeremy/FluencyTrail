@@ -32,7 +32,8 @@ const CREATE_ACTIVITY_MUTATION: TypedDocumentNode<
 const NewActivity = () => {
   const { setActivityModalOpen } = useActivityModal();
   const { reward } = useReward('rewardId', 'confetti', {
-    elementCount: 100,
+    elementCount: 150,
+    startVelocity: 60,
   });
 
   const [createActivity, { loading, error }] = useMutation(
@@ -62,7 +63,7 @@ const NewActivity = () => {
       >
         <Plus className="h-6 w-6" />
       </Button>
-      <span id="rewardId" className="fixed bottom-1/4 right-1/2" />
+      <span id="rewardId" className="fixed bottom-0 right-1/2" />
       <ActivityForm onSave={onSave} loading={loading} error={error} />
     </>
   );
