@@ -1,5 +1,6 @@
 import type {
   MutationResolvers,
+  QueryResolvers,
   UserRelationResolvers,
   User as UserType,
 } from 'types/graphql';
@@ -12,11 +13,19 @@ import { db } from 'src/lib/db';
 //   return db.user.findMany();
 // };
 
-// export const user: QueryResolvers['user'] = ({ id }) => {
-//   return db.user.findUnique({
-//     where: { id },
-//   });
-// };
+export const user: QueryResolvers['user'] = ({ id }) => {
+  // if there is no id provided, use the current user id
+  const userId = id || context.currentUser?.id;
+
+  // if there's really no id, throw an error
+  if (!userId) {
+    throw new Error('No user id provided');
+  }
+
+  return db.user.findUnique({
+    where: { id },
+  });
+};
 
 export const confirmUserEmail: MutationResolvers['confirmUserEmail'] = async ({
   token,
