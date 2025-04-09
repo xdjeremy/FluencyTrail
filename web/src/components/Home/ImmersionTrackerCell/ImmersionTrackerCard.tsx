@@ -6,13 +6,19 @@ import {
   Headphones,
   MessageSquareQuote,
   PenIcon,
+  Plus,
   TvMinimalPlay,
 } from 'lucide-react';
 import { ActivityType, FindActivitiesForRecentActivities } from 'types/graphql';
 
+import { Button } from 'src/components/ui/button';
+import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
+
 const ImmersionTrackerCard = ({
   activities,
 }: FindActivitiesForRecentActivities) => {
+  const { setActivityModalOpen } = useActivityModal();
+
   // group activities by date
   const groupedActivities = activities.reduce(
     (acc, activity) => {
@@ -39,48 +45,60 @@ const ImmersionTrackerCard = ({
 
   return (
     <div className="space-y-4">
-      {Object.keys(groupedActivities).map(date => (
-        <div key={date} className="space-y-2">
-          <h4 className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
-            {new Date(date).toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </h4>
-          <div className="space-y-2">
-            {groupedActivities[date].map(activity => (
-              <div
-                key={activity.id}
-                className="bg-background flex items-center justify-between rounded-md border p-3"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300 flex h-8 w-8 items-center justify-center rounded-full">
-                    {activityIcons[activity.activityType] || (
-                      <Book className="h-4 w-4" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="font-medium">
-                      {activity.activityType}
-                      {/* {activityLabels[activity.type] || activity.type} */}
-                    </p>
-                    {activity.notes && (
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                        {activity.notes}
+      <div className="flex items-center justify-between">
+        <h3 className="text-lg font-semibold">Recent Activities</h3>
+        <Button
+          size="sm"
+          className="bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400 text-white dark:text-neutral-900"
+          onClick={() => setActivityModalOpen(true)}
+        >
+          <Plus className="mr-1 h-4 w-4" /> Add Activity
+        </Button>
+      </div>
+      <div className="space-y-4">
+        {Object.keys(groupedActivities).map(date => (
+          <div key={date} className="space-y-2">
+            <h4 className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+              {new Date(date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </h4>
+            <div className="space-y-2">
+              {groupedActivities[date].map(activity => (
+                <div
+                  key={activity.id}
+                  className="bg-background flex items-center justify-between rounded-md border p-3"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300 flex h-8 w-8 items-center justify-center rounded-full">
+                      {activityIcons[activity.activityType] || (
+                        <Book className="h-4 w-4" />
+                      )}
+                    </div>
+                    <div>
+                      <p className="font-medium">
+                        {activity.activityType}
+                        {/* {activityLabels[activity.type] || activity.type} */}
                       </p>
-                    )}
+                      {activity.notes && (
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                          {activity.notes}
+                        </p>
+                      )}
+                    </div>
                   </div>
+                  <span className="text-sm font-medium">
+                    {activity.duration} min
+                  </span>
                 </div>
-                <span className="text-sm font-medium">
-                  {activity.duration} min
-                </span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
@@ -109,8 +127,8 @@ const ImmersionCardError = ({ error }: { error?: string }) => (
   </div>
 );
 export {
-  ImmersionTrackerCard,
-  ImmersionCardLoading,
   ImmersionCardEmpty,
   ImmersionCardError,
+  ImmersionCardLoading,
+  ImmersionTrackerCard,
 };
