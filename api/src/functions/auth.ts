@@ -209,6 +209,7 @@ export const handler = async (
         },
       });
 
+      // TODO: add rate limiting to prevent abuse
       // Send confirmation email
       const confirmationUrl = `${process.env.APP_URL}/confirm-email?token=${confirmationToken}`;
       await sendConfirmationEmail(user.email, confirmationUrl, user.name);
