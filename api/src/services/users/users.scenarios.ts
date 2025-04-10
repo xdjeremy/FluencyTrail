@@ -17,9 +17,10 @@ export const standard = defineScenario<Prisma.UserCreateArgs>({
     two: {
       data: {
         email: 'String9662096',
+        name: 'Name2',
         hashedPassword: 'String',
         salt: 'String',
-        timezone: 'America/Los_Angeles',
+        timezone: 'Asia/Tokyo',
         updatedAt: '2025-03-30T11:13:26.011Z',
       },
     },

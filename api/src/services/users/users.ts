@@ -83,11 +83,13 @@ export const editUser: MutationResolvers['editUser'] = async ({ input }) => {
   });
 
   // Validate timezone value against known IANA identifiers
-  if (!validTimezones.has(input.timezone)) {
-    throw new Error(
-      'Invalid timezone. Please provide a valid IANA timezone identifier. For example, "America/New_York" or "Europe/London"'
-    );
-  }
+  validateWithSync(() => {
+    if (!validTimezones.has(input.timezone)) {
+      throw new Error(
+        'Invalid timezone. Please provide a valid IANA timezone identifier. For example, "America/New_York" or "Europe/London"'
+      );
+    }
+  });
 
   return db.user.update({
     where: {
