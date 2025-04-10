@@ -15,13 +15,15 @@ import { db } from 'src/lib/db';
 // };
 
 export const user: QueryResolvers['user'] = ({ id }) => {
-  // if there is no id provided, use the current user id
-  const userId = id ? id : context.currentUser.id;
+  // if there is no id provided, use the current user id if available
+  const userId = id || context.currentUser?.id;
 
   // if there's really no id, throw an error
-  if (!userId) {
-    throw new Error('No user id provided');
-  }
+  validateWithSync(() => {
+    if (!userId) {
+      throw new Error('No user id provided');
+    }
+  });
 
   return db.user.findUnique({
     where: { id: userId },

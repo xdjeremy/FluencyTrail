@@ -6,11 +6,12 @@ export const standard = defineScenario<Prisma.UserCreateArgs>({
   user: {
     one: {
       data: {
+        id: 123,
         email: 'String1828080',
+        name: 'String',
         hashedPassword: 'String',
         salt: 'String',
         timezone: 'America/Los_Angeles',
-        updatedAt: '2025-03-30T11:13:26.011Z',
       },
     },
     two: {

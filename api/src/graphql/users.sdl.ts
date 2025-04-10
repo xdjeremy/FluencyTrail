@@ -3,7 +3,6 @@ export const schema = gql`
     id: Int!
     email: String!
     name: String!
-    emailVerified: Boolean
     timezone: String
     createdAt: DateTime
     updatedAt: DateTime

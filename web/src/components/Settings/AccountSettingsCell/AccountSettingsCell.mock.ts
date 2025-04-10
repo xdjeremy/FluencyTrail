@@ -5,5 +5,6 @@ export const standard = (/* vars, { ctx, req } */) => ({
     id: 42,
     name: 'John Doe',
     email: 'john@example.com',
+    timezone: 'America/New_York',
   },
 });
