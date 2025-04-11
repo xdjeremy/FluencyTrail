@@ -314,8 +314,10 @@ export const updateActivity: MutationResolvers['updateActivity'] = ({
 };
 
 export const deleteActivity: MutationResolvers['deleteActivity'] = ({ id }) => {
+  const userId = context.currentUser.id;
+
   return db.activity.delete({
-    where: { id },
+    where: { id, userId }, // Ensure the userId matches
   });
 };
 
