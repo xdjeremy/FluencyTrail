@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import type {
   MutationResolvers,
   QueryResolvers,
@@ -5,7 +6,12 @@ import type {
   User as UserType,
 } from 'types/graphql';
 
-import { validate, validateWith, validateWithSync } from '@redwoodjs/api';
+import {
+  RedwoodError,
+  validate,
+  validateWith,
+  validateWithSync,
+} from '@redwoodjs/api';
 import { hashPassword } from '@redwoodjs/auth-dbauth-api';
 
 import { db } from 'src/lib/db';
@@ -27,6 +33,10 @@ export const user: QueryResolvers['user'] = ({ id }) => {
 
   return db.user.findUnique({
     where: { id: userId },
+    include: {
+      languages: true,
+      primaryLanguage: true,
+    },
   });
 };
 
@@ -159,8 +169,225 @@ export const deleteUser: MutationResolvers['deleteUser'] = async () => {
   });
 };
 
+export const userStats: QueryResolvers['userStats'] = async ({
+  userId,
+  languageId,
+}) => {
+  // Ensure current user can only access their own stats
+  if (userId !== context.currentUser?.id) {
+    throw new RedwoodError('Unauthorized');
+  }
+
+  const where: Prisma.ActivityWhereInput = { userId };
+  if (languageId) {
+    where.languageId = languageId;
+  }
+
+  const activities = await db.activity.findMany({
+    where,
+    select: {
+      date: true,
+      duration: true,
+    },
+    orderBy: { date: 'asc' },
+  });
+
+  // Calculate stats
+  const totalMinutes = activities.reduce(
+    (sum, act) => sum + (act.duration || 0),
+    0
+  );
+
+  // Get unique dates for streak calculation
+  const uniqueDates = new Set(
+    activities.map(a => a.date.toISOString().split('T')[0])
+  );
+  const sortedDates = Array.from(uniqueDates).sort();
+
+  // Calculate streaks
+  let currentStreak = 0;
+  let longestStreak = 0;
+  let currentCount = 0;
+
+  for (let i = 0; i < sortedDates.length; i++) {
+    if (i === 0) {
+      currentCount = 1;
+    } else {
+      const curr = new Date(sortedDates[i]);
+      const prev = new Date(sortedDates[i - 1]);
+      const diffDays = Math.floor(
+        (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      if (diffDays === 1) {
+        currentCount++;
+      } else {
+        // Streak broken
+        longestStreak = Math.max(longestStreak, currentCount);
+        currentCount = 1;
+      }
+    }
+  }
+
+  // Update longest streak one final time
+  longestStreak = Math.max(longestStreak, currentCount);
+
+  // Check if the last date is today or yesterday for current streak
+  if (sortedDates.length > 0) {
+    const lastDate = new Date(sortedDates[sortedDates.length - 1]);
+    const today = new Date();
+    const diffDays = Math.floor(
+      (today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    currentStreak = diffDays <= 1 ? currentCount : 0;
+  } else {
+    currentStreak = 0;
+  }
+
+  return {
+    totalMinutes,
+    currentStreak,
+    longestStreak,
+  };
+};
+
+export const addUserLanguage: MutationResolvers['addUserLanguage'] = async ({
+  input,
+}) => {
+  const userId = context.currentUser.id;
+
+  // Find the language by code
+  const language = await db.language.findUnique({
+    where: { code: input.languageCode },
+  });
+
+  if (!language) {
+    throw new RedwoodError('Language not found');
+  }
+
+  // Check if user already has this language
+  const existingLanguage = await db.user.findFirst({
+    where: {
+      id: userId,
+      languages: { some: { code: input.languageCode } },
+    },
+  });
+
+  if (existingLanguage) {
+    throw new RedwoodError('Language already added to your profile');
+  }
+
+  // Add the language to user's list
+  return db.user.update({
+    where: { id: userId },
+    data: {
+      languages: {
+        connect: { id: language.id },
+      },
+    },
+    include: {
+      languages: true,
+      primaryLanguage: true,
+    },
+  });
+};
+
+export const removeUserLanguage: MutationResolvers['removeUserLanguage'] =
+  async ({ input }) => {
+    const userId = context.currentUser.id;
+
+    const language = await db.language.findUnique({
+      where: { code: input.languageCode },
+    });
+
+    if (!language) {
+      throw new RedwoodError('Language not found');
+    }
+
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      include: {
+        languages: true,
+      },
+    });
+
+    if (!user) {
+      throw new RedwoodError('User not found');
+    }
+
+    // Cannot remove the primary language
+    if (user.primaryLanguageId === language.id) {
+      throw new RedwoodError(
+        'Cannot remove primary language. Set a different primary language first.'
+      );
+    }
+
+    // Cannot remove if it's the only language
+    if (user.languages.length <= 1) {
+      throw new RedwoodError('Cannot remove your only language');
+    }
+
+    return db.user.update({
+      where: { id: userId },
+      data: {
+        languages: {
+          disconnect: { id: language.id },
+        },
+      },
+      include: {
+        languages: true,
+        primaryLanguage: true,
+      },
+    });
+  };
+
+export const setPrimaryLanguage: MutationResolvers['setPrimaryLanguage'] =
+  async ({ input }) => {
+    const userId = context.currentUser.id;
+
+    const language = await db.language.findUnique({
+      where: { code: input.languageCode },
+    });
+
+    if (!language) {
+      throw new RedwoodError('Language not found');
+    }
+
+    // Verify user has this language
+    const user = await db.user.findFirst({
+      where: {
+        id: userId,
+        languages: { some: { id: language.id } },
+      },
+    });
+
+    if (!user) {
+      throw new RedwoodError(
+        'You must add this language before setting it as primary'
+      );
+    }
+
+    return db.user.update({
+      where: { id: userId },
+      data: {
+        primaryLanguageId: language.id,
+      },
+      include: {
+        languages: true,
+        primaryLanguage: true,
+      },
+    });
+  };
+
 export const User: UserRelationResolvers = {
   Activity: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).Activity();
+  },
+  languages: (_obj, { root }) => {
+    return db.user.findUnique({ where: { id: root?.id } }).languages();
+  },
+  primaryLanguage: (_obj, { root }) => {
+    return db.user.findUnique({ where: { id: root?.id } }).primaryLanguage();
   },
 };

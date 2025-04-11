@@ -11,6 +11,9 @@ export const schema = gql`
     date: DateTime!
     createdAt: DateTime!
     updatedAt: DateTime!
+
+    "The language this activity was performed in"
+    language: Language! @requireAuth
   }
 
   enum ActivityType {
@@ -40,13 +43,21 @@ export const schema = gql`
   }
 
   type Query {
-    activities(itemsPerPage: Int, page: Int, userId: Int): [Activity!]!
-      @requireAuth
+    activities(
+      itemsPerPage: Int
+      page: Int
+      userId: Int
+      languageId: Int
+    ): [Activity!]! @requireAuth
     activity(id: String!): Activity @requireAuth
-    heatMap: [HeatMap!]! @requireAuth
-    streak: Streak! @requireAuth
-    completedToday: Boolean! @requireAuth
-    totalTime: TotalTime! @requireAuth
+    "Get heatmap data, optionally filtered by language"
+    heatMap(languageId: Int): [HeatMap!]! @requireAuth
+    "Get streak data, optionally filtered by language"
+    streak(languageId: Int): Streak! @requireAuth
+    "Check if any activities were completed today, optionally filtered by language"
+    completedToday(languageId: Int): Boolean! @requireAuth
+    "Get total time spent on activities, optionally filtered by language"
+    totalTime(languageId: Int): TotalTime! @requireAuth
   }
 
   input CreateActivityInput {
@@ -55,10 +66,22 @@ export const schema = gql`
     notes: String
     duration: Int
     date: Date! # Changed from DateTime! to Date!
+    languageId: Int! # Required field for language
+  }
+
+  input UpdateActivityInput {
+    mediaSlug: String
+    activityType: ActivityType
+    notes: String
+    duration: Int
+    date: Date
+    languageId: Int # Optional for updates
   }
 
   type Mutation {
     createActivity(input: CreateActivityInput!): Activity! @requireAuth
+    updateActivity(id: String!, input: UpdateActivityInput!): Activity!
+      @requireAuth
     deleteActivity(id: String!): Activity! @requireAuth
   }
 `;

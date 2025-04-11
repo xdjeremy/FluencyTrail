@@ -14,6 +14,21 @@ generator client {
   binaryTargets = "native"
 }
 
+model Language {
+  id   Int    @id @default(autoincrement())
+  code String @unique // e.g., 'en', 'es', 'ja'
+  name String // e.g., 'English', 'Spanish', 'Japanese'
+
+  users      User[] // Implicit many-to-many relation with User
+  activities Activity[] // One-to-many relation with Activity
+
+  // Relation for tracking primary language
+  UserPrimaryLanguage User[] @relation("UserPrimaryLanguage")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model User {
   id                              Int       @id @default(autoincrement())
   email                           String    @unique
@@ -25,12 +40,19 @@ model User {
   emailVerified                   Boolean   @default(false)
   emailVerificationToken          String?
   emailVerificationTokenExpiresAt DateTime?
-  timezone                        String? // Make timezone non-nullable
+  timezone                        String // Now non-nullable
   createdAt                       DateTime  @default(now())
   updatedAt                       DateTime  @updatedAt
 
+  // Language relations
+  languages         Language[] // Implicit many-to-many
+  primaryLanguageId Int? // Foreign key for primary language
+  primaryLanguage   Language?  @relation("UserPrimaryLanguage", fields: [primaryLanguageId], references: [id], onDelete: Restrict)
+
   Activity Activity[]
   OAuth    OAuth[]
+
+  @@index([primaryLanguageId])
 }
 
 model OAuth {
@@ -40,7 +62,7 @@ model OAuth {
   // The username of the user on the OAuth provider's system. Useful for helping users identify their linked accounts
   providerUsername String
   // The below two fields should be in reference to whatever your user model is
-  user             User   @relation(fields: [userId], references: [id])
+  user             User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId           Int
 
   createdAt DateTime @default(now())
@@ -52,7 +74,7 @@ model OAuth {
 
 model Activity {
   id           String       @id @default(uuid())
-  userId       Int?
+  userId       Int
   activityType ActivityType
   mediaId      String?
   notes        String?
@@ -61,8 +83,14 @@ model Activity {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
-  user  User?  @relation(fields: [userId], references: [id], onDelete: SetNull)
+  // Language relation
+  languageId Int
+  language   Language @relation(fields: [languageId], references: [id], onDelete: Restrict)
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   media Media? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+
+  @@index([languageId])
 }
 
 enum ActivityType {

@@ -11,9 +11,10 @@ import {
   Save,
 } from 'lucide-react';
 import type {
-  ActivityType, // <-- Import ActivityType enum
+  ActivityType,
   CreateActivityInput,
   CreateActivityMutation,
+  Language, // Import Language type directly if needed
 } from 'types/graphql';
 
 import {
@@ -56,6 +57,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from 'src/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'src/components/ui/select'; // Import Select components
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
 import { cn } from 'src/utils/cn';
 
@@ -68,9 +76,16 @@ interface ActivityFormProps {
   onSave: (data: CreateActivityInput) => void;
   error: RWGqlError;
   loading: boolean;
+  // Pass user languages and primary language ID as props
+  userLanguages?: Pick<Language, 'id' | 'name'>[]; // Use Pick for specific fields
+  primaryLanguageId?: number;
 }
 
-const ActivityForm = (props: ActivityFormProps) => {
+const ActivityForm = ({
+  userLanguages = [], // Default to empty array
+  primaryLanguageId,
+  ...props
+}: ActivityFormProps) => {
   const { isActivityModalOpen, setActivityModalOpen } = useActivityModal();
   const { currentUser } = useAuth();
 
@@ -82,6 +97,7 @@ const ActivityForm = (props: ActivityFormProps) => {
       date: new Date(),
       duration: 15,
       mediaSlug: '',
+      languageId: primaryLanguageId || undefined, // Set default language
     },
   });
 
@@ -99,12 +115,14 @@ const ActivityForm = (props: ActivityFormProps) => {
     const formattedDate = format(data.date, 'yyyy-MM-dd');
 
     const saveData: CreateActivityInput = {
-      ...data,
-      activityType: data.activityType as ActivityType, // <-- Explicit cast
-      date: formattedDate, // <-- Use the formatted date string
-      duration: Number(data.duration), // <-- Explicitly convert duration to number
+      activityType: data.activityType as ActivityType,
+      notes: data.notes,
+      duration: Number(data.duration),
+      date: formattedDate,
+      mediaSlug: data.mediaSlug,
+      languageId: Number(data.languageId), // Ensure languageId is a number
     };
-    props.onSave(saveData); // <-- Use the correctly typed object
+    props.onSave(saveData);
   };
 
   return (
@@ -167,6 +185,40 @@ const ActivityForm = (props: ActivityFormProps) => {
               )}
             />
             <ActivityMediaSelect isLoading={props.loading} />
+            {/* Language Select Field */}
+            <FormField
+              control={form.control}
+              name="languageId"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <FormLabel className="text-right">Language*</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value?.toString()} // Convert number to string for Select
+                    disabled={props.loading || !userLanguages.length}
+                  >
+                    <FormControl className="col-span-3">
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a language" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {userLanguages.map(lang => (
+                        <SelectItem key={lang.id} value={lang.id.toString()}>
+                          {lang.name}
+                        </SelectItem>
+                      ))}
+                      {!userLanguages.length && (
+                        <div className="text-muted-foreground p-2 text-sm">
+                          No languages added yet. Go to Settings to add one.
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="activityType"
