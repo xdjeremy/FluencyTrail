@@ -8,7 +8,6 @@ import {
   Headphones,
   MessageSquareQuote,
   MoreHorizontal,
-  Pencil,
   PenIcon,
   TvMinimalPlay,
 } from 'lucide-react';
@@ -19,7 +18,6 @@ import { Button } from 'src/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'src/components/ui/dropdown-menu';
 
@@ -61,7 +59,7 @@ const ActivityList = ({ activities }: GetActivitiesForActivityList) => {
             {groupedActivities[date].map(activity => (
               <div
                 key={activity.id}
-                className="border border-neutral-200 p-4 transition-colors hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700"
+                className="border p-4 transition-colors hover:border-neutral-300 dark:hover:border-neutral-700"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -95,12 +93,6 @@ const ActivityList = ({ activities }: GetActivitiesForActivityList) => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                      // onClick={() => handleEditActivity(activity)}
-                      >
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
                       <DeleteActivity activityId={activity.id} />
                     </DropdownMenuContent>
                   </DropdownMenu>

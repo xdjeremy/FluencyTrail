@@ -303,16 +303,6 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
   });
 };
 
-export const updateActivity: MutationResolvers['updateActivity'] = ({
-  id,
-  input,
-}) => {
-  return db.activity.update({
-    data: input,
-    where: { id },
-  });
-};
-
 export const deleteActivity: MutationResolvers['deleteActivity'] = ({ id }) => {
   const userId = context.currentUser.id;
 
