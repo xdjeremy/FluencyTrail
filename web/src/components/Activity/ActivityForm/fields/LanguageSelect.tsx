@@ -63,7 +63,11 @@ const LanguageSelect = () => {
       render={({ field }) => (
         <FormItem className="grid grid-cols-4 items-center gap-4">
           <FormLabel className="text-right">Language*</FormLabel>
-          <Select onValueChange={field.onChange} disabled={loading || !data}>
+          <Select
+            value={String(field.value)}
+            onValueChange={field.onChange}
+            disabled={loading || !data}
+          >
             <FormControl className="col-span-3">
               <SelectTrigger>
                 <SelectValue placeholder="Select a language" />
@@ -74,7 +78,7 @@ const LanguageSelect = () => {
                 data.user.languages.map(lang => (
                   <SelectItem
                     key={lang.id}
-                    value={lang.id.toString()}
+                    value={String(lang.id)}
                     className="cursor-pointer"
                   >
                     {lang.name}
