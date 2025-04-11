@@ -57,17 +57,8 @@ export const schema = gql`
     date: Date! # Changed from DateTime! to Date!
   }
 
-  input UpdateActivityInput {
-    activityType: ActivityType
-    notes: String
-    duration: Int
-    date: DateTime
-  }
-
   type Mutation {
     createActivity(input: CreateActivityInput!): Activity! @requireAuth
-    updateActivity(id: String!, input: UpdateActivityInput!): Activity!
-      @requireAuth
     deleteActivity(id: String!): Activity! @requireAuth
   }
 `;
