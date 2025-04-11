@@ -16,7 +16,6 @@ import {
 
 import logo from '../fluencytrail-logo-two-lines.svg';
 
-import OAuthSignup from './OAuthSignup';
 import {
   SignupConfirmPasswordField,
   SignupEmailField,
@@ -89,7 +88,7 @@ const SignupForm = ({
             Create Account
           </Button>
         </Form>
-        <OAuthSignup isLoading={isLoading} />
+        {/* <OAuthSignup isLoading={isLoading} /> */}
       </CardContent>
       <CardFooter className="flex flex-col space-y-4 border-t pt-6">
         <div className="text-center text-sm">

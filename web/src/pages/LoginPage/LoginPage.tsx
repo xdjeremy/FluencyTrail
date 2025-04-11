@@ -22,7 +22,6 @@ import { Input } from 'src/components/ui/input';
 
 import logo from './fluencytrail-logo-two-lines.svg';
 import { LoginSchema, LoginSchemaType } from './LoginSchema';
-import OAuthLogin from './OAuthLogin';
 
 const LoginPage = () => {
   const { isAuthenticated, logIn } = useAuth();
@@ -176,7 +175,7 @@ const LoginPage = () => {
                 </div>
               </div>
 
-              <OAuthLogin />
+              {/* <OAuthLogin /> */}
               {/* <div className="mt-6 grid grid-cols-3 gap-3">
                 <Button
                   variant="outline"
