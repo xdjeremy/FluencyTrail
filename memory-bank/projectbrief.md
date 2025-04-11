@@ -19,11 +19,11 @@ FluencyTrail is a web application built with RedwoodJS designed to help users tr
 
 ## 4. Key Features (High-Level)
 
-*   **User Accounts:** Secure registration, login (email/password and OAuth - Google/GitHub), profile management, email verification, password reset.
+*   **User Accounts:** Secure registration, login (email/password and OAuth - Google/GitHub), profile management, email verification, password reset, language management.
 *   **Activity Logging:** Record various types of language learning activities (watching, reading, listening, grammar, vocabulary, etc.) with details like duration, notes, date, and language.
 *   **Media Integration:** Link activities to specific media items (movies, TV shows, books) potentially sourced from external databases.
-*   **Progress Tracking & Visualization:** Display user progress through metrics and visualizations (e.g., heatmaps).
-*   **Language Management:** Allow users to specify their primary language and the languages they are learning.
+*   **Progress Tracking & Visualization:** Display user progress through metrics and visualizations (e.g., heatmaps) per language.
+*   **Language Management:** Allow users to specify their primary language and the languages they are learning, with per-language statistics.
 
 ## 5. Scope
 

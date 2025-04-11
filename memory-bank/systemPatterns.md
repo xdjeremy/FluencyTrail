@@ -46,23 +46,57 @@
 ## 4. Component Relationships
 
 ### Backend Services / Data Models (from `schema.prisma`)
-*   `User` central model, linked to `Activity`, `Language`, `OAuth`.
-*   `Activity` linked to `User`, `Language`, optionally `Media`.
-*   `Media` linked to `Activity`, `MovieMetadata`, `TvMetadata`.
-*   `Language` linked to `User`, `Activity`.
-*   `OAuth` linked to `User`.
+*   **User Model**:
+    * Central model with one-to-many relationship to `Activity`
+    * Many-to-many relationship with `Language` (languages user is learning)
+    * One-to-one relationship with `Language` (primary language)
+    * One-to-many relationship with `OAuth` (auth providers)
+*   **Activity Model**:
+    * Many-to-one relationship with `User`
+    * Many-to-one relationship with `Language` (required)
+    * Optional many-to-one relationship with `Media`
+*   **Media Model**:
+    * One-to-many relationship with `Activity`
+    * One-to-one relationships with `MovieMetadata` or `TvMetadata`
+*   **Language Model**:
+    * Many-to-many with `User` (languages being learned)
+    * One-to-many with `User` (as primary language)
+    * One-to-many with `Activity`
 
 ## 5. Critical Implementation Paths
 
 ### User Authentication Flow
-*   Steps: ...
-*   Components Involved: ...
-*   Error Handling: ...
+*   Steps: Standard RedwoodJS dbAuth with OAuth support
+*   Components Involved:
+    * Frontend: LoginPage, SignupPage
+    * Backend: auth function, users service
+*   Error Handling: Form validation, API error responses
 
-### Data Flow
-*   Request Path: ...
-*   Response Path: ...
-*   Error Handling: ...
+### Data Flow: Activity Creation
+*   Request Path:
+    1. User interaction with `ActivityForm`
+    2. Language data fetched via `NewActivityCell`
+    3. Form data validation with `ActivitySchema`
+    4. GraphQL mutation to create activity
+*   Response Path:
+    1. Activity creation in database with language association
+    2. Success/error response to client
+    3. UI updates (notifications, form reset)
+*   Error Handling:
+    * Frontend form validation (required fields, constraints)
+    * Backend service validation
+    * GraphQL error responses
+
+### Data Flow: Language Management
+*   Request Path:
+    1. User interaction with language settings
+    2. GraphQL mutations for language operations
+*   Response Path:
+    1. Database updates (add/remove languages, set primary)
+    2. UI updates reflecting changes
+*   Error Handling:
+    * Validation for primary language requirement
+    * Cascade handling for related activities
 
 ## 6. System Constraints
 
