@@ -26,6 +26,7 @@ const ActivitySchema = z.object({
       message: 'Notes must be 300 characters or less',
     })
     .optional(),
+  languageId: z.coerce.number().min(1, { message: 'Language is required' }),
 });
 
 export { ActivitySchema };

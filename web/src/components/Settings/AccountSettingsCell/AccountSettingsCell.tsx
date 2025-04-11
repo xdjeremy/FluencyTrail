@@ -21,6 +21,23 @@ export const QUERY: TypedDocumentNode<
       email
       name
       timezone
+      languages {
+        id
+        code
+        name
+      }
+      primaryLanguage {
+        id
+        code
+        name
+      }
+    }
+
+    # Fetch all available languages for selection
+    languages {
+      id
+      code
+      name
     }
   }
 `;
@@ -39,9 +56,10 @@ export const Failure = ({
 
 export const Success = ({
   user,
+  languages,
 }: CellSuccessProps<
   FindUserForProfileSettings,
   FindUserForProfileSettingsVariables
 >) => {
-  return <AccountSettings user={user} />;
+  return <AccountSettings user={user} languages={languages} />;
 };

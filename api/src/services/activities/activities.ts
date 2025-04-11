@@ -1,12 +1,12 @@
+import type { Prisma } from '@prisma/client';
 import {
   differenceInCalendarDays,
-  endOfDay, // Added endOfDay
-  isValid, // Added isValid import
+  endOfDay,
+  isValid,
   startOfDay,
   subDays,
   subYears,
 } from 'date-fns';
-// Import both timezone functions we need
 import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
 import type {
   ActivityRelationResolvers,
@@ -14,14 +14,11 @@ import type {
   QueryResolvers,
 } from 'types/graphql';
 
-// Removed validate, validateWith
+import { RedwoodError } from '@redwoodjs/api';
 
 import { db } from 'src/lib/db';
-import { TimezoneConverter } from 'src/lib/TimezoneConverter'; // Import the new converter
+import { TimezoneConverter } from 'src/lib/TimezoneConverter';
 
-// Removed MediaManager import
-
-// Import the validation function from the new file
 import { validateActivityInput } from './activityValidation';
 
 // --- Service Functions ---
@@ -29,14 +26,20 @@ export const activities: QueryResolvers['activities'] = ({
   itemsPerPage = 10,
   page = 1,
   userId = context.currentUser.id,
+  languageId,
 }) => {
-  // TODO: convert date to user's timezone
   const offset = (page - 1) * itemsPerPage;
+
+  const where: Prisma.ActivityWhereInput = { userId };
+  if (languageId) {
+    where.languageId = languageId;
+  }
+
   return db.activity.findMany({
     take: itemsPerPage,
     skip: offset,
     orderBy: { date: 'desc' },
-    where: { userId },
+    where,
   });
 };
 
@@ -46,16 +49,21 @@ export const activity: QueryResolvers['activity'] = ({ id }) => {
   });
 };
 
-export const heatMap: QueryResolvers['heatMap'] = async () => {
+export const heatMap: QueryResolvers['heatMap'] = async ({ languageId }) => {
   const oneYearAgo = subYears(new Date(), 1);
+  const where: Prisma.ActivityWhereInput = {
+    userId: context.currentUser.id,
+    date: {
+      gte: oneYearAgo,
+    },
+  };
+
+  if (languageId) {
+    where.languageId = languageId;
+  }
 
   const activities = await db.activity.findMany({
-    where: {
-      userId: context.currentUser.id,
-      date: {
-        gte: oneYearAgo,
-      },
-    },
+    where,
     select: {
       date: true,
       duration: true,
@@ -91,12 +99,17 @@ export const heatMap: QueryResolvers['heatMap'] = async () => {
   return heatMapData;
 };
 
-export const streak: QueryResolvers['streak'] = async () => {
+export const streak: QueryResolvers['streak'] = async ({ languageId }) => {
   const userId = context.currentUser.id;
-  const userTimeZone = context.currentUser?.timezone || 'UTC'; // Default to UTC if not set
+  const userTimeZone = context.currentUser?.timezone || 'UTC';
+
+  const where: Prisma.ActivityWhereInput = { userId };
+  if (languageId) {
+    where.languageId = languageId;
+  }
 
   const activities = await db.activity.findMany({
-    where: { userId },
+    where,
     select: { date: true },
     orderBy: { date: 'asc' },
   });
@@ -172,7 +185,9 @@ export const streak: QueryResolvers['streak'] = async () => {
   return { currentStreak, bestStreak };
 };
 
-export const completedToday: QueryResolvers['completedToday'] = async () => {
+export const completedToday: QueryResolvers['completedToday'] = async ({
+  languageId,
+}) => {
   const userId = context.currentUser.id;
   const userTimeZone = context.currentUser?.timezone || 'UTC'; // Default to UTC
 
@@ -192,20 +207,26 @@ export const completedToday: QueryResolvers['completedToday'] = async () => {
   // but it's safer to be explicit if unsure. Prisma typically expects ISO strings or Date objects
   // which it treats as UTC. Let's use the Date objects directly.
 
-  const count = await db.activity.count({
-    where: {
-      userId: userId,
-      date: {
-        gte: startOfToday, // Greater than or equal to the start of the day in user's TZ
-        lte: endOfToday, // Less than or equal to the end of the day in user's TZ
-      },
+  const where: Prisma.ActivityWhereInput = {
+    userId: userId,
+    date: {
+      gte: startOfToday,
+      lte: endOfToday,
     },
-  });
+  };
+
+  if (languageId) {
+    where.languageId = languageId;
+  }
+
+  const count = await db.activity.count({ where });
 
   return count > 0;
 };
 
-export const totalTime: QueryResolvers['totalTime'] = async () => {
+export const totalTime: QueryResolvers['totalTime'] = async ({
+  languageId,
+}) => {
   const userId = context.currentUser.id;
   const now = new Date();
 
@@ -216,16 +237,21 @@ export const totalTime: QueryResolvers['totalTime'] = async () => {
   const startOfLastWeek = startOfDay(subDays(now, 13)); // Start of 14 days ago
 
   // Use Prisma aggregate for efficient summation
+  const baseWhere = {
+    userId,
+    ...(languageId ? { languageId } : {}),
+  };
+
   const [totalDurationSum, thisWeekDurationSum, lastWeekDurationSum] =
     await Promise.all([
       db.activity.aggregate({
         _sum: { duration: true },
-        where: { userId },
+        where: baseWhere,
       }),
       db.activity.aggregate({
         _sum: { duration: true },
         where: {
-          userId,
+          ...baseWhere,
           date: {
             gte: startOfThisWeek,
             lte: endOfToday,
@@ -235,10 +261,10 @@ export const totalTime: QueryResolvers['totalTime'] = async () => {
       db.activity.aggregate({
         _sum: { duration: true },
         where: {
-          userId,
+          ...baseWhere,
           date: {
             gte: startOfLastWeek,
-            lt: endOfLastWeek, // Use 'lt' (less than) to avoid overlap with startOfThisWeek if run exactly at midnight
+            lt: endOfLastWeek,
           },
         },
       }),
@@ -265,7 +291,27 @@ export const totalTime: QueryResolvers['totalTime'] = async () => {
 export const createActivity: MutationResolvers['createActivity'] = async ({
   input,
 }) => {
-  // Call the consolidated validation function, passing currentUser
+  // Validate language exists and user has access to it
+  if (!input.languageId) {
+    throw new RedwoodError('Language is required');
+  }
+
+  const user = await db.user.findUnique({
+    where: {
+      id: context.currentUser.id,
+    },
+    select: {
+      languages: {
+        where: { id: input.languageId },
+      },
+    },
+  });
+
+  if (!user?.languages?.length) {
+    throw new RedwoodError('Selected language is not added to your profile');
+  }
+
+  // Call the consolidated validation function for other validations
   const { media } = await validateActivityInput(input, context.currentUser);
 
   // Determine the final Date object for Prisma using the TimezoneConverter
@@ -298,8 +344,74 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
       duration: input.duration,
       date: finalDateForDb,
       userId: context.currentUser.id,
-      mediaId: media?.id, // Use the media object returned from validation
+      languageId: input.languageId,
+      mediaId: media?.id,
     },
+  });
+};
+
+export const updateActivity: MutationResolvers['updateActivity'] = async ({
+  id,
+  input,
+}) => {
+  // Ensure user owns this activity
+  const activity = await db.activity.findFirst({
+    where: {
+      id,
+      userId: context.currentUser.id,
+    },
+  });
+
+  if (!activity) {
+    throw new RedwoodError('Activity not found');
+  }
+
+  // If changing language, validate the new language
+  if (input.languageId) {
+    const user = await db.user.findUnique({
+      where: {
+        id: context.currentUser.id,
+      },
+      select: {
+        languages: {
+          where: { id: input.languageId },
+        },
+      },
+    });
+
+    if (!user?.languages?.length) {
+      throw new RedwoodError('Selected language is not added to your profile');
+    }
+  }
+
+  // Handle date conversion if date is being updated
+  let finalDateForDb = undefined;
+  if (input.date) {
+    const userTimeZone = context.currentUser?.timezone || 'UTC';
+    if (!isValid(input.date)) {
+      throw new RedwoodError('Invalid date provided');
+    }
+
+    const dateString = formatInTimeZone(input.date, 'UTC', 'yyyy-MM-dd');
+    finalDateForDb = TimezoneConverter.userDateToUtc(dateString, userTimeZone);
+  }
+
+  const updateData: Prisma.ActivityUpdateInput = {
+    activityType: input.activityType,
+    notes: input.notes,
+    duration: input.duration,
+    date: finalDateForDb,
+    ...(input.languageId
+      ? { language: { connect: { id: input.languageId } } }
+      : {}),
+    ...(input.mediaSlug
+      ? { media: { connect: { slug: input.mediaSlug } } }
+      : {}),
+  };
+
+  return db.activity.update({
+    where: { id },
+    data: updateData,
   });
 };
 
@@ -314,5 +426,8 @@ export const deleteActivity: MutationResolvers['deleteActivity'] = ({ id }) => {
 export const Activity: ActivityRelationResolvers = {
   user: (_obj, { root }) => {
     return db.activity.findUnique({ where: { id: root?.id } }).user();
+  },
+  language: (_obj, { root }) => {
+    return db.activity.findUnique({ where: { id: root?.id } }).language();
   },
 };
