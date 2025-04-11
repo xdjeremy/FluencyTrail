@@ -7794,6 +7794,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@spoonjoy/redwoodjs-dbauth-oauth-web@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@spoonjoy/redwoodjs-dbauth-oauth-web@npm:2.0.1"
+  peerDependencies:
+    "@redwoodjs/core": 8.1.1
+    "@redwoodjs/router": 8.1.1
+    react: 18.2.0
+    react-dom: 18.2.0
+  checksum: 10c0/c5099f15c80e8b80b3630d0777db4947f45a54c3c3f50d79ac269792e6ca567ff62d9b2f979a7e1b82eef12e1d515efa723d284d39f81e0cb63964a0e80ce390
+  languageName: node
+  linkType: hard
+
 "@standard-schema/utils@npm:^0.3.0":
   version: 0.3.0
   resolution: "@standard-schema/utils@npm:0.3.0"
@@ -25054,6 +25066,7 @@ __metadata:
     "@redwoodjs/router": "npm:8.6.0"
     "@redwoodjs/vite": "npm:8.6.0"
     "@redwoodjs/web": "npm:8.6.0"
+    "@spoonjoy/redwoodjs-dbauth-oauth-web": "npm:^2.0.1"
     "@types/react": "npm:^18.2.55"
     "@types/react-dom": "npm:^18.2.19"
     "@uiw/react-heat-map": "npm:^2.3.2"
