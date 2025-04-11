@@ -17,7 +17,11 @@ const onOAuthError = (error: string) => {
 };
 
 const oAuthClient = createOAuthClient({
-  enabledProviders: { apple: false, github: false, google: false },
+  enabledProviders: {
+    apple: false,
+    github: true,
+    google: true,
+  },
 });
 
 export const { OAuthProvider, useOAuth } = createOAuth(

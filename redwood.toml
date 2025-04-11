@@ -12,6 +12,8 @@
   includeEnvironmentVariables = [
     # Add any ENV vars that should be available to the web side to this array
     # See https://redwoodjs.com/docs/environment-variables#web
+    'GITHUB_CLIENT_ID',
+    'GOOGLE_CLIENT_ID'
   ]
 [api]
   port = 8911
