@@ -50,11 +50,10 @@ const LanguageSelect = () => {
 
   // Set primary language as default value if available
   useEffect(() => {
-    if (data?.user.primaryLanguage) {
-      console.log('Setting default language:', data.user.primaryLanguage.id);
+    if (data?.user?.primaryLanguage && !form.getValues('languageId')) {
       form.setValue('languageId', data.user.primaryLanguage.id);
     }
-  }, [data, form]);
+  }, [data?.user.primaryLanguage, data?.user.primaryLanguage.id, form]); // Only run when primaryLanguage ID changes
 
   return (
     <FormField
