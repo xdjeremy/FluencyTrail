@@ -27,17 +27,18 @@ FluencyTrail provides a centralized platform for language learners to log all th
 
 *   **Feature: Activity Tracking**
     *   Users should be able to easily log language immersion activities (e.g., watching movies, reading books, listening) and study sessions (grammar, vocabulary).
-    *   Logging should include language, duration, date, optional notes, and optionally link to a specific movie, TV show, or book.
-    *   The system should calculate and display total immersion time based on logged activities.
+    *   Logging must include language selection (required), duration, date, optional notes, and optionally link to a specific movie, TV show, or book.
+    *   The system should calculate and display total immersion time based on logged activities per language.
 *   **Feature: Progress Visualization**
-    *   Users should see clear visualizations of their activity consistency, such as a heatmap showing logged days/time.
-    *   Display streaks or other motivational metrics based on logged activities.
+    *   Users should see clear visualizations of their activity consistency per language, such as a heatmap showing logged days/time.
+    *   Display streaks or other motivational metrics based on logged activities, filtered by language.
 *   **Feature: User Accounts**
     *   Users need secure login via email/password or OAuth providers (Google, GitHub).
-    *   Users should be able to manage their profile (e.g., name, timezone, primary language, learned languages).
+    *   Users must set a primary language and can add additional languages they're learning.
+    *   Users should be able to manage their profile (e.g., name, timezone, languages, primary language).
     *   Implement email confirmation and password reset functionality.
 *   **Feature: Media Discovery (Implied)**
-    *   Users should potentially be able to search for or add media items (movies, TV, books) to link to their activities.
+    *   Users should potentially be able to search for or add media items (movies, TV, books) to link to their activities, with language metadata.
 
 ## 5. User Experience (UX) Goals
 

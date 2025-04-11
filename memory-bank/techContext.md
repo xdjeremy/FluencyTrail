@@ -67,27 +67,50 @@
 ### Frontend Dependencies (Key Libraries)
 *   `@redwoodjs/*` (web, forms, router, auth-dbauth-web)
 *   `@spoonjoy/redwoodjs-dbauth-oauth-web`
-*   `shadcn/ui` related (`@radix-ui/*`, `tailwind-merge`, `clsx`, `lucide-react`, etc.)
-*   `react-hook-form`, `zod`
-*   `date-fns`, `date-fns-tz`, `react-day-picker`
-*   `@uiw/react-heat-map`
-*   `next-themes`
-*   `sonner`
+*   `shadcn/ui` related:
+    * `@radix-ui/react-select` (Language selection dropdown)
+    * `@radix-ui/react-dialog` (Activity form)
+    * Other base components (`tailwind-merge`, `clsx`, `lucide-react`)
+*   Form handling:
+    * `react-hook-form`
+    * `zod` (Form validation including language requirement)
+*   Date handling:
+    * `date-fns`
+    * `date-fns-tz`
+    * `react-day-picker`
+*   UI components/features:
+    * `@uiw/react-heat-map` (Activity visualization)
+    * `next-themes` (Dark mode support)
+    * `sonner` (Toast notifications)
 
 ### Backend Dependencies (Key Libraries)
-*   `@redwoodjs/*` (api, auth-dbauth-api, graphql-server)
-*   `@spoonjoy/redwoodjs-dbauth-oauth-api`
-*   `axios`, `axios-rate-limit`
-*   `date-fns`, `date-fns-tz`
-*   `node-cache`
-*   `nodemailer`
-*   `prisma` client
+*   `@redwoodjs/*`:
+    * `api` (Core API functionality)
+    * `auth-dbauth-api` (Authentication)
+    * `graphql-server` (GraphQL API)
+*   `@spoonjoy/redwoodjs-dbauth-oauth-api` (OAuth support)
+*   External API integration:
+    * `axios`
+    * `axios-rate-limit`
+*   Date/time handling:
+    * `date-fns`
+    * `date-fns-tz`
+*   Caching and email:
+    * `node-cache`
+    * `nodemailer`
+*   Database:
+    * `prisma` client (ORM with type-safe queries)
 
 ## 5. Tool Usage Patterns
 
 ### Authentication
-*   Combines Redwood `dbAuth` (email/password) with OAuth (Google, GitHub) using `@spoonjoy` packages.
-*   Includes email verification and password reset flows (`nodemailer`).
+*   User authentication:
+    * Redwood `dbAuth` (email/password)
+    * OAuth (Google, GitHub) via `@spoonjoy` packages
+    * Email verification and password reset flows (`nodemailer`)
+*   Data access:
+    * Authorization checks in GraphQL resolvers
+    * Language-specific data filtering per user
 
 ### CI/CD
 *   Build process: ...
