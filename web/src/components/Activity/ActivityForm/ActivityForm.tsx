@@ -14,7 +14,6 @@ import type {
   ActivityType,
   CreateActivityInput,
   CreateActivityMutation,
-  Language, // Import Language type directly if needed
 } from 'types/graphql';
 
 import {
@@ -57,18 +56,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from 'src/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from 'src/components/ui/select'; // Import Select components
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
 import { cn } from 'src/utils/cn';
 
 import { ActivitySchema, ActivitySchemaType } from './ActivitySchema';
 import { activityTypes } from './constants';
+import LanguageSelect from './fields/LanguageSelect';
 import ActivityMediaSelect from './fields/MediaSelect';
 
 interface ActivityFormProps {
@@ -76,16 +69,9 @@ interface ActivityFormProps {
   onSave: (data: CreateActivityInput) => void;
   error: RWGqlError;
   loading: boolean;
-  // Pass user languages and primary language ID as props
-  userLanguages?: Pick<Language, 'id' | 'name'>[]; // Use Pick for specific fields
-  primaryLanguageId?: number;
 }
 
-const ActivityForm = ({
-  userLanguages = [], // Default to empty array
-  primaryLanguageId,
-  ...props
-}: ActivityFormProps) => {
+const ActivityForm = ({ ...props }: ActivityFormProps) => {
   const { isActivityModalOpen, setActivityModalOpen } = useActivityModal();
   const { currentUser } = useAuth();
 
@@ -97,7 +83,6 @@ const ActivityForm = ({
       date: new Date(),
       duration: 15,
       mediaSlug: '',
-      languageId: primaryLanguageId || undefined, // Set default language
     },
   });
 
@@ -186,39 +171,7 @@ const ActivityForm = ({
             />
             <ActivityMediaSelect isLoading={props.loading} />
             {/* Language Select Field */}
-            <FormField
-              control={form.control}
-              name="languageId"
-              render={({ field }) => (
-                <FormItem className="grid grid-cols-4 items-center gap-4">
-                  <FormLabel className="text-right">Language*</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value?.toString()} // Convert number to string for Select
-                    disabled={props.loading || !userLanguages.length}
-                  >
-                    <FormControl className="col-span-3">
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a language" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {userLanguages.map(lang => (
-                        <SelectItem key={lang.id} value={lang.id.toString()}>
-                          {lang.name}
-                        </SelectItem>
-                      ))}
-                      {!userLanguages.length && (
-                        <div className="text-muted-foreground p-2 text-sm">
-                          No languages added yet. Go to Settings to add one.
-                        </div>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <LanguageSelect />
             <FormField
               control={form.control}
               name="activityType"
