@@ -13,7 +13,6 @@ const CONFIRM_EMAIL_MUTATION = gql`
   mutation ConfirmEmailMutation($token: String!) {
     confirmUserEmail(token: $token) {
       id
-      emailVerified
     }
   }
 `;
