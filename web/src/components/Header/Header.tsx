@@ -1,6 +1,6 @@
 import { Menu } from 'lucide-react';
 
-import { Link, routes } from '@redwoodjs/router';
+import { Link, NavLink, routes } from '@redwoodjs/router';
 
 import { useAuth } from 'src/auth';
 
@@ -27,19 +27,21 @@ const Header = () => {
             </Link>
 
             <nav className="hidden items-center gap-6 lg:flex">
-              <Link
-                to={routes.home()}
-                className="text-brand-600 hover:text-brand-800 text-sm font-medium transition-colors"
-              >
-                Home
-              </Link>
-              <Link
+              <NavLink
                 to={routes.home()}
                 className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
+                activeClassName="text-brand-600 hover:text-brand-800 text-sm font-medium transition-colors"
               >
-                Lessons
-              </Link>
-              <Link
+                Home
+              </NavLink>
+              <NavLink
+                to={routes.activity()}
+                className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
+                activeClassName="text-brand-600 hover:text-brand-800 text-sm font-medium transition-colors"
+              >
+                Activities
+              </NavLink>
+              {/* <Link
                 to={routes.home()}
                 className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
               >
@@ -50,7 +52,7 @@ const Header = () => {
                 className="hover:text-brand-600 text-sm font-medium text-neutral-600 transition-colors"
               >
                 Progress
-              </Link>
+              </Link> */}
             </nav>
           </div>
 

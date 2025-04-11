@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 
 import { Book } from 'lucide-react';
 
-import { Link, routes } from '@redwoodjs/router';
+import { Link, NavLink, routes } from '@redwoodjs/router';
 
 import { useAuth } from 'src/auth';
 
@@ -37,30 +37,20 @@ const MobileMenu: FC<MobileMenuProps> = ({ trigger }) => {
         </div>
 
         <nav className="flex flex-col items-center gap-8">
-          <Link
+          <NavLink
             to={routes.home()}
-            className="text-brand-600 hover:text-brand-700 text-xl font-medium transition-colors"
+            className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
+            activeClassName="text-brand-600 hover:text-brand-700 text-xl font-medium transition-colors"
           >
             Dashboard
-          </Link>
-          <Link
-            to={routes.home()}
+          </NavLink>
+          <NavLink
+            to={routes.activity()}
             className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
+            activeClassName="text-brand-600 hover:text-brand-700 text-xl font-medium transition-colors"
           >
             Lessons
-          </Link>
-          <Link
-            to={routes.home()}
-            className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
-          >
-            Practice
-          </Link>
-          <Link
-            to={routes.home()}
-            className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
-          >
-            Progress
-          </Link>
+          </NavLink>
           <Link
             to={routes.home()}
             className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
