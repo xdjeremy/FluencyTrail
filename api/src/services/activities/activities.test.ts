@@ -26,6 +26,7 @@ describe('activities', () => {
       id: scenario.activity.one.userId,
       name: 'John Doe',
       timezone: 'UTC', // Mock timezone for date validation
+      email: 'john@example.com',
     });
     const result = await activities({
       itemsPerPage: 10,
@@ -46,6 +47,7 @@ describe('activities', () => {
       id: scenario.activity.two.userId,
       name: 'John Doe',
       timezone: 'UTC', // Mock timezone for date validation
+      email: 'john@example.com',
     });
 
     // Convert the ISO string from scenario to a Date object, simulating GraphQL scalar
@@ -85,6 +87,7 @@ describe('activities', () => {
         id: scenario.activity.one.userId,
         name: 'John Doe',
         timezone: 'UTC',
+        email: 'john@example.com',
       });
 
       // Convert the ISO string from scenario to a Date object
@@ -124,6 +127,7 @@ describe('activities', () => {
         id: scenario.activity.one.userId,
         name: 'John Doe',
         timezone: 'UTC',
+        email: 'john@example.com',
       });
 
       // Convert the ISO string from scenario to a Date object
@@ -149,6 +153,7 @@ describe('activities', () => {
         id: scenario.activity.one.userId,
         name: 'John Doe',
         timezone: 'UTC',
+        email: 'john@example.com',
       });
 
       const invalidDate = new Date('invalid'); // Will result in Invalid Date
@@ -172,6 +177,7 @@ describe('activities', () => {
         id: scenario.activity.one.userId,
         name: 'John Doe',
         timezone: 'UTC', // Mocked user timezone
+        email: 'john@example.com',
       });
 
       // Create a Date object for tomorrow at UTC midnight
@@ -198,6 +204,7 @@ describe('activities', () => {
         id: scenario.activity.one.userId,
         name: 'John Doe',
         timezone: 'UTC',
+        email: 'john@example.com',
       });
 
       // Create an invalid Date object (month 13)
@@ -222,6 +229,7 @@ describe('activities', () => {
         id: scenario.activity.one.userId,
         name: 'John Doe',
         timezone: 'UTC',
+        email: 'john@example.com',
       });
 
       // Note: new Date('2023-02-29') creates a valid Date (March 1st 2023)
@@ -253,7 +261,14 @@ describe('activities', () => {
     expect(result.activityType).toEqual('OTHER');
   });
 
-  scenario('deletes a activity', async (scenario: StandardScenario) => {
+  scenario('deletes an activity', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.activity.one.userId,
+      name: 'John Doe',
+      timezone: 'UTC', // Mock timezone for date validation
+      email: 'john@example.com',
+    });
+
     const original = (await deleteActivity({
       id: scenario.activity.one.id,
     })) as Activity;
@@ -272,6 +287,7 @@ describe('activities', () => {
         id: userId,
         name: 'Timezone Tester',
         timezone: userTimeZone,
+        email: 'john@example.com',
       });
 
       // Create an activity with today's date
