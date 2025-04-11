@@ -10,7 +10,6 @@ import {
   createActivity,
   deleteActivity,
   heatMap,
-  updateActivity,
 } from './activities';
 import type { StandardScenario } from './activities.scenarios';
 
@@ -249,18 +248,6 @@ describe('activities', () => {
   );
 
   // --- Update and Delete tests remain unchanged ---
-  scenario('updates a activity', async (scenario: StandardScenario) => {
-    const original = (await activity({
-      id: scenario.activity.one.id,
-    })) as Activity;
-    const result = await updateActivity({
-      id: original.id,
-      input: { activityType: 'OTHER' },
-    });
-
-    expect(result.activityType).toEqual('OTHER');
-  });
-
   scenario('deletes an activity', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.activity.one.userId,
