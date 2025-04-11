@@ -38,7 +38,7 @@ export const getCurrentUser = async (session: Decoded) => {
     where: { id: session.id },
     // Select the fields you want accessible in context.currentUser
     // Be careful not to expose sensitive fields publicly!
-    select: { id: true, name: true, timezone: true },
+    select: { id: true, email: true, name: true, timezone: true },
   });
 };
 
