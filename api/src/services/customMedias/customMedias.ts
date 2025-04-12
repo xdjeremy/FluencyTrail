@@ -1,0 +1,135 @@
+import type { Prisma } from '@prisma/client';
+
+interface CustomMedia {
+  id: string;
+  mediaId: string;
+  userId: number;
+  metadata: Prisma.JsonValue;
+  createdAt: Date;
+  updatedAt: Date;
+  media: { id: string; title: string };
+  user: { id: number; email: string };
+}
+
+interface QueryResolvers {
+  customMedias(): Promise<CustomMedia[]>;
+  customMedia(args: { id: string }): Promise<CustomMedia | null>;
+  myCustomMedias(args: { query?: string }): Promise<CustomMedia[]>;
+}
+
+interface MutationResolvers {
+  createCustomMedia(args: {
+    input: { mediaId: string; metadata: Prisma.JsonValue };
+  }): Promise<CustomMedia>;
+  updateCustomMedia(args: {
+    id: string;
+    input: { metadata?: Prisma.JsonValue };
+  }): Promise<CustomMedia>;
+  deleteCustomMedia(args: { id: string }): Promise<CustomMedia>;
+}
+
+interface CustomMediaResolvers {
+  media: (
+    args: unknown,
+    obj: { root: { id: string } }
+  ) => Promise<{ id: string; title: string }>;
+  user: (
+    args: unknown,
+    obj: { root: { id: string } }
+  ) => Promise<{ id: number; email: string }>;
+}
+
+import { db } from 'src/lib/db';
+
+export const customMedias: QueryResolvers['customMedias'] = async () => {
+  return db.customMedia.findMany({
+    include: {
+      media: { select: { id: true, title: true } },
+      user: { select: { id: true, email: true } },
+    },
+  });
+};
+
+export const customMedia: QueryResolvers['customMedia'] = async ({ id }) => {
+  return db.customMedia.findUnique({
+    where: { id },
+    include: {
+      media: { select: { id: true, title: true } },
+      user: { select: { id: true, email: true } },
+    },
+  });
+};
+
+export const myCustomMedias: QueryResolvers['myCustomMedias'] = async ({
+  query,
+}) => {
+  const where: {
+    userId: number;
+    metadata?: { path: string[]; string_contains: string };
+  } = { userId: context.currentUser?.id as number };
+
+  if (query) {
+    where.metadata = { path: ['title'], string_contains: query };
+  }
+  return db.customMedia.findMany({
+    where,
+    include: {
+      media: { select: { id: true, title: true } },
+      user: { select: { id: true, email: true } },
+    },
+  });
+};
+
+export const createCustomMedia: MutationResolvers['createCustomMedia'] =
+  async ({ input }) => {
+    return db.customMedia.create({
+      data: {
+        ...input,
+        userId: context.currentUser?.id,
+      },
+      include: {
+        media: { select: { id: true, title: true } },
+        user: { select: { id: true, email: true } },
+      },
+    });
+  };
+
+export const updateCustomMedia: MutationResolvers['updateCustomMedia'] =
+  async ({ id, input }) => {
+    return db.customMedia.update({
+      data: input,
+      where: { id },
+      include: {
+        media: { select: { id: true, title: true } },
+        user: { select: { id: true, email: true } },
+      },
+    });
+  };
+
+export const deleteCustomMedia: MutationResolvers['deleteCustomMedia'] =
+  async ({ id }) => {
+    return db.customMedia.delete({
+      where: { id },
+      include: {
+        media: { select: { id: true, title: true } },
+        user: { select: { id: true, email: true } },
+      },
+    });
+  };
+
+export const CustomMedia: CustomMediaResolvers = {
+  media: (_obj, { root }) =>
+    db.customMedia
+      .findUnique({
+        where: { id: root.id },
+        include: { media: { select: { id: true, title: true } } },
+      })
+      .then(c => c?.media),
+  user: (_obj, { root }) =>
+    db.customMedia
+      .findUnique({
+        where: { id: root.id },
+        include: { user: { select: { id: true, email: true } } },
+      })
+      .then(c => c?.user),
+};

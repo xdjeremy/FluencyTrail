@@ -9,6 +9,9 @@
 
 import { PrivateSet, Route, Router, Set } from '@redwoodjs/router';
 
+import CustomMediaPage from 'src/pages/CustomMediaPage/CustomMediaPage';
+import EditCustomMediaPage from 'src/pages/EditCustomMediaPage/EditCustomMediaPage';
+
 import { useAuth } from './auth';
 import AuthLayout from './layouts/AuthLayout/AuthLayout';
 import BaseLayout from './layouts/BaseLayout/BaseLayout';
@@ -23,6 +26,16 @@ const Routes = () => {
           <Route path="/" page={HomePage} name="home" />
           <Route path="/media/{slug}" page={MediaPage} name="media" />
           <Route path="/activity" page={ActivityPage} name="activity" />
+          <Route
+            path="/custom-media/{id}"
+            page={CustomMediaPage}
+            name="customMedia"
+          />
+          <Route
+            path="/custom-media/{id}/edit"
+            page={EditCustomMediaPage}
+            name="editCustomMedia"
+          />
           <PrivateSet wrap={SettingLayout} unauthenticated="login">
             <Route
               path="/settings"
