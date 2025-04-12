@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Form, SubmitHandler, useForm } from '@redwoodjs/forms';
-import { Link, navigate, routes } from '@redwoodjs/router';
+import { Link, navigate, routes, useParams } from '@redwoodjs/router';
 import { Metadata } from '@redwoodjs/web';
 
 import { useAuth } from 'src/auth';
@@ -24,9 +24,10 @@ import logo from './fluencytrail-logo-two-lines.svg';
 import { LoginSchema, LoginSchemaType } from './LoginSchema';
 
 const LoginPage = () => {
-  const { isAuthenticated, logIn } = useAuth();
+  const { isAuthenticated, logIn, loading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string>('');
+  const params = useParams();
 
   const form = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
@@ -36,7 +37,6 @@ const LoginPage = () => {
     },
   });
 
-  // TODO: add loading state so the user won't see the login page if they are already logged in
   useEffect(() => {
     if (isAuthenticated) {
       navigate(routes.home());
@@ -58,11 +58,25 @@ const LoginPage = () => {
     if (response.error) {
       setServerError(response.error);
     } else {
+      // if redirectTo is provided on , redirect to that page
+      if (params.redirectTo) {
+        const redirectTo = decodeURIComponent(params.redirectTo);
+        navigate(redirectTo);
+      }
+
       toast.success('Welcome back!');
     }
 
     setIsLoading(false);
   };
+
+  if (authLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>
