@@ -21,7 +21,7 @@ const HomePage = () => {
           <LanguageSelectorCell />
         </section>
 
-        {/* Note: I had to put this in a diffent component so it can access the context provider */}
+        {/* Note: I had to put this in a different component so it can access the context provider */}
         <HomeCards />
       </div>
     </HomeProvider>
