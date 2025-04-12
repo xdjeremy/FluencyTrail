@@ -1,78 +1,59 @@
-import type { Activity, Language, User } from '@prisma/client';
+import type { Activity, Prisma } from '@prisma/client';
 
 import type { ScenarioData } from '@redwoodjs/testing/api';
 
-// Define the expected structure of the scenario data after creation
-// Let Redwood infer the exact types where possible, focus on model structure
-export type StandardScenario = ScenarioData<{
-  language: Language[];
-  user: User[];
-  activity: Activity[];
-}>;
-
-export const standard = defineScenario({
-  language: {
-    // Use descriptive keys matching the model name (lowercase)
-    language_en: {
-      data: {
-        code: 'en',
-        name: 'English',
-        updatedAt: new Date(),
-      },
-    },
-    language_es: {
-      data: {
-        code: 'es',
-        name: 'Spanish',
-        updatedAt: new Date(),
-      },
-    },
-  },
-  user: {
-    user_one: {
-      // Use descriptive key
-      data: {
-        email: 'userone@example.com',
-        name: 'User One',
-        hashedPassword: 'mockhashedpassword',
-        salt: 'mocksalt',
-        timezone: 'UTC',
-        updatedAt: new Date(),
-        languages: { connect: { code: 'en' } },
-        primaryLanguage: { connect: { code: 'en' } },
-      },
-    },
-  },
+export const standard = defineScenario<
+  Prisma.ActivityCreateArgs,
+  'activity',
+  'one'
+>({
   activity: {
-    activity_one: scenario => ({
-      // Use descriptive key
+    one: {
       data: {
-        activityType: 'WATCHING',
-        date: '2025-03-30T11:11:30.989Z',
-        duration: 15,
-        notes: 'Activity One Notes',
         user: {
-          connect: { id: scenario.user.user_one.id }, // Use correct key
+          create: {
+            id: 1,
+            name: 'John Doe',
+            timezone: 'UTC',
+            email: 'john@example.com',
+            languages: {
+              connectOrCreate: {
+                where: { id: 1 },
+                create: {
+                  name: 'English',
+                  code: 'en',
+                  id: 1,
+                },
+              },
+            },
+          },
+        },
+        id: '1',
+        date: new Date('2023-10-01T00:00:00Z'), // UTC date
+        duration: 60,
+        activityType: 'GRAMMAR',
+        media: {
+          create: {
+            mediaType: 'BOOK',
+            externalId: '12345',
+            title: 'Sample Book',
+            id: '1',
+            slug: 'sample-book',
+            description: 'A sample book for testing',
+          },
         },
         language: {
-          connect: { id: scenario.language.language_en.id }, // Use correct key
+          create: {
+            id: 1,
+            code: 'en',
+            name: 'English',
+          },
         },
+        createdAt: new Date('2023-10-01T00:00:00Z'), // UTC date
+        updatedAt: new Date('2023-10-01T00:00:00Z'), // UTC date
       },
-    }),
-    activity_two: scenario => ({
-      // Use descriptive key
-      data: {
-        activityType: 'READING',
-        date: '2025-03-31T11:11:30.989Z',
-        duration: 30,
-        notes: 'Activity Two Notes',
-        user: {
-          connect: { id: scenario.user.user_one.id }, // Use correct key
-        },
-        language: {
-          connect: { id: scenario.language.language_es.id }, // Use correct key
-        },
-      },
-    }),
+    },
   },
 });
+
+export type StandardScenario = ScenarioData<Activity>;

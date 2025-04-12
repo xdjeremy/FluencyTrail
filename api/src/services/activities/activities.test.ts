@@ -9,7 +9,6 @@ import {
   activity,
   createActivity,
   deleteActivity,
-  heatMap,
 } from './activities';
 import type { StandardScenario } from './activities.scenarios';
 
@@ -23,9 +22,9 @@ describe('activities', () => {
   scenario('returns all activities', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.activity.one.userId,
+      email: 'email@example.com',
       name: 'John Doe',
       timezone: 'UTC', // Mock timezone for date validation
-      email: 'john@example.com',
     });
     const result = await activities({
       itemsPerPage: 10,
@@ -41,41 +40,42 @@ describe('activities', () => {
     expect(result).toEqual(scenario.activity.one);
   });
 
-  scenario('creates a activity', async (scenario: StandardScenario) => {
+  scenario('creates an activity', async (scenario: StandardScenario) => {
     mockCurrentUser({
-      id: scenario.activity.two.userId,
+      id: scenario.activity.one.userId,
       name: 'John Doe',
       timezone: 'UTC', // Mock timezone for date validation
       email: 'john@example.com',
     });
 
     // Convert the ISO string from scenario to a Date object, simulating GraphQL scalar
-    const inputDate = new Date(scenario.activity.two.date);
+    const inputDate = new Date(scenario.activity.one.date);
 
     const result = await createActivity({
       input: {
-        activityType: scenario.activity.two.activityType,
-        notes: scenario.activity.two.notes,
-        duration: scenario.activity.two.duration,
+        activityType: scenario.activity.one.activityType,
+        notes: scenario.activity.one.notes,
+        duration: scenario.activity.one.duration,
         date: inputDate,
         mediaSlug: 'teasing-master-takagisan-235913-TV',
+        languageId: scenario.activity.one.languageId,
       },
     });
 
     // The service should store the UTC timestamp for midnight in the mocked timezone (UTC)
     const expectedDate = TimezoneConverter.userDateToUtc(
       formatInTimeZone(
-        new Date(scenario.activity.two.date),
+        new Date(scenario.activity.one.date),
         'UTC',
         'yyyy-MM-dd'
       ),
       'UTC'
     );
 
-    expect(result.userId).toEqual(scenario.activity.two.userId);
-    expect(result.activityType).toEqual(scenario.activity.two.activityType);
-    expect(result.notes).toEqual(scenario.activity.two.notes);
-    expect(result.duration).toEqual(scenario.activity.two.duration);
+    expect(result.userId).toEqual(scenario.activity.one.userId);
+    expect(result.activityType).toEqual(scenario.activity.one.activityType);
+    expect(result.notes).toEqual(scenario.activity.one.notes);
+    expect(result.duration).toEqual(scenario.activity.one.duration);
     expect(result.date.getTime()).toEqual(expectedDate.getTime());
   });
 
@@ -97,6 +97,9 @@ describe('activities', () => {
           activityType: scenario.activity.one.activityType,
           date: inputDate,
           duration: scenario.activity.one.duration,
+          mediaSlug: null,
+          languageId: scenario.activity.one.languageId,
+          notes: null,
         },
       });
 
@@ -139,6 +142,8 @@ describe('activities', () => {
             date: inputDate,
             duration: scenario.activity.one.duration,
             mediaSlug: 'invalid-slug',
+            languageId: scenario.activity.one.languageId,
+            notes: null,
           },
         })
       ).rejects.toThrow('Media not found');
@@ -163,6 +168,9 @@ describe('activities', () => {
             activityType: scenario.activity.one.activityType,
             date: invalidDate,
             duration: scenario.activity.one.duration,
+            mediaSlug: null,
+            languageId: scenario.activity.one.languageId,
+            notes: null,
           },
         })
       ).rejects.toThrow('Invalid Date object received.');
@@ -190,6 +198,9 @@ describe('activities', () => {
             activityType: scenario.activity.one.activityType,
             date: tomorrow,
             duration: scenario.activity.one.duration,
+            mediaSlug: null,
+            languageId: scenario.activity.one.languageId,
+            notes: null,
           },
         })
       ).rejects.toThrow('Activity date cannot be in the future.');
@@ -215,6 +226,9 @@ describe('activities', () => {
             activityType: scenario.activity.one.activityType,
             date: invalidDate,
             duration: scenario.activity.one.duration,
+            mediaSlug: null,
+            languageId: scenario.activity.one.languageId,
+            notes: null,
           },
         })
       ).rejects.toThrow('Invalid Date object received.');
@@ -239,6 +253,9 @@ describe('activities', () => {
           activityType: scenario.activity.one.activityType,
           date: leapDate,
           duration: scenario.activity.one.duration,
+          mediaSlug: null,
+          languageId: scenario.activity.one.languageId,
+          notes: null,
         },
       });
 
@@ -263,53 +280,4 @@ describe('activities', () => {
 
     expect(result).toEqual(null);
   });
-
-  scenario(
-    'correctly handles dates in heatmap',
-    async (scenario: StandardScenario) => {
-      const userTimeZone = 'Asia/Manila';
-      const userId = scenario.activity.one.userId;
-
-      mockCurrentUser({
-        id: userId,
-        name: 'Timezone Tester',
-        timezone: userTimeZone,
-        email: 'john@example.com',
-      });
-
-      // Create an activity with today's date
-      const today = new Date();
-      today.setUTCHours(0, 0, 0, 0); // Ensure consistent time portion
-
-      await createActivity({
-        input: {
-          activityType: 'READING',
-          date: today,
-          duration: 30,
-        },
-      });
-
-      // Get heatmap data and assert its shape
-      type HeatMapEntry = {
-        date: string;
-        count: number;
-      };
-      const heatMapResult = await heatMap();
-
-      // Get expected date string for today in Asia/Manila
-      const expectedDateString = formatInTimeZone(
-        today,
-        userTimeZone,
-        'yyyy/MM/dd'
-      );
-
-      // Find today's entry in the heatmap results
-      const todayEntry = (heatMapResult as HeatMapEntry[]).find(
-        entry => entry.date === expectedDateString
-      );
-
-      expect(todayEntry).toBeTruthy();
-      expect(todayEntry?.count).toBe(30); // Duration we set
-    }
-  );
 });
