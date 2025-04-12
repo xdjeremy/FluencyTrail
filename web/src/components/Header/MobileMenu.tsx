@@ -41,6 +41,7 @@ const MobileMenu: FC<MobileMenuProps> = ({ trigger }) => {
             to={routes.home()}
             className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
             activeClassName="text-brand-600 hover:text-brand-700 text-xl font-medium transition-colors"
+            onClick={() => setIsOpen(false)}
           >
             Dashboard
           </NavLink>
@@ -48,12 +49,14 @@ const MobileMenu: FC<MobileMenuProps> = ({ trigger }) => {
             to={routes.activity()}
             className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
             activeClassName="text-brand-600 hover:text-brand-700 text-xl font-medium transition-colors"
+            onClick={() => setIsOpen(false)}
           >
             Lessons
           </NavLink>
           <Link
             to={routes.home()}
             className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
+            onClick={() => setIsOpen(false)}
           >
             My Profile
           </Link>
@@ -71,7 +74,9 @@ const MobileMenu: FC<MobileMenuProps> = ({ trigger }) => {
                 onClick={() => setIsOpen(false)}
                 asChild
               >
-                <Link to={routes.signup()}>Sign up</Link>
+                <Link to={routes.signup()} onClick={() => setIsOpen(false)}>
+                  Sign up
+                </Link>
               </Button>
               <Button
                 variant="outline"
@@ -79,7 +84,9 @@ const MobileMenu: FC<MobileMenuProps> = ({ trigger }) => {
                 onClick={() => setIsOpen(false)}
                 asChild
               >
-                <Link to={routes.login()}>Log in</Link>
+                <Link to={routes.login()} onClick={() => setIsOpen(false)}>
+                  Log in
+                </Link>
               </Button>
             </>
           )}
