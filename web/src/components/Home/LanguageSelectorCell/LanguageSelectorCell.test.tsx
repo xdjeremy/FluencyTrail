@@ -36,7 +36,7 @@ describe('LanguageSelectorCell', () => {
 
   it('renders Success successfully', async () => {
     expect(() => {
-      render(<Success id={42} languageSelector={standard().languageSelector} />)
+      render(<Success id={42} user={standard().user} />)
     }).not.toThrow()
   })
 })
