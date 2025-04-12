@@ -21,6 +21,7 @@ const App = ({ children }: AppProps) => (
         <OAuthProvider>
           <RedwoodApolloProvider useAuth={useAuth}>
             {children}
+            <div id="portal-root" />
           </RedwoodApolloProvider>
         </OAuthProvider>
       </AuthProvider>
