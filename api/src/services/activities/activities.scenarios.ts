@@ -56,4 +56,4 @@ export const standard = defineScenario<
   },
 });
 
-export type StandardScenario = ScenarioData<Activity>;
+export type StandardScenario = ScenarioData<Activity, 'activity', 'one'>;

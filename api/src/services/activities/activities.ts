@@ -26,7 +26,7 @@ export const activities: QueryResolvers['activities'] = ({
   itemsPerPage = 10,
   page = 1,
   userId = context.currentUser.id,
-  languageId,
+  languageId = null,
 }) => {
   const offset = (page - 1) * itemsPerPage;
 

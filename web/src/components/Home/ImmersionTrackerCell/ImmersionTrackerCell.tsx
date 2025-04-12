@@ -20,8 +20,8 @@ export const QUERY: TypedDocumentNode<
   FindActivitiesForRecentActivities,
   FindActivitiesForRecentActivitiesVariables
 > = gql`
-  query FindActivitiesForRecentActivities {
-    activities: activities(itemsPerPage: 5, page: 1) {
+  query FindActivitiesForRecentActivities($languageId: Int) {
+    activities: activities(itemsPerPage: 5, page: 1, languageId: $languageId) {
       id
       activityType
       duration

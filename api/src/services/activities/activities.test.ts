@@ -34,12 +34,73 @@ describe('activities', () => {
     expect(result.length).toEqual(Object.keys(scenario.activity).length);
   });
 
+  scenario(
+    'return activities by languageId',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+        email: 'email@example.com',
+        name: 'John Doe',
+        timezone: 'UTC', // Mock timezone for date validation
+      });
+
+      const result = await activities({
+        languageId: scenario.activity.one.languageId,
+      });
+
+      expect(result.length).toEqual(Object.keys(scenario.activity).length);
+    }
+  );
+
+  scenario(
+    'return activities but no languageId',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+        name: 'John Doe',
+        timezone: 'UTC', // Mock timezone for date validation
+        email: 'john@example.com',
+      });
+
+      const result = await activities({
+        itemsPerPage: 10,
+        page: 1,
+      });
+
+      expect(result.length).toEqual(Object.keys(scenario.activity).length);
+    }
+  );
+
+  scenario(
+    'return activities but language id is not on users languages',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.activity.one.userId,
+        name: 'John Doe',
+        timezone: 'UTC', // Mock timezone for date validation
+        email: 'email@example.com',
+      });
+
+      const result = await activities({
+        languageId: 999, // Assuming this language ID does not exist for the user
+        itemsPerPage: 10,
+        page: 1,
+      });
+
+      expect(result).toEqual([]); // Expect no activities to be returned
+    }
+  );
+});
+
+describe('activity', () => {
   scenario('returns a single activity', async (scenario: StandardScenario) => {
     const result = await activity({ id: scenario.activity.one.id });
 
     expect(result).toEqual(scenario.activity.one);
   });
+});
 
+describe('createActivity', () => {
   scenario('creates an activity', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.activity.one.userId,
@@ -263,7 +324,9 @@ describe('activities', () => {
       expect(result.date.toISOString()).toBe('2023-03-01T00:00:00.000Z');
     }
   );
+});
 
+describe('deleteActivity', () => {
   // --- Update and Delete tests remain unchanged ---
   scenario('deletes an activity', async (scenario: StandardScenario) => {
     mockCurrentUser({
