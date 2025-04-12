@@ -1,14 +1,15 @@
-// import { Link, routes } from '@redwoodjs/router'
 import { Metadata } from '@redwoodjs/web';
 
 import HeatMapCell from 'src/components/Home/HeatMapCell';
+import { HomeProvider } from 'src/components/Home/HomeProvider';
 import ImmersionTrackerCell from 'src/components/Home/ImmersionTrackerCell';
+import LanguageSelectorCell from 'src/components/Home/LanguageSelectorCell';
 import StreakCell from 'src/components/Home/StreakCell';
 import TotalTimeCell from 'src/components/Home/TotalTimeCell';
 
 const HomePage = () => {
   return (
-    <>
+    <HomeProvider>
       <Metadata title="Home" description="Home page" />
 
       <div className="flex flex-col gap-6">
@@ -19,11 +20,7 @@ const HomePage = () => {
               Track your language learning progress
             </p>
           </div>
-          {/* <LanguageSelector
-          languages={languages}
-          currentLanguage={currentLanguage}
-          onLanguageChange={setCurrentLanguage}
-        /> */}
+          <LanguageSelectorCell />
         </section>
 
         {/* Activity Heatmap - Central element */}
@@ -40,7 +37,7 @@ const HomePage = () => {
           <ImmersionTrackerCell />
         </section>
       </div>
-    </>
+    </HomeProvider>
   );
 };
 
