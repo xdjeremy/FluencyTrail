@@ -11,7 +11,7 @@ import { useQuery } from '@redwoodjs/web';
 import CustomMediaForm from 'src/components/CustomMedia/CustomMediaForm/CustomMediaForm';
 
 const QUERY = gql`
-  query FindCustomMediaQuery($id: String!) {
+  query FindCustomMediaForEditPage($id: String!) {
     customMedia: customMedia(id: $id) {
       id
       mediaId

@@ -132,6 +132,7 @@ enum MediaType {
   MOVIE
   TV
   BOOK
+  OTHER
 }
 
 model MovieMetadata {

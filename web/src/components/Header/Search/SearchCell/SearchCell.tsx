@@ -15,7 +15,7 @@ import { useSearchNavigation } from '../useSearchNavigation';
 
 // Update the query to use searchMyContent
 export const QUERY: TypedDocumentNode<any, any> = gql`
-  query SearchMyContent($query: String!) {
+  query SearchMyContentForHeader($query: String!) {
     # Rename the result field for clarity if desired, or keep as searchMyContent
     results: searchMyContent(query: $query) {
       id

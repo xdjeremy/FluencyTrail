@@ -38,7 +38,7 @@ import { cn } from 'src/utils/cn';
 
 // Use the unified search query
 const SEARCH_MEDIA_QUERY: TypedDocumentNode<any, any> = gql`
-  query SearchMyContent($query: String!) {
+  query SearchMyContentForMediaSelect($query: String!) {
     results: searchMyContent(query: $query) {
       id
       title

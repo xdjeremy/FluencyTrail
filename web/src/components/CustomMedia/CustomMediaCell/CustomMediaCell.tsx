@@ -1,21 +1,17 @@
 import type {
-  FindCustomMediaQuery,
-  FindCustomMediaQueryVariables,
-} from 'types/graphql';
-
-import type {
   CellSuccessProps,
   CellFailureProps,
   TypedDocumentNode,
 } from '@redwoodjs/web';
 
+import type { CustomMediaWithMetadata } from '../customMedia.types';
 import CustomMediaDetail from '../CustomMediaDetail';
 
 export const QUERY: TypedDocumentNode<
   FindCustomMediaQuery,
   FindCustomMediaQueryVariables
 > = gql`
-  query FindCustomMediaQuery($id: String!) {
+  query FindCustomMediaForCell($id: String!) {
     customMedia: customMedia(id: $id) {
       id
       mediaId
@@ -43,5 +39,7 @@ export const Failure = ({
 export const Success = ({
   customMedia,
 }: CellSuccessProps<FindCustomMediaQuery, FindCustomMediaQueryVariables>) => {
-  return <CustomMediaDetail customMedia={customMedia} />;
+  // Cast to our typed version to satisfy CustomMediaDetail's prop type
+  const typedCustomMedia = customMedia as CustomMediaWithMetadata;
+  return <CustomMediaDetail customMedia={typedCustomMedia} />;
 };

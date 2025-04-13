@@ -10,7 +10,7 @@ import type { CustomMediaWithMetadata } from 'src/components/CustomMedia/customM
 import CustomMediaDetail from 'src/components/CustomMedia/CustomMediaDetail/CustomMediaDetail';
 
 const QUERY = gql`
-  query FindCustomMediaQuery($id: String!) {
+  query FindCustomMediaForPage($id: String!) {
     customMedia: customMedia(id: $id) {
       id
       mediaId
