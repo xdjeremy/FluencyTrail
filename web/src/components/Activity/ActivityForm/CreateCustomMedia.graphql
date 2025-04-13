@@ -1,0 +1,9 @@
+mutation CreateCustomMedia($input: CreateCustomMediaInput!) {
+  createCustomMedia(input: $input) {
+    id
+    media {
+      id
+      slug
+    }
+  }
+}

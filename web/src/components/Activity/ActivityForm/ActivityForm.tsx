@@ -15,6 +15,8 @@ import type {
   ActivityType,
   CreateActivityInput,
   CreateActivityMutation,
+  CreateCustomMediaInput,
+  CreateCustomMediaMutation,
 } from 'types/graphql';
 
 import {
@@ -63,22 +65,9 @@ import { cn } from 'src/utils/cn';
 
 import { ActivitySchema, ActivitySchemaType } from './ActivitySchema';
 import { activityTypes } from './constants';
+import { CREATE_CUSTOM_MEDIA } from './CreateCustomMedia'; // Import from the .ts file
 import LanguageSelect from './fields/LanguageSelect';
 import ActivityMediaSelect from './fields/MediaSelect';
-
-const CREATE_CUSTOM_MEDIA_MUTATION = gql`
-  mutation CreateCustomMedia($input: CreateCustomMediaInput!) {
-    createCustomMedia(input: $input) {
-      id
-      mediaId
-      media {
-        id
-        title
-        slug
-      }
-    }
-  }
-`;
 
 interface ActivityFormProps {
   activity?: CreateActivityMutation['createActivity'];
@@ -91,7 +80,11 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
   const { isActivityModalOpen, setActivityModalOpen } = useActivityModal();
   const { currentUser } = useAuth();
 
-  const [createCustomMedia] = useMutation(CREATE_CUSTOM_MEDIA_MUTATION, {
+  const [createCustomMedia, { loading: creatingMedia }] = useMutation<
+    CreateCustomMediaMutation,
+    { input: CreateCustomMediaInput }
+  >(CREATE_CUSTOM_MEDIA, {
+    // Use the imported constant
     onError: error => {
       console.error('Error creating custom media:', error);
     },
@@ -123,41 +116,62 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
   // Clear draft on successful submit
   const onSubmit: SubmitHandler<ActivitySchemaType> = async data => {
     try {
-      let mediaSlug = data.mediaSlug;
-
-      // If no mediaSlug but customMediaTitle exists, create custom media
-      if (!mediaSlug && data.customMediaTitle) {
-        // Generate a unique ID for the custom media
-        const customId = `custom-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-        const customMediaInput = {
-          mediaId: customId,
-          metadata: {
-            title: data.customMediaTitle,
-          },
-        };
-
-        const result = await createCustomMedia({
-          variables: { input: customMediaInput },
-        });
-
-        mediaSlug = result.data.createCustomMedia.media.slug;
-      }
-
-      sessionStorage.removeItem('activityFormDraft');
-
       // Format the date as 'yyyy-MM-dd' string before sending
       const formattedDate = format(data.date, 'yyyy-MM-dd');
 
+      let mediaSlug = data.mediaSlug;
+
+      // If we have a custom media title, create it first
+      if (data.customMediaTitle && !data.mediaSlug) {
+        const customId = `custom-${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2)}`;
+
+        try {
+          const result = await createCustomMedia({
+            variables: {
+              input: {
+                mediaId: customId,
+                metadata: {
+                  title: data.customMediaTitle,
+                },
+              },
+            },
+          });
+
+          // Access the slug from the nested media object
+          if (result.data?.createCustomMedia?.media?.slug) {
+            mediaSlug = result.data.createCustomMedia.media.slug;
+          } else {
+            // Handle case where media or slug might be missing in response
+            console.error(
+              'Custom media created, but slug not found in response'
+            );
+            // Optionally, you could try using the mediaId if slug isn't critical
+            // or throw an error to prevent saving the activity without a valid link.
+            // For now, we'll proceed without a slug if it's missing.
+            mediaSlug = undefined;
+          }
+        } catch (error) {
+          console.error('Failed to create custom media:', error);
+          return; // Stop if custom media creation fails
+        }
+      }
+
+      // Prepare activity data without customMediaTitle
       const saveData: CreateActivityInput = {
         activityType: data.activityType as ActivityType,
         notes: data.notes,
         duration: Number(data.duration),
         date: formattedDate,
-        mediaSlug,
+        mediaSlug: mediaSlug || undefined,
         languageId: Number(data.languageId),
       };
 
+      // Clear draft after successful creation
+      sessionStorage.removeItem('activityFormDraft');
+
+      // Save activity
       props.onSave(saveData);
     } catch (error) {
       console.error('Error during form submission:', error);
@@ -171,6 +185,9 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
       form.setValue('date', zonedDate);
     }
   }, [currentUser, form]);
+
+  // Form loading state
+  const isLoading = props.loading || creatingMedia;
 
   return (
     <>
@@ -207,7 +224,7 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
                                   'col-span-3',
                                   !field.value && 'text-muted-foreground'
                                 )}
-                                disabled={props.loading}
+                                disabled={isLoading}
                               >
                                 {field.value ? (
                                   format(new Date(field.value), 'PPP')
@@ -240,7 +257,7 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
                       </FormItem>
                     )}
                   />
-                  <ActivityMediaSelect isLoading={props.loading} />
+                  <ActivityMediaSelect isLoading={isLoading} />
                   {/* Language Select Field */}
                   <LanguageSelect />
                   <FormField
@@ -259,7 +276,7 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
                                   'col-span-3 justify-between lowercase',
                                   !field.value && 'text-muted-foreground'
                                 )}
-                                disabled={props.loading}
+                                disabled={isLoading}
                               >
                                 {field.value
                                   ? activityTypes.find(
@@ -321,7 +338,7 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
                           <Input
                             type="number"
                             {...field}
-                            disabled={props.loading}
+                            disabled={isLoading}
                           />
                         </FormControl>
                         <FormMessage />
@@ -337,7 +354,7 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
                         <FormControl className="col-span-3">
                           <Input
                             placeholder="Optional notes about this activity"
-                            disabled={props.loading}
+                            disabled={isLoading}
                             {...field}
                           />
                         </FormControl>
@@ -350,9 +367,9 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
                   <Button
                     type="submit"
                     className="bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400 text-white dark:text-neutral-900"
-                    disabled={props.loading}
+                    disabled={isLoading}
                   >
-                    {props.loading ? (
+                    {isLoading ? (
                       <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                     ) : (
                       <Save className="mr-1 h-4 w-4" />

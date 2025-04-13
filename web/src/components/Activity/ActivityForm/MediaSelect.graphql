@@ -1,0 +1,8 @@
+query SearchMediaForActivitySelect($query: String!) {
+  media: medias(query: $query) {
+    title
+    slug
+    releaseDate
+    mediaType
+  }
+}

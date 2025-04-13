@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { format } from 'date-fns';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, Plus } from 'lucide-react';
 import {
   SearchMediaForActivitySelect,
   SearchMediaForActivitySelectVariables,
@@ -49,6 +49,7 @@ const SEARCH_MEDIA_QUERY: TypedDocumentNode<
 
 const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
   const [searchValue, setSearchValue] = useState('');
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const debouncedSearch = useDebounce(searchValue, 500);
   const form = useFormContext();
 
@@ -59,22 +60,42 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
     fetchPolicy: 'cache-and-network',
   });
 
-  // Update customMediaTitle when search value changes and no results
+  // Allow typing in search field
   const handleSearchValueChange = (value: string) => {
     setSearchValue(value);
-    // Clear mediaSlug if we're typing (since we might be creating custom media)
-    if (value) {
-      form.setValue('mediaSlug', '');
-    }
-    // Update customMediaTitle for potential custom media creation
-    form.setValue('customMediaTitle', value);
   };
 
-  // When selecting existing media, clear customMediaTitle
+  // Handle media selection
   const handleMediaSelect = (slug: string) => {
     form.setValue('mediaSlug', slug);
     form.setValue('customMediaTitle', '');
     form.setFocus('activityType');
+    setSearchValue(''); // Clear search after selection
+    setIsPopoverOpen(false); // Close dropdown after selection
+  };
+
+  // Handle custom media creation
+  const handleCreateCustomMedia = (title: string) => {
+    form.setValue('mediaSlug', '');
+    form.setValue('customMediaTitle', title);
+    form.setFocus('activityType');
+    setSearchValue(''); // Clear search after selection
+    setIsPopoverOpen(false); // Close dropdown after selection
+  };
+
+  // Get current values
+  const currentMediaSlug = form.watch('mediaSlug');
+  const currentCustomMedia = form.watch('customMediaTitle');
+
+  // Get display title
+  const getDisplayTitle = () => {
+    if (currentMediaSlug) {
+      return data?.media.find(media => media.slug === currentMediaSlug)?.title;
+    }
+    if (currentCustomMedia) {
+      return currentCustomMedia;
+    }
+    return 'Select media (optional)';
   };
 
   return (
@@ -83,8 +104,8 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
       name="mediaSlug"
       render={({ field }) => (
         <FormItem className="grid grid-cols-4 items-center gap-4">
-          <FormLabel className="text-right">Media*</FormLabel>
-          <Popover>
+          <FormLabel className="text-right">Media</FormLabel>
+          <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
             <PopoverTrigger asChild>
               <FormControl>
                 <Button
@@ -92,61 +113,66 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                   role="combobox"
                   className={cn(
                     'col-span-3 justify-between',
-                    !field.value && 'text-muted-foreground'
+                    !currentMediaSlug &&
+                      !currentCustomMedia &&
+                      'text-muted-foreground'
                   )}
                   disabled={isLoading}
+                  onClick={() => setIsPopoverOpen(true)}
                 >
-                  {field.value
-                    ? data?.media.find(media => media.slug === field.value)
-                        ?.title
-                    : searchValue
-                      ? searchValue
-                      : 'Search or create media'}
+                  {getDisplayTitle()}
                   <ChevronsUpDown className="size-4 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="p-0">
-              <Command>
+              <Command shouldFilter={false}>
                 <CommandInput
-                  placeholder="Search or create media..."
+                  placeholder="Search media..."
                   className="h-9"
                   value={searchValue}
                   onValueChange={handleSearchValueChange}
                 />
                 <CommandList>
-                  <CommandEmpty className="p-4">
-                    <div className="text-center">
-                      <p className="text-muted-foreground mb-2 text-sm">
-                        No media found - your search term will be used to create
-                        new custom media
-                      </p>
-                      <div className="bg-muted rounded-md p-2">
-                        <p className="mb-1 text-xs font-medium">Preview:</p>
-                        <p className="text-sm">{searchValue}</p>
-                      </div>
-                    </div>
-                  </CommandEmpty>
-                  <CommandGroup>
-                    {data?.media.map(media => (
-                      <CommandItem
-                        value={media.slug}
-                        key={media.slug}
-                        onSelect={() => handleMediaSelect(media.slug)}
-                      >
-                        {media.title} (
-                        {format(new Date(media.releaseDate), 'yyyy')})
-                        <Check
-                          className={cn(
-                            'ml-auto size-4',
-                            media.slug === field.value
-                              ? 'opacity-100'
-                              : 'opacity-0'
-                          )}
-                        />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  {searchValue && !data?.media?.length && (
+                    <>
+                      <CommandEmpty className="py-2 text-sm">
+                        No media found. You can:
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {/* Option 1: Use search text as title */}
+                        <CommandItem
+                          onSelect={() => handleCreateCustomMedia(searchValue)}
+                          className="gap-2"
+                        >
+                          <Plus className="size-4" />
+                          Create &quot;{searchValue}&quot;
+                        </CommandItem>
+                      </CommandGroup>
+                    </>
+                  )}
+                  {data?.media && data.media.length > 0 && (
+                    <CommandGroup>
+                      {data.media.map(media => (
+                        <CommandItem
+                          value={media.slug}
+                          key={media.slug}
+                          onSelect={() => handleMediaSelect(media.slug)}
+                        >
+                          {media.title} (
+                          {format(new Date(media.releaseDate), 'yyyy')})
+                          <Check
+                            className={cn(
+                              'ml-auto size-4',
+                              media.slug === field.value
+                                ? 'opacity-100'
+                                : 'opacity-0'
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  )}
                 </CommandList>
               </Command>
             </PopoverContent>
