@@ -119,7 +119,7 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
       // Format the date as 'yyyy-MM-dd' string before sending
       const formattedDate = format(data.date, 'yyyy-MM-dd');
 
-      let mediaSlug = data.mediaSlug;
+      let finalMediaSlug = data.mediaSlug;
 
       // If we have a custom media title, create it first
       if (data.customMediaTitle && !data.mediaSlug) {
@@ -139,19 +139,13 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
             },
           });
 
-          // Access the slug from the nested media object
-          if (result.data?.createCustomMedia?.media?.slug) {
-            mediaSlug = result.data.createCustomMedia.media.slug;
-          } else {
-            // Handle case where media or slug might be missing in response
-            console.error(
+          if (!result.data?.createCustomMedia?.media?.slug) {
+            throw new Error(
               'Custom media created, but slug not found in response'
             );
-            // Optionally, you could try using the mediaId if slug isn't critical
-            // or throw an error to prevent saving the activity without a valid link.
-            // For now, we'll proceed without a slug if it's missing.
-            mediaSlug = undefined;
           }
+
+          finalMediaSlug = result.data.createCustomMedia.media.slug;
         } catch (error) {
           console.error('Failed to create custom media:', error);
           return; // Stop if custom media creation fails
@@ -164,7 +158,7 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
         notes: data.notes,
         duration: Number(data.duration),
         date: formattedDate,
-        mediaSlug: mediaSlug || undefined,
+        mediaSlug: finalMediaSlug,
         languageId: Number(data.languageId),
       };
 

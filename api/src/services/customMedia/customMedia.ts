@@ -7,7 +7,13 @@ interface CustomMedia {
   metadata: Prisma.JsonValue;
   createdAt: Date;
   updatedAt: Date;
-  media: { id: string; title: string };
+  media: {
+    id: string;
+    title: string;
+    slug: string;
+    mediaType: string;
+    externalId: string;
+  };
   user: { id: number; email: string };
 }
 
@@ -32,19 +38,35 @@ interface CustomMediaResolvers {
   media: (
     args: unknown,
     obj: { root: { id: string } }
-  ) => Promise<{ id: string; title: string }>;
+  ) => Promise<{
+    id: string;
+    title: string;
+    slug: string;
+    mediaType: string;
+    externalId: string;
+  }>;
   user: (
     args: unknown,
     obj: { root: { id: string } }
   ) => Promise<{ id: number; email: string }>;
 }
 
+import { context } from '@redwoodjs/graphql-server';
+
 import { db } from 'src/lib/db';
 
 export const customMedias: QueryResolvers['customMedias'] = async () => {
   return db.customMedia.findMany({
     include: {
-      media: { select: { id: true, title: true, slug: true } },
+      media: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          mediaType: true,
+          externalId: true,
+        },
+      },
       user: { select: { id: true, email: true } },
     },
   });
@@ -54,7 +76,15 @@ export const customMedia: QueryResolvers['customMedia'] = async ({ id }) => {
   return db.customMedia.findUnique({
     where: { id },
     include: {
-      media: { select: { id: true, title: true, slug: true } },
+      media: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          mediaType: true,
+          externalId: true,
+        },
+      },
       user: { select: { id: true, email: true } },
     },
   });
@@ -74,7 +104,15 @@ export const myCustomMedias: QueryResolvers['myCustomMedias'] = async ({
   return db.customMedia.findMany({
     where,
     include: {
-      media: { select: { id: true, title: true, slug: true } },
+      media: {
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          mediaType: true,
+          externalId: true,
+        },
+      },
       user: { select: { id: true, email: true } },
     },
   });
@@ -106,8 +144,8 @@ export const createCustomMedia: MutationResolvers['createCustomMedia'] =
         },
       });
 
-      // Then create the CustomMedia record with proper metadata type
-      return tx.customMedia.create({
+      // Create the CustomMedia record with proper metadata type
+      const customMedia = await tx.customMedia.create({
         data: {
           mediaId: media.id,
           userId: context.currentUser?.id,
@@ -119,6 +157,8 @@ export const createCustomMedia: MutationResolvers['createCustomMedia'] =
               id: true,
               title: true,
               slug: true,
+              mediaType: true,
+              externalId: true,
             },
           },
           user: {
@@ -129,6 +169,8 @@ export const createCustomMedia: MutationResolvers['createCustomMedia'] =
           },
         },
       });
+
+      return customMedia;
     });
   };
 
@@ -138,7 +180,15 @@ export const updateCustomMedia: MutationResolvers['updateCustomMedia'] =
       data: input,
       where: { id },
       include: {
-        media: { select: { id: true, title: true, slug: true } },
+        media: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            mediaType: true,
+            externalId: true,
+          },
+        },
         user: { select: { id: true, email: true } },
       },
     });
@@ -149,7 +199,15 @@ export const deleteCustomMedia: MutationResolvers['deleteCustomMedia'] =
     return db.customMedia.delete({
       where: { id },
       include: {
-        media: { select: { id: true, title: true, slug: true } },
+        media: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            mediaType: true,
+            externalId: true,
+          },
+        },
         user: { select: { id: true, email: true } },
       },
     });
@@ -160,7 +218,17 @@ export const CustomMedia: CustomMediaResolvers = {
     db.customMedia
       .findUnique({
         where: { id: root.id },
-        include: { media: { select: { id: true, title: true, slug: true } } },
+        include: {
+          media: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              mediaType: true,
+              externalId: true,
+            },
+          },
+        },
       })
       .then(c => c?.media),
   user: (_obj, { root }) =>

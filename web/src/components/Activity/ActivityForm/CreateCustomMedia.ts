@@ -9,6 +9,17 @@ export const CREATE_CUSTOM_MEDIA = gql`
       user {
         id
       }
+      media {
+        id
+        title
+        slug
+        mediaType
+        externalId
+        releaseDate
+        posterUrl
+        backdropUrl
+        originalTitle
+      }
     }
   }
 `;
