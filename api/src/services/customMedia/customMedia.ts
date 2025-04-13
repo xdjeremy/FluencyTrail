@@ -1,55 +1,4 @@
-import type { Prisma } from '@prisma/client';
-
-interface CustomMedia {
-  id: string;
-  mediaId: string;
-  userId: number;
-  metadata: Prisma.JsonValue;
-  createdAt: Date;
-  updatedAt: Date;
-  media: {
-    id: string;
-    title: string;
-    slug: string;
-    mediaType: string;
-    externalId: string;
-  };
-  user: { id: number; email: string };
-}
-
-interface QueryResolvers {
-  customMedias(): Promise<CustomMedia[]>;
-  customMedia(args: { id: string }): Promise<CustomMedia | null>;
-  myCustomMedias(args: { query?: string }): Promise<CustomMedia[]>;
-}
-
-interface MutationResolvers {
-  createCustomMedia(args: {
-    input: { mediaId: string; metadata: Prisma.JsonValue };
-  }): Promise<CustomMedia>;
-  updateCustomMedia(args: {
-    id: string;
-    input: { metadata?: Prisma.JsonValue };
-  }): Promise<CustomMedia>;
-  deleteCustomMedia(args: { id: string }): Promise<CustomMedia>;
-}
-
-interface CustomMediaResolvers {
-  media: (
-    args: unknown,
-    obj: { root: { id: string } }
-  ) => Promise<{
-    id: string;
-    title: string;
-    slug: string;
-    mediaType: string;
-    externalId: string;
-  }>;
-  user: (
-    args: unknown,
-    obj: { root: { id: string } }
-  ) => Promise<{ id: number; email: string }>;
-}
+import { Prisma } from '@prisma/client'; // Changed from 'import type'
 
 import { context } from '@redwoodjs/graphql-server';
 
@@ -58,16 +7,8 @@ import { db } from 'src/lib/db';
 export const customMedias: QueryResolvers['customMedias'] = async () => {
   return db.customMedia.findMany({
     include: {
-      media: {
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          mediaType: true,
-          externalId: true,
-        },
-      },
-      user: { select: { id: true, email: true } },
+      media: true, // Fetch the full media object
+      user: true, // Fetch the full user object
     },
   });
 };
@@ -76,16 +17,8 @@ export const customMedia: QueryResolvers['customMedia'] = async ({ id }) => {
   return db.customMedia.findUnique({
     where: { id },
     include: {
-      media: {
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          mediaType: true,
-          externalId: true,
-        },
-      },
-      user: { select: { id: true, email: true } },
+      media: true, // Fetch the full media object
+      user: true, // Fetch the full user object
     },
   });
 };
@@ -104,16 +37,8 @@ export const myCustomMedias: QueryResolvers['myCustomMedias'] = async ({
   return db.customMedia.findMany({
     where,
     include: {
-      media: {
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          mediaType: true,
-          externalId: true,
-        },
-      },
-      user: { select: { id: true, email: true } },
+      media: true, // Fetch the full media object
+      user: true, // Fetch the full user object
     },
   });
 };
@@ -149,24 +74,15 @@ export const createCustomMedia: MutationResolvers['createCustomMedia'] =
         data: {
           mediaId: media.id,
           userId: context.currentUser?.id,
-          metadata: typeof input.metadata === 'object' ? input.metadata : {},
+          // Cast metadata to Prisma's expected type
+          metadata:
+            typeof input.metadata === 'object'
+              ? (input.metadata as Prisma.InputJsonValue)
+              : Prisma.JsonNull,
         },
         include: {
-          media: {
-            select: {
-              id: true,
-              title: true,
-              slug: true,
-              mediaType: true,
-              externalId: true,
-            },
-          },
-          user: {
-            select: {
-              id: true,
-              email: true,
-            },
-          },
+          media: true, // Fetch the full media object
+          user: true, // Fetch the full user object
         },
       });
 
@@ -176,20 +92,21 @@ export const createCustomMedia: MutationResolvers['createCustomMedia'] =
 
 export const updateCustomMedia: MutationResolvers['updateCustomMedia'] =
   async ({ id, input }) => {
+    // Prepare data with potential metadata cast
+    const data: Prisma.CustomMediaUpdateInput = {};
+    if (input.metadata !== undefined) {
+      data.metadata =
+        typeof input.metadata === 'object'
+          ? (input.metadata as Prisma.InputJsonValue)
+          : Prisma.JsonNull;
+    }
+
     return db.customMedia.update({
-      data: input,
+      data,
       where: { id },
       include: {
-        media: {
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            mediaType: true,
-            externalId: true,
-          },
-        },
-        user: { select: { id: true, email: true } },
+        media: true, // Fetch the full media object
+        user: true, // Fetch the full user object
       },
     });
   };
@@ -199,43 +116,8 @@ export const deleteCustomMedia: MutationResolvers['deleteCustomMedia'] =
     return db.customMedia.delete({
       where: { id },
       include: {
-        media: {
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-            mediaType: true,
-            externalId: true,
-          },
-        },
-        user: { select: { id: true, email: true } },
+        media: true, // Fetch the full media object
+        user: true, // Fetch the full user object
       },
     });
   };
-
-export const CustomMedia: CustomMediaResolvers = {
-  media: (_obj, { root }) =>
-    db.customMedia
-      .findUnique({
-        where: { id: root.id },
-        include: {
-          media: {
-            select: {
-              id: true,
-              title: true,
-              slug: true,
-              mediaType: true,
-              externalId: true,
-            },
-          },
-        },
-      })
-      .then(c => c?.media),
-  user: (_obj, { root }) =>
-    db.customMedia
-      .findUnique({
-        where: { id: root.id },
-        include: { user: { select: { id: true, email: true } } },
-      })
-      .then(c => c?.user),
-};
