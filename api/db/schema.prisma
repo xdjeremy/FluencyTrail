@@ -49,8 +49,9 @@ model User {
   primaryLanguageId Int? // Foreign key for primary language
   primaryLanguage   Language?  @relation("UserPrimaryLanguage", fields: [primaryLanguageId], references: [id], onDelete: Restrict)
 
-  Activity Activity[]
-  OAuth    OAuth[]
+  Activity    Activity[]
+  OAuth       OAuth[]
+  CustomMedia CustomMedia[]
 
   @@index([primaryLanguageId])
 }
@@ -74,9 +75,7 @@ model OAuth {
 
 model Activity {
   id           String       @id @default(uuid())
-  userId       Int
   activityType ActivityType
-  mediaId      String?
   notes        String?
   duration     Int?
   date         DateTime     @default(now())
@@ -84,11 +83,15 @@ model Activity {
   updatedAt    DateTime     @updatedAt
 
   // Language relation
-  languageId Int
-  language   Language @relation(fields: [languageId], references: [id], onDelete: Restrict)
+  mediaId       String?
+  languageId    Int
+  userId        Int
+  customMediaId String?
 
-  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  media Media? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  media       Media?       @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  language    Language     @relation(fields: [languageId], references: [id], onDelete: Restrict)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customMedia CustomMedia? @relation(fields: [customMediaId], references: [id], onDelete: SetNull)
 
   @@index([languageId])
 }
@@ -124,6 +127,20 @@ model Media {
   Activity      Activity[]
 
   @@unique([externalId, mediaType])
+}
+
+model CustomMedia {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId Int
+
+  User    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Acivity Activity[]
+
+  @@unique([userId, title])
 }
 
 enum MediaType {

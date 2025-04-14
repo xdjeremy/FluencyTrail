@@ -1,7 +1,7 @@
 import type { MediaRelationResolvers, QueryResolvers } from 'types/graphql';
 
-import { mapSearchResults } from 'src/lib/api/mapresult';
 import { db } from 'src/lib/db';
+import { mapSearchResults } from 'src/services/medias/mediamanager/mapresult';
 
 import MediaManager from './mediamanager';
 import TheMovieDb from './themoviedb';
@@ -37,6 +37,14 @@ export const similarMedias: QueryResolvers['similarMedias'] = async ({
   });
 
   return mapSearchResults(similarMedias.results);
+};
+
+export const searchMedias: QueryResolvers['searchMedias'] = async ({
+  query,
+}) => {
+  // search for media
+  const mediaManager = new MediaManager();
+  return mediaManager.searchMedias(query);
 };
 
 export const Media: MediaRelationResolvers = {

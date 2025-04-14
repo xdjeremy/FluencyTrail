@@ -1,4 +1,5 @@
-import { Media, ResolverTypeWrapper } from 'types/graphql';
+import type { CustomMedia } from '@prisma/client';
+import { Media } from 'types/graphql';
 
 import MediaManager from 'src/services/medias/mediamanager';
 import {
@@ -6,34 +7,15 @@ import {
   TmdbTvResult,
 } from 'src/services/medias/themoviedb/interfaces';
 
-export type ServiceMedia = ResolverTypeWrapper<
-  Omit<Media, 'releaseDate' | 'createdAt' | 'updatedAt'> & {
-    releaseDate: Date;
-    createdAt: Date;
-    updatedAt: Date;
-  } & (
-      | {
-          mediaType: 'MOVIE';
-          MovieMetadata: Media['MovieMetadata'];
-        }
-      | {
-          mediaType: 'TV';
-          TvMetadata: Omit<Media['TvMetadata'], 'firstAirDate'> & {
-            firstAirDate: Date | null;
-          };
-        }
-    )
->;
-
 export const mapMovieResult = (
   movieResult: TmdbMovieResult
   // media?: Media
-): ServiceMedia => {
+): Media => {
   const mediaManager = new MediaManager();
   return {
     slug: mediaManager.generateSlug(movieResult.title, movieResult.id, 'MOVIE'),
     externalId: movieResult.id.toString(),
-    mediaType: 'MOVIE' as const,
+    mediaType: 'MOVIE',
     originalTitle: movieResult.original_title,
     description: movieResult.overview,
     popularity: movieResult.popularity,
@@ -62,13 +44,13 @@ export const mapMovieResult = (
 export const mapTvResult = (
   tvResult: TmdbTvResult
   // media?: Media
-): ServiceMedia => {
+): Media => {
   const mediaManager = new MediaManager();
   return {
     id: tvResult.id.toString(),
     slug: mediaManager.generateSlug(tvResult.name, tvResult.id, 'TV'),
     // Some results from tmdb dont return the mediaType so we force it here!
-    mediaType: 'TV' as const,
+    mediaType: 'TV',
     title: tvResult.name,
     originalTitle: tvResult.original_name,
     description: tvResult.overview,
@@ -97,10 +79,9 @@ export const mapTvResult = (
   };
 };
 
-export const mapSearchResults = (
+export const mapTMDBResults = (
   results: (TmdbMovieResult | TmdbTvResult)[]
-  // media?: Media[]
-): ServiceMedia[] =>
+): Media[] =>
   results
     .map(result => {
       if (!result.media_type) {
@@ -115,4 +96,15 @@ export const mapSearchResults = (
           return null;
       }
     })
-    .filter((result): result is ServiceMedia => result !== null);
+    .filter((media): media is Media => media !== null);
+
+export const mapCustomResult = (result: CustomMedia): Media => {
+  return {
+    id: result.id,
+    title: result.title,
+    slug: result.id,
+    releaseDate: result.createdAt,
+    createdAt: result.createdAt,
+    updatedAt: result.updatedAt,
+  };
+};

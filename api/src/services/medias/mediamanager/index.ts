@@ -1,10 +1,12 @@
-import type { Media } from '@prisma/client';
+import type { CustomMedia } from '@prisma/client';
 import { subDays } from 'date-fns';
-import { MediaType } from 'types/graphql';
+import { Media, MediaType } from 'types/graphql';
 
 import { db } from 'src/lib/db';
 
 import TheMovieDb from '../themoviedb';
+
+import { mapCustomResult, mapTMDBResults } from './mapresult';
 
 export default class MediaManager {
   private tmdb: TheMovieDb;
@@ -225,5 +227,45 @@ export default class MediaManager {
     const title = slug.split('-').slice(0, -2).join('-');
 
     return { tmdbId, mediaType, title };
+  }
+
+  // ----- New Methods -----
+  public async searchMedias(query: string): Promise<Media[]> {
+    // if query is empty, return empty array
+    if (!query) {
+      return [];
+    }
+
+    // Search for TMDB media
+    const tmdbResults = await this.tmdb.searchMulti({
+      query,
+      page: 1,
+    });
+    // Map TMDB results to Media format
+    const mappedTMDBResults = mapTMDBResults(tmdbResults.results);
+
+    // Search for Custom Media
+    let customResults: CustomMedia[] = [];
+    if (context.currentUser) {
+      // Only search custom media if user is authenticated
+      customResults = await db.customMedia.findMany({
+        where: {
+          userId: context.currentUser.id,
+          title: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        take: 3,
+      });
+    }
+
+    // Map Custom Media results to Media format
+    const mappedCustomResults = customResults.map(media =>
+      mapCustomResult(media)
+    );
+
+    // Return combined results
+    return [...mappedCustomResults, ...mappedTMDBResults];
   }
 }
