@@ -27,7 +27,12 @@ export default class MediaManager {
     });
 
     if (existingMedia) {
-      return existingMedia;
+      return {
+        ...existingMedia,
+        releaseDate: existingMedia.releaseDate
+          ? new Date(existingMedia.releaseDate)
+          : null,
+      };
     }
 
     // If no fresh data, fetch from TMDB
@@ -265,7 +270,33 @@ export default class MediaManager {
       mapCustomResult(media)
     );
 
-    // Return combined results
-    return [...mappedCustomResults, ...mappedTMDBResults];
+    // Ensure all results conform to Media type with proper date handling
+    const results = [...mappedCustomResults, ...mappedTMDBResults].map(
+      media => {
+        const parsedDate = media.releaseDate
+          ? new Date(media.releaseDate)
+          : null;
+        return {
+          ...media,
+          id: media.id,
+          title: media.title,
+          slug: media.slug,
+          mediaType: media.mediaType || 'BOOK',
+          originalTitle: media.originalTitle || null,
+          description: media.description || null,
+          posterUrl: media.posterUrl || null,
+          backdropUrl: media.backdropUrl || null,
+          popularity: media.popularity || null,
+          releaseDate: parsedDate,
+          createdAt: new Date(media.createdAt),
+          updatedAt: new Date(media.updatedAt),
+          MovieMetadata: media.MovieMetadata || null,
+          TvMetadata: media.TvMetadata || null,
+          externalId: media.externalId || null,
+        };
+      }
+    );
+
+    return results;
   }
 }

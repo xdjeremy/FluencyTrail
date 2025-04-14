@@ -21,7 +21,7 @@ export const mapMovieResult = (
     popularity: movieResult.popularity,
     releaseDate: movieResult.release_date
       ? new Date(movieResult.release_date)
-      : new Date(0), // Fallback to epoch time if missing
+      : null,
     title: movieResult.title,
     backdropUrl: movieResult.backdrop_path,
     posterUrl: movieResult.poster_path,
@@ -62,7 +62,7 @@ export const mapTvResult = (
     externalId: tvResult.id.toString(),
     releaseDate: tvResult.first_air_date
       ? new Date(tvResult.first_air_date)
-      : new Date(0), // Fallback to epoch time if missing
+      : null,
     TvMetadata: {
       genres: tvResult.genre_ids.map(id => id.toString()),
       originalLanguage: tvResult.original_language,
@@ -103,8 +103,18 @@ export const mapCustomResult = (result: CustomMedia): Media => {
     id: result.id,
     title: result.title,
     slug: result.id,
-    releaseDate: result.createdAt,
     createdAt: result.createdAt,
     updatedAt: result.updatedAt,
+    releaseDate: null, // Custom media doesn't have a release date, it should be null
+    mediaType: 'BOOK' as const, // Custom media is always a BOOK
+    externalId: result.id, // Use the same ID as external ID for custom media
+    // Add required Media fields that were missing
+    originalTitle: null,
+    description: null,
+    posterUrl: null,
+    backdropUrl: null,
+    popularity: null,
+    MovieMetadata: null,
+    TvMetadata: null,
   };
 };
