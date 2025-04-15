@@ -1,4 +1,5 @@
 import type { CustomMedia } from '@prisma/client';
+import type { MediaType } from 'types/graphql';
 
 import { db } from 'src/lib/db';
 
@@ -11,7 +12,8 @@ export class CustomMediaMapper implements MediaMapper<CustomMedia> {
       externalId: source.id,
       slug: source.id, // Using ID as slug as specified
       title: source.title,
-      mediaType: 'BOOK', // CustomMedia are considered books by default
+      mediaType: 'CUSTOM' as MediaType,
+      date: source.createdAt, // Using createdAt as the date
     };
   }
 }

@@ -21,6 +21,7 @@ export const schema = gql`
     MOVIE
     TV
     BOOK
+    CUSTOM
   }
 
   type Query {

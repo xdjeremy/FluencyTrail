@@ -52,7 +52,7 @@ export const searchMedias: QueryResolvers['searchMedias'] = async ({
     posterUrl: result.posterUrl,
     backdropUrl: result.backdropUrl,
     popularity: result.popularity,
-    releaseDate: result.releaseDate,
+    releaseDate: result.date, // Map date field to releaseDate
     createdAt: new Date(), // Required by GraphQL schema
     updatedAt: new Date(), // Required by GraphQL schema
   }));

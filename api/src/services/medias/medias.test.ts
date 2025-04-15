@@ -1,7 +1,6 @@
 import { db } from 'src/lib/db';
 
 import MediaManager from './mediamanager';
-import { MediaTypeEnum } from './mediamanager/interfaces';
 import { searchMedias, setMediaManager } from './medias';
 import TheMovieDb from './themoviedb';
 import { TmdbSearchMultiResponse } from './themoviedb/interfaces';
@@ -77,14 +76,14 @@ describe('medias', () => {
         {
           id: 'custom-1',
           title: 'Custom Media 1',
-          createdAt: new Date(),
+          createdAt: new Date('2024-01-01'),
           updatedAt: new Date(),
           userId: 1,
         },
         {
           id: 'custom-2',
           title: 'Custom Media 2',
-          createdAt: new Date(),
+          createdAt: new Date('2024-01-02'),
           updatedAt: new Date(),
           userId: 1,
         },
@@ -102,28 +101,34 @@ describe('medias', () => {
         expect.objectContaining({
           id: 'custom-1',
           title: 'Custom Media 1',
-          mediaType: 'BOOK' as MediaTypeEnum,
+          mediaType: 'CUSTOM',
+          releaseDate: expect.any(Date),
         })
       );
       expect(result[1]).toEqual(
         expect.objectContaining({
           id: 'custom-2',
           title: 'Custom Media 2',
-          mediaType: 'BOOK' as MediaTypeEnum,
+          mediaType: 'CUSTOM',
+          releaseDate: expect.any(Date),
         })
       );
       expect(result[2]).toEqual(
         expect.objectContaining({
           id: 'tmdb-1',
+          slug: 'tmdb-movie-1',
           title: 'TMDB Movie',
-          mediaType: 'MOVIE' as MediaTypeEnum,
+          mediaType: 'MOVIE',
+          releaseDate: new Date('2024-01-01'),
         })
       );
       expect(result[3]).toEqual(
         expect.objectContaining({
           id: 'tmdb-2',
+          slug: 'tmdb-tv-2',
           title: 'TMDB TV Show',
-          mediaType: 'TV' as MediaTypeEnum,
+          mediaType: 'TV',
+          releaseDate: new Date('2024-01-01'),
         })
       );
     });
@@ -151,7 +156,7 @@ describe('medias', () => {
         expect.objectContaining({
           id: 'custom-1',
           title: 'Custom Media 1',
-          mediaType: 'BOOK' as MediaTypeEnum,
+          mediaType: 'CUSTOM',
         })
       );
     });
@@ -189,8 +194,10 @@ describe('medias', () => {
       expect(result[0]).toEqual(
         expect.objectContaining({
           id: 'tmdb-1',
+          slug: 'tmdb-movie-1',
           title: 'TMDB Movie',
-          mediaType: 'MOVIE' as MediaTypeEnum,
+          mediaType: 'MOVIE',
+          releaseDate: new Date('2024-01-01'),
         })
       );
     });
@@ -251,7 +258,7 @@ describe('medias', () => {
         expect.objectContaining({
           id: 'custom-0',
           title: 'Custom Media 0',
-          mediaType: 'BOOK' as MediaTypeEnum,
+          mediaType: 'CUSTOM',
         })
       );
     });
