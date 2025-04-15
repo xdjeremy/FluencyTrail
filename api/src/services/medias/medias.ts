@@ -1,95 +1,61 @@
-import type {
-  MediaRelationResolvers,
-  QueryResolvers,
-  MovieMetadata,
-  TvMetadata,
-} from 'types/graphql';
+import type { MediaRelationResolvers, QueryResolvers } from 'types/graphql';
 
 import { db } from 'src/lib/db';
-import { mapTMDBResults } from 'src/services/medias/mediamanager/mapresult';
 
 import MediaManager from './mediamanager';
 import TheMovieDb from './themoviedb';
-import { TmdbSearchMultiResponse } from './themoviedb/interfaces';
 
-// Convert raw media to resolver-compatible media
-type MediaInput = {
-  id?: string;
-  title?: string;
-  slug?: string;
-  mediaType?: 'MOVIE' | 'TV' | 'BOOK';
-  externalId?: string | null;
-  originalTitle?: string | null;
-  description?: string | null;
-  posterUrl?: string | null;
-  backdropUrl?: string | null;
-  popularity?: number | null;
-  releaseDate?: string | Date | null;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-  MovieMetadata?: MovieMetadata | null;
-  TvMetadata?: TvMetadata | null;
+// For testing purposes, we'll allow injecting the TMDB client
+let tmdbClient: TheMovieDb;
+let mediaManager: MediaManager;
+
+const getMediaManager = () => {
+  if (!mediaManager) {
+    // Create singleton instances if they don't exist
+    tmdbClient = new TheMovieDb();
+    mediaManager = new MediaManager(tmdbClient);
+  }
+  return mediaManager;
 };
 
-const prepareMediaForResolver = (media: MediaInput | null) => {
-  if (!media) return null;
-
-  // Ensure all required fields are present with proper types
-  return {
-    id: media.id!, // Required by schema
-    title: media.title!, // Required by schema
-    slug: media.slug!, // Required by schema
-    mediaType: media.mediaType ?? 'BOOK',
-    externalId: media.externalId ?? null,
-    originalTitle: media.originalTitle ?? null,
-    description: media.description ?? null,
-    posterUrl: media.posterUrl ?? null,
-    backdropUrl: media.backdropUrl ?? null,
-    popularity: media.popularity ?? null,
-    releaseDate: media.releaseDate ? new Date(media.releaseDate) : null,
-    createdAt: new Date(media.createdAt!), // Required by schema
-    updatedAt: new Date(media.updatedAt!), // Required by schema
-    MovieMetadata: media.MovieMetadata ?? null,
-    TvMetadata: media.TvMetadata ?? null,
-  };
+// For testing - allows us to inject mocked instances
+export const setMediaManager = (manager: MediaManager) => {
+  mediaManager = manager;
 };
 
-export const media: QueryResolvers['media'] = async ({ slug }) => {
-  const mediaManager = new MediaManager();
-  const result = await mediaManager.getMediaBySlug(slug);
-  return prepareMediaForResolver(result);
-};
-
-export const medias: QueryResolvers['medias'] = async ({ query }) => {
-  const tmdb = new TheMovieDb();
-  const results: TmdbSearchMultiResponse = await tmdb.searchMulti({
-    query,
-    page: Number(1),
-  });
-  const mediaResults = mapTMDBResults(results.results);
-  return mediaResults.map(prepareMediaForResolver);
+export const media: QueryResolvers['media'] = async ({ slug: _slug }) => {
+  // TODO: Implement media resolver
+  return null;
 };
 
 export const similarMedias: QueryResolvers['similarMedias'] = async ({
-  slug,
+  slug: _slug,
 }) => {
-  const tmdb = new TheMovieDb();
-  const mediaManager = new MediaManager();
-  const { mediaType, tmdbId } = mediaManager.extractFromSlug(slug);
-  const similarMedias = await tmdb.getSimilarMedias({
-    mediaId: tmdbId,
-    mediaType,
-  });
-  const mediaResults = mapTMDBResults(similarMedias.results);
-  return mediaResults.map(prepareMediaForResolver);
+  // TODO: Implement similarMedias
+  return [];
 };
 
 export const searchMedias: QueryResolvers['searchMedias'] = async ({
   query,
 }) => {
-  const mediaManager = new MediaManager();
-  const results = await mediaManager.searchMedias(query);
-  return results.map(prepareMediaForResolver);
+  const results = await getMediaManager().searchMedias(query);
+
+  // Convert MediaResultDto[] to Media[] as expected by GraphQL
+  return results.map(result => ({
+    id: result.id,
+    externalId: result.externalId,
+    slug: result.slug,
+    title: result.title,
+    mediaType: result.mediaType,
+    originalTitle: result.originalTitle,
+    description: result.description,
+    posterUrl: result.posterUrl,
+    backdropUrl: result.backdropUrl,
+    popularity: result.popularity,
+    releaseDate: result.releaseDate,
+    createdAt: new Date(), // Required by GraphQL schema
+    updatedAt: new Date(), // Required by GraphQL schema
+  }));
 };
 
 export const MediaResolver: MediaRelationResolvers = {
@@ -97,7 +63,6 @@ export const MediaResolver: MediaRelationResolvers = {
     return db.media.findUnique({ where: { id: root?.id } }).MovieMetadata();
   },
   TvMetadata: (_obj, { root }) => {
-    // Added TvMetadata resolver
     return db.media.findUnique({ where: { id: root?.id } }).TvMetadata();
   },
 };

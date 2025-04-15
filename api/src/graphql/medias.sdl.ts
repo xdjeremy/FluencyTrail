@@ -25,7 +25,6 @@ export const schema = gql`
 
   type Query {
     media(slug: String!): Media @skipAuth
-    medias(query: String!): [Media!]! @skipAuth
     similarMedias(slug: String!): [Media!]! @skipAuth
     searchMedias(query: String!): [Media]! @skipAuth
   }
