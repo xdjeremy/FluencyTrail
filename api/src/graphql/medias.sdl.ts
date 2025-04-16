@@ -10,7 +10,7 @@ export const schema = gql`
     posterUrl: String
     backdropUrl: String
     popularity: Float
-    releaseDate: DateTime
+    date: DateTime
     createdAt: DateTime!
     updatedAt: DateTime!
     MovieMetadata: MovieMetadata

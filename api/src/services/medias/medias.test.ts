@@ -1,9 +1,11 @@
+import type { ScenarioData } from '@redwoodjs/testing/api';
+
 import { db } from 'src/lib/db';
 
 import MediaManager from './mediamanager';
 import { searchMedias, setMediaManager } from './medias';
+import { standard, tmdbSearchResults } from './medias.scenarios';
 import TheMovieDb from './themoviedb';
-import { TmdbSearchMultiResponse } from './themoviedb/interfaces';
 
 // Mock TheMovieDb
 jest.mock('./themoviedb', () => {
@@ -15,6 +17,8 @@ jest.mock('./themoviedb', () => {
 describe('medias', () => {
   let tmdbInstance;
   let mediaManager;
+
+  type StandardScenario = ScenarioData<typeof standard>;
 
   beforeEach(() => {
     // Clear all mocks
@@ -37,167 +41,108 @@ describe('medias', () => {
   });
 
   describe('searchMedias', () => {
-    scenario('returns combined results prioritizing CustomMedia', async () => {
-      const mockTmdbResults: TmdbSearchMultiResponse = {
-        page: 1,
-        results: [
-          {
-            id: 1,
-            media_type: 'movie',
-            title: 'TMDB Movie',
-            original_title: 'Original TMDB Movie',
-            name: undefined,
-            original_name: undefined,
-            overview: 'Movie description',
-            poster_path: '/path/to/poster.jpg',
-            backdrop_path: '/path/to/backdrop.jpg',
-            popularity: 100,
-            release_date: '2024-01-01',
-          },
-          {
-            id: 2,
-            media_type: 'tv',
-            title: undefined,
-            original_title: undefined,
-            name: 'TMDB TV Show',
-            original_name: 'Original TMDB TV Show',
-            overview: 'TV Show description',
-            poster_path: '/path/to/poster.jpg',
-            backdrop_path: '/path/to/backdrop.jpg',
-            popularity: 90,
-            first_air_date: '2024-01-01',
-          },
-        ],
-        total_pages: 1,
-        total_results: 2,
-      };
+    scenario(
+      'returns combined results with correct dates',
+      async (_scenario: StandardScenario) => {
+        const mockTmdbResults = {
+          page: 1,
+          results: [tmdbSearchResults.movie, tmdbSearchResults.tv],
+          total_pages: 1,
+          total_results: 2,
+        };
 
-      const mockCustomMedias = [
-        {
+        const mockCustomMedia = {
           id: 'custom-1',
-          title: 'Custom Media 1',
+          title: 'Custom Book 1',
           createdAt: new Date('2024-01-01'),
-          updatedAt: new Date(),
+          updatedAt: new Date('2024-01-01'),
           userId: 1,
-        },
-        {
-          id: 'custom-2',
-          title: 'Custom Media 2',
-          createdAt: new Date('2024-01-02'),
-          updatedAt: new Date(),
-          userId: 1,
-        },
-      ];
+        };
 
-      tmdbInstance.searchMulti.mockResolvedValue(mockTmdbResults);
-      jest
-        .spyOn(db.customMedia, 'findMany')
-        .mockResolvedValue(mockCustomMedias);
+        tmdbInstance.searchMulti.mockResolvedValue(mockTmdbResults);
+        jest
+          .spyOn(db.customMedia, 'findMany')
+          .mockResolvedValue([mockCustomMedia]);
 
-      const result = await searchMedias({ query: 'test' });
+        const result = await searchMedias({ query: 'test' });
 
-      expect(result).toHaveLength(4);
-      expect(result[0]).toEqual(
-        expect.objectContaining({
-          id: 'custom-1',
-          title: 'Custom Media 1',
-          mediaType: 'CUSTOM',
-          releaseDate: expect.any(Date),
-        })
-      );
-      expect(result[1]).toEqual(
-        expect.objectContaining({
-          id: 'custom-2',
-          title: 'Custom Media 2',
-          mediaType: 'CUSTOM',
-          releaseDate: expect.any(Date),
-        })
-      );
-      expect(result[2]).toEqual(
-        expect.objectContaining({
-          id: 'tmdb-1',
-          slug: 'tmdb-movie-1',
-          title: 'TMDB Movie',
-          mediaType: 'MOVIE',
-          releaseDate: new Date('2024-01-01'),
-        })
-      );
-      expect(result[3]).toEqual(
-        expect.objectContaining({
-          id: 'tmdb-2',
-          slug: 'tmdb-tv-2',
-          title: 'TMDB TV Show',
-          mediaType: 'TV',
-          releaseDate: new Date('2024-01-01'),
-        })
-      );
-    });
+        expect(result).toHaveLength(3);
+        expect(result[0]).toEqual(
+          expect.objectContaining({
+            id: 'custom-1',
+            title: 'Custom Book 1',
+            mediaType: 'CUSTOM',
+            date: new Date('2024-01-01'),
+          })
+        );
+        expect(result[1]).toEqual(
+          expect.objectContaining({
+            id: 'tmdb-11070',
+            slug: 'tmdb-movie-11070',
+            title: 'Moonlight Tariff',
+            mediaType: 'MOVIE',
+            date: new Date('2024-01-01'),
+          })
+        );
+        expect(result[2]).toEqual(
+          expect.objectContaining({
+            id: 'tmdb-38634',
+            slug: 'tmdb-tv-38634',
+            title: 'Bloody Monday',
+            mediaType: 'TV',
+            date: new Date('2024-01-01'),
+          })
+        );
+      }
+    );
 
-    scenario('handles TMDB API failure gracefully', async () => {
-      const mockCustomMedias = [
-        {
-          id: 'custom-1',
-          title: 'Custom Media 1',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          userId: 1,
-        },
-      ];
-
-      tmdbInstance.searchMulti.mockRejectedValue(new Error('API Error'));
-      jest
-        .spyOn(db.customMedia, 'findMany')
-        .mockResolvedValue(mockCustomMedias);
-
-      const result = await searchMedias({ query: 'test' });
-
-      expect(result).toHaveLength(1);
-      expect(result[0]).toEqual(
-        expect.objectContaining({
-          id: 'custom-1',
-          title: 'Custom Media 1',
-          mediaType: 'CUSTOM',
-        })
-      );
-    });
-
-    scenario('handles CustomMedia query failure gracefully', async () => {
-      const mockTmdbResults: TmdbSearchMultiResponse = {
+    scenario('handles missing dates correctly', async () => {
+      const mockTmdbResults = {
         page: 1,
-        results: [
-          {
-            id: 1,
-            media_type: 'movie',
-            title: 'TMDB Movie',
-            original_title: 'Original TMDB Movie',
-            name: undefined,
-            original_name: undefined,
-            overview: 'Movie description',
-            poster_path: '/path/to/poster.jpg',
-            backdrop_path: '/path/to/backdrop.jpg',
-            popularity: 100,
-            release_date: '2024-01-01',
-          },
-        ],
+        results: [tmdbSearchResults.withoutDates],
         total_pages: 1,
         total_results: 1,
       };
 
       tmdbInstance.searchMulti.mockResolvedValue(mockTmdbResults);
-      jest
-        .spyOn(db.customMedia, 'findMany')
-        .mockRejectedValue(new Error('DB Error'));
+      jest.spyOn(db.customMedia, 'findMany').mockResolvedValue([]);
 
       const result = await searchMedias({ query: 'test' });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual(
         expect.objectContaining({
-          id: 'tmdb-1',
-          slug: 'tmdb-movie-1',
-          title: 'TMDB Movie',
+          id: 'tmdb-999',
+          slug: 'tmdb-movie-999',
+          title: 'No Date Movie',
           mediaType: 'MOVIE',
-          releaseDate: new Date('2024-01-01'),
+          date: undefined,
+        })
+      );
+    });
+
+    scenario('handles TMDB API failure gracefully', async () => {
+      const mockCustomMedia = {
+        id: 'custom-1',
+        title: 'Custom Book 1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: 1,
+      };
+
+      tmdbInstance.searchMulti.mockRejectedValue(new Error('API Error'));
+      jest
+        .spyOn(db.customMedia, 'findMany')
+        .mockResolvedValue([mockCustomMedia]);
+
+      const result = await searchMedias({ query: 'test' });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          id: 'custom-1',
+          title: 'Custom Book 1',
+          mediaType: 'CUSTOM',
         })
       );
     });
@@ -214,22 +159,14 @@ describe('medias', () => {
     });
 
     scenario('limits total results to 10', async () => {
-      const mockTmdbResults: TmdbSearchMultiResponse = {
+      const mockTmdbResults = {
         page: 1,
         results: Array(15)
           .fill(null)
           .map((_, i) => ({
+            ...tmdbSearchResults.movie,
             id: i,
-            media_type: 'movie',
             title: `TMDB Movie ${i}`,
-            original_title: `Original TMDB Movie ${i}`,
-            name: undefined,
-            original_name: undefined,
-            overview: 'Movie description',
-            poster_path: '/path/to/poster.jpg',
-            backdrop_path: '/path/to/backdrop.jpg',
-            popularity: 100,
-            release_date: '2024-01-01',
           })),
         total_pages: 1,
         total_results: 15,
@@ -253,7 +190,6 @@ describe('medias', () => {
       const result = await searchMedias({ query: 'test' });
 
       expect(result).toHaveLength(10);
-      // Verify first results are from CustomMedia
       expect(result[0]).toEqual(
         expect.objectContaining({
           id: 'custom-0',
