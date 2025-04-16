@@ -110,7 +110,7 @@ enum ActivityType {
 model Media {
   id            String    @id @default(uuid())
   slug          String    @unique
-  externalId    String    @unique
+  externalId    String    @unique @default("")
   title         String
   mediaType     MediaType
   originalTitle String?
@@ -121,6 +121,8 @@ model Media {
   releaseDate   DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  lastSyncedAt  DateTime?
+  ttl           Int       @default(2592000) // 30 days in seconds
 
   MovieMetadata MovieMetadata?
   TvMetadata    TvMetadata?

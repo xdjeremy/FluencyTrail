@@ -1,7 +1,27 @@
 import type { ScenarioData } from '@redwoodjs/testing/api';
 
 export const standard = defineScenario({
-  // Empty scenario since we're mocking the custom media responses directly in tests
+  media: {
+    one: {
+      data: {
+        id: 'tmdb-123',
+        slug: 'tmdb-movie-123',
+        title: 'Test Movie',
+        mediaType: 'MOVIE',
+        externalId: '123',
+        originalTitle: 'Test Movie',
+        description: 'Test description',
+        posterUrl: 'https://test.com/poster.jpg',
+        backdropUrl: 'https://test.com/backdrop.jpg',
+        popularity: 7.5,
+        releaseDate: new Date('2024-01-01'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastSyncedAt: new Date(),
+        ttl: 2592000,
+      },
+    },
+  },
 });
 
 export const tmdbSearchResults = {

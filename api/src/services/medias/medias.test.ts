@@ -3,7 +3,7 @@ import type { ScenarioData } from '@redwoodjs/testing/api';
 import { db } from 'src/lib/db';
 
 import MediaManager from './mediamanager';
-import { searchMedias, setMediaManager } from './medias';
+import { media, searchMedias, setMediaManager } from './medias';
 import { standard, tmdbSearchResults } from './medias.scenarios';
 import TheMovieDb from './themoviedb';
 
@@ -38,6 +38,64 @@ describe('medias', () => {
 
     // Reset the spies
     jest.spyOn(db.customMedia, 'findMany').mockReset();
+  });
+
+  describe('media resolver', () => {
+    scenario('returns existing media from database', async scenario => {
+      const result = await media({ slug: scenario.media.one.slug });
+
+      // Convert scenario media to expected GraphQL type
+      expect(result).toMatchObject({
+        id: scenario.media.one.id,
+        slug: scenario.media.one.slug,
+        title: scenario.media.one.title,
+        mediaType: scenario.media.one.mediaType,
+        externalId: scenario.media.one.externalId,
+        originalTitle: scenario.media.one.originalTitle,
+        description: scenario.media.one.description,
+        posterUrl: scenario.media.one.posterUrl,
+        backdropUrl: scenario.media.one.backdropUrl,
+        popularity: scenario.media.one.popularity,
+        date: scenario.media.one.releaseDate,
+        MovieMetadata: undefined,
+        TvMetadata: undefined,
+      });
+    });
+
+    scenario('fetches and saves new media from TMDB', async () => {
+      const mockMedia = {
+        id: 'tmdb-123',
+        slug: 'tmdb-movie-123',
+        title: 'Test Movie',
+        mediaType: 'MOVIE',
+        externalId: '123',
+        originalTitle: 'Test Movie',
+        description: 'Test description',
+        posterUrl: 'https://test.com/poster.jpg',
+        backdropUrl: 'https://test.com/backdrop.jpg',
+        popularity: 7.5,
+        date: new Date('2024-01-01'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        MovieMetadata: undefined,
+        TvMetadata: undefined,
+      };
+
+      jest.spyOn(mediaManager, 'getMediaBySlug').mockResolvedValue(mockMedia);
+
+      const result = await media({ slug: 'tmdb-movie-123' });
+      expect(result).toEqual(mockMedia);
+      expect(mediaManager.getMediaBySlug).toHaveBeenCalledWith(
+        'tmdb-movie-123'
+      );
+    });
+
+    scenario('returns null for non-existent media', async () => {
+      jest.spyOn(mediaManager, 'getMediaBySlug').mockResolvedValue(null);
+
+      const result = await media({ slug: 'non-existent-slug' });
+      expect(result).toBeNull();
+    });
   });
 
   describe('searchMedias', () => {

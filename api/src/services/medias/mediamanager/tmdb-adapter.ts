@@ -43,6 +43,42 @@ export class TmdbFetcher implements MediaFetcher {
     this.mapper = new TmdbMapper();
   }
 
+  async fetchById(
+    id: string,
+    mediaType: MediaType
+  ): Promise<MediaResultDto | null> {
+    try {
+      let response;
+      if (mediaType === 'MOVIE') {
+        response = await this.client.getMovie({ movieId: parseInt(id) });
+      } else {
+        response = await this.client.getTv({ tvId: parseInt(id) });
+      }
+      return this.mapper.map({
+        ...response,
+        media_type: mediaType === 'MOVIE' ? 'movie' : 'tv',
+      });
+    } catch (error) {
+      console.error(`[TmdbFetcher] Error fetching by ID: ${error.message}`);
+      return null;
+    }
+  }
+
+  async fetchBySlug(slug: string): Promise<MediaResultDto | null> {
+    try {
+      // Implement search logic based on slug - might need to parse mediaType from slug
+      const mediaType = slug.startsWith('tmdb-movie-') ? 'MOVIE' : 'TV';
+      const idMatch = slug.match(/tmdb-(movie|tv)-(\d+)/);
+      if (!idMatch) return null;
+
+      const id = idMatch[2];
+      return this.fetchById(id, mediaType);
+    } catch (error) {
+      console.error(`[TmdbFetcher] Error fetching by slug: ${error.message}`);
+      return null;
+    }
+  }
+
   async fetch(query: string): Promise<MediaResultDto[]> {
     try {
       const response = await this.client.searchMulti({ query });

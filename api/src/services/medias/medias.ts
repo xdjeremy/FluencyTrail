@@ -23,9 +23,30 @@ export const setMediaManager = (manager: MediaManager) => {
   mediaManager = manager;
 };
 
-export const media: QueryResolvers['media'] = async ({ slug: _slug }) => {
-  // TODO: Implement media resolver
-  return null;
+export const media: QueryResolvers['media'] = async ({ slug }) => {
+  const result = await getMediaManager().getMediaBySlug(slug);
+
+  if (!result) {
+    return null;
+  }
+
+  return {
+    id: result.id,
+    externalId: result.externalId,
+    slug: result.slug,
+    title: result.title,
+    mediaType: result.mediaType,
+    originalTitle: result.originalTitle,
+    description: result.description,
+    posterUrl: result.posterUrl,
+    backdropUrl: result.backdropUrl,
+    popularity: result.popularity,
+    date: result.date,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    MovieMetadata: undefined,
+    TvMetadata: undefined,
+  };
 };
 
 export const similarMedias: QueryResolvers['similarMedias'] = async ({

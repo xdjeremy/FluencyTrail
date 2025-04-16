@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Media" ADD COLUMN     "lastSyncedAt" TIMESTAMP(3),
+ADD COLUMN     "ttl" INTEGER NOT NULL DEFAULT 2592000;
