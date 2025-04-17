@@ -39,10 +39,10 @@ const SEARCH_MEDIA_QUERY: TypedDocumentNode<
   SearchMediaForActivitySelectVariables
 > = gql`
   query SearchMediaForActivitySelect($query: String!) {
-    media: medias(query: $query) {
+    searchMedias: searchMedias(query: $query) {
       title
       slug
-      releaseDate
+      date
     }
   }
 `;
@@ -79,8 +79,9 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                   disabled={isLoading}
                 >
                   {field.value
-                    ? data?.media.find(media => media.slug === field.value)
-                        .title
+                    ? data?.searchMedias.find(
+                        media => media.slug === field.value
+                      ).title
                     : 'Select media'}
                   <ChevronsUpDown className="size-4 opacity-50" />
                 </Button>
@@ -98,7 +99,7 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                   <CommandEmpty>No media found.</CommandEmpty>
                   <CommandGroup>
                     {data &&
-                      data.media.map(media => (
+                      data.searchMedias.map(media => (
                         <CommandItem
                           value={media.slug}
                           key={media.slug}
@@ -107,8 +108,7 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                             form.setFocus('activityType');
                           }}
                         >
-                          {media.title} (
-                          {format(new Date(media.releaseDate), 'yyyy')})
+                          {media.title} ({format(new Date(media.date), 'yyyy')})
                           <Check
                             className={cn(
                               'ml-auto size-4',

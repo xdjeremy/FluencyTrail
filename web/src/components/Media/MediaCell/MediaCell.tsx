@@ -18,7 +18,7 @@ export const QUERY: TypedDocumentNode<FindMediaQuery, FindMediaQueryVariables> =
         originalTitle
         posterUrl
         popularity
-        releaseDate
+        date
         mediaType
         MovieMetadata {
           genres
@@ -30,7 +30,7 @@ export const QUERY: TypedDocumentNode<FindMediaQuery, FindMediaQueryVariables> =
         id
         title
         mediaType
-        releaseDate
+        date
         posterUrl
         slug
       }

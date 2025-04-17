@@ -56,7 +56,7 @@ const MediaDetails = ({ media, similarMedias }: FindMediaQuery) => {
             <div className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400">
               <Calendar className="h-4 w-4" />
               <span>
-                {formatDate(new Date(media.releaseDate || ''), 'MMMM dd, yyyy')}
+                {formatDate(new Date(media.date || ''), 'MMMM dd, yyyy')}
               </span>
             </div>
           </div>
@@ -166,8 +166,7 @@ const MediaDetails = ({ media, similarMedias }: FindMediaQuery) => {
                       </span>
                     </div>
                     <h3 className="text-sm font-medium text-white">
-                      {item.title} (
-                      {formatDate(new Date(item.releaseDate), 'yyyy')})
+                      {item.title} ({formatDate(new Date(item.date), 'yyyy')})
                     </h3>
                     {/* <div className="mt-1 flex flex-wrap gap-1">
                       {item.genre.slice(0, 2).map(genre => (

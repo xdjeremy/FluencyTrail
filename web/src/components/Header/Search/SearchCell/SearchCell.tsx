@@ -16,11 +16,11 @@ export const QUERY: TypedDocumentNode<
   SearchMediaByQueryVariables
 > = gql`
   query SearchMediaByQuery($query: String!) {
-    medias: medias(query: $query) {
+    searchMedias: searchMedias(query: $query) {
       id
       title
       description
-      releaseDate
+      date
       mediaType
       originalTitle
       slug
@@ -52,7 +52,7 @@ export const Failure = ({
 );
 
 export const Success = ({
-  medias,
+  searchMedias,
 }: CellSuccessProps<SearchMediaByQuery, SearchMediaByQueryVariables>) => {
   const { selectedIndex, setSelectedIndex, open, handleSelect } =
     useSearchNavigation();
@@ -62,8 +62,8 @@ export const Success = ({
     'arrowdown',
     e => {
       e.preventDefault();
-      if (medias.length) {
-        setSelectedIndex((selectedIndex + 1) % medias.length);
+      if (searchMedias.length) {
+        setSelectedIndex((selectedIndex + 1) % searchMedias.length);
       }
     },
     { enableOnFormTags: true, enabled: open }
@@ -73,8 +73,10 @@ export const Success = ({
     'arrowup',
     e => {
       e.preventDefault();
-      if (medias.length) {
-        setSelectedIndex((selectedIndex - 1 + medias.length) % medias.length);
+      if (searchMedias.length) {
+        setSelectedIndex(
+          (selectedIndex - 1 + searchMedias.length) % searchMedias.length
+        );
       }
     },
     { enableOnFormTags: true, enabled: open }
@@ -85,8 +87,8 @@ export const Success = ({
     'enter',
     e => {
       e.preventDefault();
-      if (medias.length && open) {
-        handleSelect({ slug: medias[selectedIndex].slug });
+      if (searchMedias.length && open) {
+        handleSelect({ slug: searchMedias[selectedIndex].slug });
       }
     },
     { enableOnFormTags: true, enabled: open }
@@ -94,7 +96,7 @@ export const Success = ({
 
   return (
     <div className="max-h-[60vh] overflow-y-auto py-2">
-      {medias.map((item, index) => {
+      {searchMedias.map((item, index) => {
         return (
           <Result
             key={item.id}

@@ -12,7 +12,7 @@ export const Result = ({
 }: {
   selectedIndex: number;
   index: number;
-  media: SearchMediaByQuery['medias'][number];
+  media: SearchMediaByQuery['searchMedias'][number];
 }) => {
   // Get handleSelect from the hook
   const { handleSelect } = useSearchNavigation();
@@ -63,7 +63,7 @@ export const Result = ({
         <div className="flex items-center justify-between">
           <h4 className="truncate text-sm font-medium">{media.title}</h4>
           <span className="ml-2 text-xs text-neutral-500 dark:text-neutral-400">
-            {media.releaseDate.split('-')[0]}
+            {media.date && new Date(media.date).getFullYear()}
           </span>
         </div>
         {media.originalTitle && media.originalTitle !== media.title && (
