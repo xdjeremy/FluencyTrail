@@ -42,10 +42,10 @@ export const media: QueryResolvers['media'] = async ({ slug }) => {
     backdropUrl: result.backdropUrl,
     popularity: result.popularity,
     date: result.date,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    MovieMetadata: undefined,
-    TvMetadata: undefined,
+    createdAt: new Date(), // These might be better sourced from the DB record if available
+    updatedAt: new Date(), // These might be better sourced from the DB record if available
+    // MovieMetadata and TvMetadata are removed here;
+    // they will be resolved by MediaResolver if the data exists in the DB.
   };
 };
 
@@ -73,7 +73,7 @@ export const searchMedias: QueryResolvers['searchMedias'] = async ({
     posterUrl: result.posterUrl,
     backdropUrl: result.backdropUrl,
     popularity: result.popularity,
-    date: result.date, // Keep the original date field
+    date: result.releaseDate, // Use releaseDate instead of deprecated date
     createdAt: new Date(), // Required by GraphQL schema
     updatedAt: new Date(), // Required by GraphQL schema
   }));

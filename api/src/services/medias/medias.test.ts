@@ -57,8 +57,7 @@ describe('medias', () => {
         backdropUrl: scenario.media.one.backdropUrl,
         popularity: scenario.media.one.popularity,
         date: scenario.media.one.releaseDate,
-        MovieMetadata: undefined,
-        TvMetadata: undefined,
+        // MovieMetadata and TvMetadata are resolved separately, not expected here
       });
     });
 
@@ -112,6 +111,7 @@ describe('medias', () => {
         const mockCustomMedia = {
           id: 'custom-1',
           title: 'Custom Book 1',
+          slug: 'custom-book-1', // Added slug
           createdAt: new Date('2024-01-01'),
           updatedAt: new Date('2024-01-01'),
           userId: 1,
@@ -183,6 +183,7 @@ describe('medias', () => {
       const mockCustomMedia = {
         id: 'custom-1',
         title: 'Custom Book 1',
+        slug: 'custom-book-1', // Added slug
         createdAt: new Date(),
         updatedAt: new Date(),
         userId: 1,
@@ -235,6 +236,7 @@ describe('medias', () => {
         .map((_, i) => ({
           id: `custom-${i}`,
           title: `Custom Media ${i}`,
+          slug: `custom-media-${i}`, // Added slug
           createdAt: new Date(),
           updatedAt: new Date(),
           userId: 1,

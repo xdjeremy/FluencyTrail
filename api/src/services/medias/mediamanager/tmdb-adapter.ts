@@ -3,7 +3,13 @@ import type { MediaType } from 'types/graphql';
 import TheMovieDb from '../themoviedb';
 import { TmdbMultiSearchResult } from '../themoviedb/interfaces';
 
-import { MediaFetcher, MediaMapper, MediaResultDto } from './interfaces';
+import {
+  MediaFetcher,
+  MediaMapper,
+  MediaResultDto,
+  MovieRawMetadata, // Added import
+  TvRawMetadata, // Added import
+} from './interfaces';
 
 export class TmdbMapper implements MediaMapper<TmdbMultiSearchResult> {
   map(source: TmdbMultiSearchResult): MediaResultDto {
@@ -32,6 +38,8 @@ export class TmdbMapper implements MediaMapper<TmdbMultiSearchResult> {
         : source.first_air_date
           ? new Date(source.first_air_date)
           : undefined,
+      // Include the raw source object as metadata, casting to satisfy the type
+      metadata: source as unknown as MovieRawMetadata | TvRawMetadata,
     };
   }
 }

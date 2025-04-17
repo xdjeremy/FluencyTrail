@@ -10,10 +10,11 @@ export class CustomMediaMapper implements MediaMapper<CustomMedia> {
     return {
       id: source.id,
       externalId: source.id,
-      slug: source.id, // Using ID as slug as specified
+      slug: source.slug, // Use the actual slug field
       title: source.title,
       mediaType: 'CUSTOM' as MediaType,
-      date: source.createdAt, // Using createdAt as the date
+      releaseDate: source.createdAt, // Map createdAt to releaseDate
+      date: source.createdAt, // Keep for backward compatibility if needed, though releaseDate is preferred
     };
   }
 }

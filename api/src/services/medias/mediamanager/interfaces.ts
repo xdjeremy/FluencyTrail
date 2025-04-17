@@ -49,4 +49,5 @@ export interface MediaResultDto {
   /** @deprecated Use releaseDate instead */
   date?: Date; // Kept for backward compatibility
   user?: UserDto;
+  metadata?: MovieRawMetadata | TvRawMetadata; // Added to hold raw metadata
 }
