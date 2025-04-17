@@ -2,7 +2,7 @@ import type { MediaRelationResolvers, QueryResolvers } from 'types/graphql';
 
 import { db } from 'src/lib/db';
 
-import MediaManager from './mediamanager';
+import { MediaManager } from './mediamanager';
 import TheMovieDb from './themoviedb';
 
 // For testing purposes, we'll allow injecting the TMDB client

@@ -8,7 +8,7 @@ import { CustomMediaFetcher } from './custom-media-adapter';
 import { MediaResultDto } from './interfaces';
 import { TmdbFetcher } from './tmdb-adapter';
 
-export class MediaManager {
+class MediaManager {
   private mapMediaToDto(media: {
     id: string;
     externalId: string | null;
@@ -200,68 +200,82 @@ export class MediaManager {
     if (newMediaDto) {
       const { metadata, ...mediaData } = newMediaDto; // Separate metadata
 
-      // Use a transaction to create Media and Metadata atomically
+      // Use a transaction with upsert to handle concurrent media creation atomically
       const createdMediaWithMetadata = await db.$transaction(async tx => {
-        // 1. Create the Media record
-        const { id: _id, ...mediaDataWithoutId } = mediaData; // Exclude id from mediaData
-        const createdMedia = await tx.media.create({
-          data: {
-            ...mediaDataWithoutId, // Basic media fields without id
+        // 1. Upsert the Media record using externalId + mediaType as unique key
+        const { id: _id, ...mediaDataWithoutId } = mediaData;
+        const createdMedia = await tx.media.upsert({
+          where: {
+            externalId_mediaType: {
+              externalId: mediaDataWithoutId.externalId,
+              mediaType: mediaDataWithoutId.mediaType,
+            },
+          },
+          create: {
+            ...mediaDataWithoutId,
             lastSyncedAt: new Date(),
-            // No nested metadata create here
+          },
+          update: {
+            ...mediaDataWithoutId,
+            lastSyncedAt: new Date(),
           },
         });
 
         // 2. Create the Metadata record if applicable
         if (metadata) {
           if (newMediaDto.mediaType === 'MOVIE') {
-            await tx.movieMetadata.create({
-              data: {
-                mediaId: createdMedia.id, // Link to the created media
-                adult: metadata.adult ?? undefined,
-                originalLanguage: metadata.original_language ?? undefined,
-                genres:
-                  (
-                    metadata.genres as unknown as Array<{
-                      id: number;
-                      name: string;
-                    }>
-                  )?.map(g => g.name) || [],
-                runtime: (metadata.runtime as number) ?? undefined,
-                rawData: metadata as unknown as Prisma.JsonValue, // Include rawData here
-              },
+            const metadataFields = {
+              mediaId: createdMedia.id,
+              adult: metadata.adult ?? undefined,
+              originalLanguage: metadata.original_language ?? undefined,
+              genres:
+                (
+                  metadata.genres as unknown as Array<{
+                    id: number;
+                    name: string;
+                  }>
+                )?.map(g => g.name) || [],
+              runtime: (metadata.runtime as number) ?? undefined,
+              rawData: metadata as unknown as Prisma.JsonValue,
+            };
+            await tx.movieMetadata.upsert({
+              where: { mediaId: createdMedia.id },
+              create: metadataFields,
+              update: metadataFields,
             });
           } else if (newMediaDto.mediaType === 'TV') {
-            await tx.tvMetadata.create({
-              data: {
-                mediaId: createdMedia.id, // Link to the created media
-                adult: metadata.adult ?? undefined,
-                originalLanguage: metadata.original_language ?? undefined,
-                genres:
-                  (
-                    metadata.genres as unknown as Array<{
-                      id: number;
-                      name: string;
-                    }>
-                  )?.map(g => g.name) || [],
-                firstAirDate:
-                  typeof metadata.first_air_date === 'string' &&
-                  metadata.first_air_date
-                    ? new Date(metadata.first_air_date)
-                    : undefined,
-                lastAirDate:
-                  typeof metadata.last_air_date === 'string' &&
-                  metadata.last_air_date
-                    ? new Date(metadata.last_air_date)
-                    : undefined,
-                numberOfSeasons:
-                  (metadata.number_of_seasons as number) ?? undefined,
-                numberOfEpisodes:
-                  (metadata.number_of_episodes as number) ?? undefined,
-                status: (metadata.status as string) ?? undefined,
-                originalCountry: (metadata.origin_country as string[]) ?? [],
-                // rawData: metadata as unknown as Prisma.JsonValue, // Removed due to TS errors
-              },
+            const tvMetadataFields = {
+              mediaId: createdMedia.id,
+              adult: metadata.adult ?? undefined,
+              originalLanguage: metadata.original_language ?? undefined,
+              genres:
+                (
+                  metadata.genres as unknown as Array<{
+                    id: number;
+                    name: string;
+                  }>
+                )?.map(g => g.name) || [],
+              firstAirDate:
+                typeof metadata.first_air_date === 'string' &&
+                metadata.first_air_date
+                  ? new Date(metadata.first_air_date)
+                  : undefined,
+              lastAirDate:
+                typeof metadata.last_air_date === 'string' &&
+                metadata.last_air_date
+                  ? new Date(metadata.last_air_date)
+                  : undefined,
+              numberOfSeasons:
+                (metadata.number_of_seasons as number) ?? undefined,
+              numberOfEpisodes:
+                (metadata.number_of_episodes as number) ?? undefined,
+              status: (metadata.status as string) ?? undefined,
+              originalCountry: (metadata.origin_country as string[]) ?? [],
+            };
+            await tx.tvMetadata.upsert({
+              where: { mediaId: createdMedia.id },
+              create: tvMetadataFields,
+              update: tvMetadataFields,
             });
           }
         }
@@ -393,32 +407,49 @@ export class MediaManager {
   }
 
   async searchMedias(query: string): Promise<MediaResultDto[]> {
-    try {
-      // Fetch results from both sources concurrently
-      const [tmdbResults, customResults] = await Promise.allSettled([
-        this.displayFetcher.fetch(query),
-        this.customMediaFetcher.fetch(query),
-      ]);
+    let retryCount = 0;
+    const maxRetries = 3;
+    const delay = (ms: number) =>
+      new Promise(resolve => setTimeout(resolve, ms));
 
-      // Combine successful results
-      const results: MediaResultDto[] = [];
+    while (retryCount < maxRetries) {
+      try {
+        // Fetch results from both sources concurrently
+        const [tmdbResults, customResults] = await Promise.allSettled([
+          this.displayFetcher.fetch(query),
+          this.customMediaFetcher.fetch(query),
+        ]);
 
-      // Add CustomMedia results first (priority)
-      if (customResults.status === 'fulfilled') {
-        results.push(...customResults.value);
+        // Combine successful results
+        const results: MediaResultDto[] = [];
+
+        // Add CustomMedia results first (priority)
+        if (customResults.status === 'fulfilled') {
+          results.push(...customResults.value);
+        }
+
+        // Add TMDB results
+        if (tmdbResults.status === 'fulfilled') {
+          results.push(...tmdbResults.value);
+        }
+
+        // Successful, return results
+        return results.slice(0, 10);
+      } catch (error) {
+        console.error(
+          `[MediaManager] Search attempt ${retryCount + 1} failed:`,
+          error
+        );
+        retryCount++;
+        if (retryCount === maxRetries) {
+          console.error('[MediaManager] Max retries reached, giving up');
+          return [];
+        }
+        // Exponential backoff
+        await delay(Math.pow(2, retryCount) * 100);
       }
-
-      // Add TMDB results
-      if (tmdbResults.status === 'fulfilled') {
-        results.push(...tmdbResults.value);
-      }
-
-      // Limit to 10 results total
-      return results.slice(0, 10);
-    } catch (error) {
-      console.error('[MediaManager] Error searching medias:', error);
-      return [];
     }
+    return [];
   }
 
   async getSimilarMedias({
@@ -450,4 +481,4 @@ export class MediaManager {
   }
 }
 
-export default MediaManager;
+export { MediaManager };
