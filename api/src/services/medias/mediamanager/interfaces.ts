@@ -35,7 +35,7 @@ export type TvRawMetadata = {
 };
 
 export interface MediaResultDto {
-  id: string;
+  id: string; // Required for GraphQL, use display-only IDs for non-DB results
   externalId?: string;
   slug: string;
   title: string;

@@ -50,13 +50,15 @@ export class MediaManager {
 
     return result;
   }
-  private tmdbFetcher: TmdbFetcher;
+  private tmdbFetcher: TmdbFetcher; // For database operations
+  private displayFetcher: TmdbFetcher; // For search/similar results
   private customMediaFetcher: CustomMediaFetcher;
   private tmdbClient: TheMovieDb;
 
   constructor(tmdbClient: TheMovieDb) {
     this.tmdbClient = tmdbClient;
-    this.tmdbFetcher = new TmdbFetcher(tmdbClient);
+    this.tmdbFetcher = new TmdbFetcher(tmdbClient, false); // Database operations
+    this.displayFetcher = new TmdbFetcher(tmdbClient, true); // Display-only results
     this.customMediaFetcher = new CustomMediaFetcher();
   }
 
@@ -201,9 +203,10 @@ export class MediaManager {
       // Use a transaction to create Media and Metadata atomically
       const createdMediaWithMetadata = await db.$transaction(async tx => {
         // 1. Create the Media record
+        const { id: _id, ...mediaDataWithoutId } = mediaData; // Exclude id from mediaData
         const createdMedia = await tx.media.create({
           data: {
-            ...mediaData, // Basic media fields
+            ...mediaDataWithoutId, // Basic media fields without id
             lastSyncedAt: new Date(),
             // No nested metadata create here
           },
@@ -393,7 +396,7 @@ export class MediaManager {
     try {
       // Fetch results from both sources concurrently
       const [tmdbResults, customResults] = await Promise.allSettled([
-        this.tmdbFetcher.fetch(query),
+        this.displayFetcher.fetch(query),
         this.customMediaFetcher.fetch(query),
       ]);
 
@@ -433,46 +436,13 @@ export class MediaManager {
         language: 'en',
       });
 
-      // Convert TMDB results to MediaResultDtos
-      return results.results.map(result => ({
-        id: `tmdb-${result.id}`,
-        externalId: result.id.toString(),
-        slug: `tmdb-${result.media_type}-${result.id}`,
-        title: result.media_type === 'tv' ? result.name : result.title,
-        mediaType: result.media_type.toUpperCase() as
-          | 'MOVIE'
-          | 'TV'
-          | 'BOOK'
-          | 'CUSTOM',
-        originalTitle:
-          result.media_type === 'tv'
-            ? result.original_name
-            : result.original_title,
-        description: result.overview,
-        posterUrl: result.poster_path
-          ? `https://image.tmdb.org/t/p/w500${result.poster_path}`
-          : null,
-        backdropUrl: result.backdrop_path
-          ? `https://image.tmdb.org/t/p/original${result.backdrop_path}`
-          : null,
-        popularity: result.popularity,
-        releaseDate:
-          result.media_type === 'tv'
-            ? result.first_air_date
-              ? new Date(result.first_air_date)
-              : null
-            : result.release_date
-              ? new Date(result.release_date)
-              : null,
-        date:
-          result.media_type === 'tv'
-            ? result.first_air_date
-              ? new Date(result.first_air_date)
-              : null
-            : result.release_date
-              ? new Date(result.release_date)
-              : null,
-      }));
+      // Use displayFetcher's mapResult method for consistent ID handling
+      return results.results.map(result =>
+        this.displayFetcher.mapResult({
+          ...result,
+          media_type: mediaType === 'MOVIE' ? 'movie' : 'tv',
+        })
+      );
     } catch (error) {
       console.error('[MediaManager] Error fetching similar medias:', error);
       return [];

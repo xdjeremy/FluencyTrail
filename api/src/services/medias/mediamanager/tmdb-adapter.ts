@@ -12,12 +12,18 @@ import {
 } from './interfaces';
 
 export class TmdbMapper implements MediaMapper<TmdbMultiSearchResult> {
+  constructor(private forDisplay: boolean = true) {}
+
   map(source: TmdbMultiSearchResult): MediaResultDto {
     const isMovie = source.media_type === 'movie';
     const mediaType = isMovie ? 'MOVIE' : 'TV';
 
+    // For display (search results, similar media), use display-only ID
+    // For database creation, use temporary unique ID that won't conflict
     return {
-      id: `tmdb-${source.id}`,
+      id: this.forDisplay
+        ? `tmdb-${source.id}`
+        : `temp-${Date.now()}-${Math.random()}`,
       externalId: source.id.toString(),
       slug: `tmdb-${mediaType.toLowerCase()}-${source.id}`,
       title: isMovie ? source.title : source.name,
@@ -47,8 +53,15 @@ export class TmdbMapper implements MediaMapper<TmdbMultiSearchResult> {
 export class TmdbFetcher implements MediaFetcher {
   private mapper: TmdbMapper;
 
-  constructor(private client: TheMovieDb) {
-    this.mapper = new TmdbMapper();
+  constructor(
+    private client: TheMovieDb,
+    forDisplay: boolean = true
+  ) {
+    this.mapper = new TmdbMapper(forDisplay);
+  }
+
+  mapResult(result: TmdbMultiSearchResult): MediaResultDto {
+    return this.mapper.map(result);
   }
 
   async fetchById(
