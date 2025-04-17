@@ -52,8 +52,10 @@ export class MediaManager {
   }
   private tmdbFetcher: TmdbFetcher;
   private customMediaFetcher: CustomMediaFetcher;
+  private tmdbClient: TheMovieDb;
 
   constructor(tmdbClient: TheMovieDb) {
+    this.tmdbClient = tmdbClient;
     this.tmdbFetcher = new TmdbFetcher(tmdbClient);
     this.customMediaFetcher = new CustomMediaFetcher();
   }
@@ -412,6 +414,67 @@ export class MediaManager {
       return results.slice(0, 10);
     } catch (error) {
       console.error('[MediaManager] Error searching medias:', error);
+      return [];
+    }
+  }
+
+  async getSimilarMedias({
+    mediaId,
+    mediaType,
+  }: {
+    mediaId: number;
+    mediaType: 'MOVIE' | 'TV';
+  }): Promise<MediaResultDto[]> {
+    try {
+      const results = await this.tmdbClient.getSimilarMedias({
+        mediaId,
+        mediaType,
+        page: 1,
+        language: 'en',
+      });
+
+      // Convert TMDB results to MediaResultDtos
+      return results.results.map(result => ({
+        id: `tmdb-${result.id}`,
+        externalId: result.id.toString(),
+        slug: `tmdb-${result.media_type}-${result.id}`,
+        title: result.media_type === 'tv' ? result.name : result.title,
+        mediaType: result.media_type.toUpperCase() as
+          | 'MOVIE'
+          | 'TV'
+          | 'BOOK'
+          | 'CUSTOM',
+        originalTitle:
+          result.media_type === 'tv'
+            ? result.original_name
+            : result.original_title,
+        description: result.overview,
+        posterUrl: result.poster_path
+          ? `https://image.tmdb.org/t/p/w500${result.poster_path}`
+          : null,
+        backdropUrl: result.backdrop_path
+          ? `https://image.tmdb.org/t/p/original${result.backdrop_path}`
+          : null,
+        popularity: result.popularity,
+        releaseDate:
+          result.media_type === 'tv'
+            ? result.first_air_date
+              ? new Date(result.first_air_date)
+              : null
+            : result.release_date
+              ? new Date(result.release_date)
+              : null,
+        date:
+          result.media_type === 'tv'
+            ? result.first_air_date
+              ? new Date(result.first_air_date)
+              : null
+            : result.release_date
+              ? new Date(result.release_date)
+              : null,
+      }));
+    } catch (error) {
+      console.error('[MediaManager] Error fetching similar medias:', error);
       return [];
     }
   }

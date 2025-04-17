@@ -3,7 +3,7 @@ import type { ScenarioData } from '@redwoodjs/testing/api';
 import { db } from 'src/lib/db';
 
 import MediaManager from './mediamanager';
-import { media, searchMedias, setMediaManager } from './medias';
+import { media, searchMedias, setMediaManager, similarMedias } from './medias';
 import { standard, tmdbSearchResults } from './medias.scenarios';
 import TheMovieDb from './themoviedb';
 
@@ -11,6 +11,7 @@ import TheMovieDb from './themoviedb';
 jest.mock('./themoviedb', () => {
   return jest.fn().mockImplementation(() => ({
     searchMulti: jest.fn(),
+    getSimilarMedias: jest.fn(),
   }));
 });
 
@@ -257,6 +258,109 @@ describe('medias', () => {
           mediaType: 'CUSTOM',
         })
       );
+    });
+  });
+
+  describe('similarMedias', () => {
+    scenario('returns similar movie results', async scenario => {
+      const mockSimilarResults = {
+        page: 1,
+        results: [tmdbSearchResults.movie],
+        total_pages: 1,
+        total_results: 1,
+      };
+
+      // Mock existing media fetch
+      jest.spyOn(mediaManager, 'getMediaBySlug').mockResolvedValue({
+        ...scenario.media.one,
+        mediaType: 'MOVIE',
+        externalId: '123',
+      });
+
+      // Mock similar movies fetch
+      tmdbInstance.getSimilarMedias.mockResolvedValue(mockSimilarResults);
+
+      const result = await similarMedias({ slug: scenario.media.one.slug });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          id: 'tmdb-11070',
+          slug: 'tmdb-movie-11070',
+          title: 'Moonlight Tariff',
+          mediaType: 'MOVIE',
+          date: expect.any(Date),
+        })
+      );
+      expect(tmdbInstance.getSimilarMedias).toHaveBeenCalledWith({
+        mediaId: 123,
+        mediaType: 'MOVIE',
+        page: 1,
+        language: 'en',
+      });
+    });
+
+    scenario('returns similar TV results', async scenario => {
+      const mockSimilarResults = {
+        page: 1,
+        results: [tmdbSearchResults.tv],
+        total_pages: 1,
+        total_results: 1,
+      };
+
+      // Mock existing media fetch
+      jest.spyOn(mediaManager, 'getMediaBySlug').mockResolvedValue({
+        ...scenario.media.one,
+        mediaType: 'TV',
+        externalId: '456',
+      });
+
+      // Mock similar TV shows fetch
+      tmdbInstance.getSimilarMedias.mockResolvedValue(mockSimilarResults);
+
+      const result = await similarMedias({ slug: scenario.media.one.slug });
+
+      expect(result).toHaveLength(1);
+      expect(result[0]).toEqual(
+        expect.objectContaining({
+          id: 'tmdb-38634',
+          slug: 'tmdb-tv-38634',
+          title: 'Bloody Monday',
+          mediaType: 'TV',
+          date: expect.any(Date),
+        })
+      );
+      expect(tmdbInstance.getSimilarMedias).toHaveBeenCalledWith({
+        mediaId: 456,
+        mediaType: 'TV',
+        page: 1,
+        language: 'en',
+      });
+    });
+
+    scenario('returns empty array for non-existent media', async () => {
+      jest.spyOn(mediaManager, 'getMediaBySlug').mockResolvedValue(null);
+
+      const result = await similarMedias({ slug: 'non-existent' });
+
+      expect(result).toEqual([]);
+      expect(tmdbInstance.getSimilarMedias).not.toHaveBeenCalled();
+    });
+
+    scenario('returns empty array when TMDB fails', async scenario => {
+      // Mock existing media fetch
+      jest.spyOn(mediaManager, 'getMediaBySlug').mockResolvedValue({
+        ...scenario.media.one,
+        mediaType: 'MOVIE',
+        externalId: '123',
+      });
+
+      // Mock TMDB API failure
+      tmdbInstance.getSimilarMedias.mockRejectedValue(new Error('API Error'));
+
+      const result = await similarMedias({ slug: scenario.media.one.slug });
+
+      expect(result).toEqual([]);
     });
   });
 });

@@ -50,10 +50,37 @@ export const media: QueryResolvers['media'] = async ({ slug }) => {
 };
 
 export const similarMedias: QueryResolvers['similarMedias'] = async ({
-  slug: _slug,
+  slug,
 }) => {
-  // TODO: Implement similarMedias
-  return [];
+  try {
+    const baseMedia = await getMediaManager().getMediaBySlug(slug);
+
+    // Only proceed for MOVIE or TV types that can have similar content
+    if (
+      !baseMedia ||
+      !baseMedia.externalId ||
+      !baseMedia.mediaType ||
+      !['MOVIE', 'TV'].includes(baseMedia.mediaType)
+    ) {
+      return [];
+    }
+
+    const results = await getMediaManager().getSimilarMedias({
+      mediaId: parseInt(baseMedia.externalId),
+      mediaType: baseMedia.mediaType as 'MOVIE' | 'TV',
+    });
+
+    // Convert MediaResultDto[] to Media[] as expected by GraphQL
+    return results.map(result => ({
+      ...result,
+      date: result.releaseDate, // Use releaseDate instead of deprecated date
+      createdAt: new Date(), // Required by GraphQL schema
+      updatedAt: new Date(), // Required by GraphQL schema
+    }));
+  } catch (error) {
+    console.error('[similarMedias] Error fetching similar medias:', error);
+    return [];
+  }
 };
 
 export const searchMedias: QueryResolvers['searchMedias'] = async ({
