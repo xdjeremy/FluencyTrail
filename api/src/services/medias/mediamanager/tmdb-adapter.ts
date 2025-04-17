@@ -25,7 +25,7 @@ export class TmdbMapper implements MediaMapper<TmdbMultiSearchResult> {
         ? `https://image.tmdb.org/t/p/original${source.backdrop_path}`
         : undefined,
       popularity: source.popularity,
-      date: isMovie
+      releaseDate: isMovie
         ? source.release_date
           ? new Date(source.release_date)
           : undefined

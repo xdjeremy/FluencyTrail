@@ -134,13 +134,14 @@ model Media {
 model CustomMedia {
   id        String   @id @default(uuid())
   title     String
+  slug      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   userId Int
 
-  User    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Acivity Activity[]
+  User     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Activity Activity[]
 
   @@unique([userId, title])
 }
