@@ -59,7 +59,22 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
     fetchPolicy: 'cache-and-network',
   });
 
-  console.log('data', data);
+  const handleSearch = (value: string) => {
+    setSearchValue(value);
+
+    // Clear either mediaSlug or customMediaTitle based on whether
+    // searching existing media or creating new
+    const isSelectingExisting = data?.searchMedias?.some(
+      media => media.title.toLowerCase() === value.toLowerCase()
+    );
+
+    if (isSelectingExisting) {
+      form.setValue('customMediaTitle', '');
+    } else {
+      form.setValue('mediaSlug', '');
+      form.setValue('customMediaTitle', value);
+    }
+  };
 
   return (
     <FormField
@@ -76,15 +91,17 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                   role="combobox"
                   className={cn(
                     'col-span-3 justify-between',
-                    !field.value && 'text-muted-foreground'
+                    !field.value &&
+                      !form.watch('customMediaTitle') &&
+                      'text-muted-foreground'
                   )}
                   disabled={isLoading}
                 >
                   {field.value
                     ? data?.searchMedias.find(
                         media => media.slug === field.value
-                      )?.title || 'Select media'
-                    : 'Select media'}
+                      )?.title
+                    : form.watch('customMediaTitle') || 'Select media'}
                   <ChevronsUpDown className="size-4 opacity-50" />
                 </Button>
               </FormControl>
@@ -98,39 +115,44 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                 }}
               >
                 <CommandInput
-                  placeholder="Search activity..."
+                  placeholder="Search media or type to create new..."
                   className="h-9"
                   value={searchValue}
-                  onValueChange={setSearchValue}
+                  onValueChange={handleSearch}
                 />
                 <CommandList>
-                  <CommandEmpty>No media found.</CommandEmpty>
+                  <CommandEmpty>
+                    {searchValue && (
+                      <div className="px-4 py-3 text-sm text-green-600">
+                        Press Enter to create &ldquo;{searchValue}&ldquo;
+                      </div>
+                    )}
+                  </CommandEmpty>
                   <CommandGroup>
-                    {data &&
-                      data.searchMedias.map(media => (
-                        <CommandItem
-                          // FIXME: some media titles are not unique
-                          value={media.slug}
-                          key={media.slug}
-                          onSelect={() => {
-                            form.setValue('mediaSlug', media.slug);
-                            form.setFocus('activityType');
-                          }}
-                        >
-                          {media.title}{' '}
-                          {media.date
-                            ? `(${format(new Date(media.date), 'yyyy')})`
-                            : ''}
-                          <Check
-                            className={cn(
-                              'ml-auto size-4',
-                              media.slug === field.value
-                                ? 'opacity-100'
-                                : 'opacity-0'
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
+                    {data?.searchMedias.map(media => (
+                      <CommandItem
+                        value={media.slug}
+                        key={media.slug}
+                        onSelect={() => {
+                          form.setValue('mediaSlug', media.slug);
+                          form.setValue('customMediaTitle', '');
+                          form.setFocus('activityType');
+                          setSearchValue('');
+                        }}
+                      >
+                        {media.title}{' '}
+                        {media.date &&
+                          `(${format(new Date(media.date), 'yyyy')})`}
+                        <Check
+                          className={cn(
+                            'ml-auto size-4',
+                            media.slug === field.value
+                              ? 'opacity-100'
+                              : 'opacity-0'
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
                   </CommandGroup>
                 </CommandList>
               </Command>

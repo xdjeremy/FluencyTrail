@@ -61,12 +61,13 @@ export const schema = gql`
   }
 
   input CreateActivityInput {
+    date: DateTime!
     mediaSlug: String
     activityType: ActivityType!
+    duration: Int!
     notes: String
-    duration: Int
-    date: Date! # Changed from DateTime! to Date!
-    languageId: Int! # Required field for language
+    languageId: Int!
+    customMediaTitle: String
   }
 
   input UpdateActivityInput {

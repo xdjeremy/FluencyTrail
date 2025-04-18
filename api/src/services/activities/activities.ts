@@ -18,8 +18,7 @@ import { RedwoodError } from '@redwoodjs/api';
 
 import { db } from 'src/lib/db';
 import { TimezoneConverter } from 'src/lib/TimezoneConverter';
-
-import { validateActivityInput } from './activityValidation';
+import { slugify } from 'src/lib/utils/slugify';
 
 // --- Service Functions ---
 export const activities: QueryResolvers['activities'] = ({
@@ -311,42 +310,80 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
     throw new RedwoodError('Selected language is not added to your profile');
   }
 
-  // Call the consolidated validation function for other validations
-  const { media } = await validateActivityInput(input, context.currentUser);
+  return await db.$transaction(async tx => {
+    let mediaId: string | undefined;
+    let customMediaId: string | undefined;
 
-  // Determine the final Date object for Prisma using the TimezoneConverter
-  let finalDateForDb: Date;
-  const userTimeZone = context.currentUser?.timezone || 'UTC'; // Ensure timezone is available
+    // Handle custom media creation
+    if (input.customMediaTitle) {
+      const existing = await tx.customMedia.findFirst({
+        where: {
+          userId: context.currentUser.id,
+          title: input.customMediaTitle,
+        },
+      });
 
-  // input.date should be a Date object (UTC midnight) from the Date scalar
-  if (!(input.date instanceof Date) || !isValid(input.date)) {
-    // Defensive check, though validation should catch this
-    throw new Error(
-      'Invalid or unexpected date type received after validation.'
-    );
-  }
+      if (existing) {
+        throw new RedwoodError('You already have a media with this title');
+      }
 
-  try {
-    // Format the Date object explicitly in UTC to get correct 'yyyy-MM-dd' string
-    const dateString = formatInTimeZone(input.date, 'UTC', 'yyyy-MM-dd');
-    // Convert the date string to the correct UTC timestamp representing
-    // the start of the day in the user's timezone.
-    finalDateForDb = TimezoneConverter.userDateToUtc(dateString, userTimeZone);
-  } catch (error) {
-    // Handle potential errors from formatting or the converter
-    throw new Error(`Failed to process date for database: ${error.message}`);
-  }
+      // Generate slug from title
+      const slug = `${slugify(input.customMediaTitle)}-${Math.random()
+        .toString(36)
+        .slice(2, 6)}`;
 
-  return db.activity.create({
-    data: {
-      activityType: input.activityType,
-      notes: input.notes,
-      duration: input.duration,
-      date: finalDateForDb,
-      userId: context.currentUser.id,
-      languageId: input.languageId,
-      mediaId: media?.id,
-    },
+      const customMedia = await tx.customMedia.create({
+        data: {
+          title: input.customMediaTitle,
+          slug,
+          userId: context.currentUser.id,
+        },
+      });
+      customMediaId = customMedia.id;
+    } else if (input.mediaSlug) {
+      // Handle existing media
+      const media = await tx.media.findUnique({
+        where: { slug: input.mediaSlug },
+      });
+      if (!media) {
+        throw new RedwoodError('Selected media not found');
+      }
+      mediaId = media.id;
+    }
+
+    // Determine the final Date object for Prisma using the TimezoneConverter
+    let finalDateForDb: Date;
+    const userTimeZone = context.currentUser?.timezone || 'UTC';
+
+    if (!(input.date instanceof Date) || !isValid(input.date)) {
+      throw new Error(
+        'Invalid or unexpected date type received after validation.'
+      );
+    }
+
+    try {
+      const dateString = formatInTimeZone(input.date, 'UTC', 'yyyy-MM-dd');
+      finalDateForDb = TimezoneConverter.userDateToUtc(
+        dateString,
+        userTimeZone
+      );
+    } catch (error) {
+      throw new Error(`Failed to process date for database: ${error.message}`);
+    }
+
+    // Create activity with the appropriate media reference
+    return tx.activity.create({
+      data: {
+        activityType: input.activityType,
+        notes: input.notes,
+        duration: input.duration,
+        date: finalDateForDb,
+        userId: context.currentUser.id,
+        languageId: input.languageId,
+        mediaId,
+        customMediaId,
+      },
+    });
   });
 };
 
