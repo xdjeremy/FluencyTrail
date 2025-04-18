@@ -6,6 +6,8 @@ export const schema = gql`
     activityType: ActivityType!
     mediaId: String
     media: Media
+    customMediaId: String
+    customMedia: CustomMedia
     notes: String
     duration: Int
     date: DateTime!

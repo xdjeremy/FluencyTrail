@@ -97,14 +97,16 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
   const onSubmit: SubmitHandler<ActivitySchemaType> = data => {
     // Create a new object with the correct type, casting activityType and formatting date
     // Format the date as 'yyyy-MM-dd' string before sending
-    const formattedDate = format(data.date, 'yyyy-MM-dd');
+    // Convert form date to ISO string while preserving user's timezone
+    const formattedDate = data.date.toISOString();
 
     const saveData: CreateActivityInput = {
       activityType: data.activityType as ActivityType,
       notes: data.notes,
       duration: Number(data.duration),
       date: formattedDate,
-      mediaSlug: data.mediaSlug,
+      mediaSlug: data.mediaSlug || undefined,
+      customMediaTitle: data.customMediaTitle || undefined,
       languageId: Number(data.languageId), // Ensure languageId is a number
     };
     props.onSave(saveData);

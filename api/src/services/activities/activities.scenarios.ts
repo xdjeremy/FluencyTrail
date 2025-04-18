@@ -1,59 +1,101 @@
-import type { Activity, Prisma } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 
-import type { ScenarioData } from '@redwoodjs/testing/api';
-
-export const standard = defineScenario<
-  Prisma.ActivityCreateArgs,
-  'activity',
-  'one'
->({
+export const standard = defineScenario<Prisma.ActivityCreateArgs>({
   activity: {
-    one: {
+    withTMDBMedia: {
       data: {
+        activityType: 'WATCHING',
+        date: '2025-04-18T00:00:00Z',
+        duration: 30,
         user: {
           create: {
             id: 1,
-            name: 'John Doe',
+            email: 'test@example.com',
             timezone: 'UTC',
-            email: 'john@example.com',
+            hashedPassword: 'dummy',
+            salt: 'dummy',
             languages: {
-              connectOrCreate: {
-                where: { id: 1 },
-                create: {
-                  name: 'English',
-                  code: 'en',
-                  id: 1,
-                },
+              create: {
+                id: 1,
+                code: 'en',
+                name: 'English',
               },
             },
           },
         },
-        id: '1',
-        date: new Date('2023-10-01T00:00:00Z'), // UTC date
-        duration: 60,
-        activityType: 'GRAMMAR',
+        language: {
+          connect: { id: 1 },
+        },
         media: {
           create: {
-            mediaType: 'BOOK',
-            externalId: '12345',
-            title: 'Sample Book',
-            id: '1',
-            slug: 'sample-book',
-            description: 'A sample book for testing',
+            title: 'Test Movie',
+            slug: 'test-movie',
+            externalId: 'tmdb-123',
+            mediaType: 'MOVIE',
+          },
+        },
+      },
+    },
+    withCustomMedia: {
+      data: {
+        activityType: 'WATCHING',
+        date: '2025-04-18T00:00:00Z',
+        duration: 45,
+        user: {
+          create: {
+            id: 2,
+            email: 'user2@example.com',
+            timezone: 'UTC',
+            hashedPassword: 'dummy',
+            salt: 'dummy',
+            languages: {
+              create: {
+                id: 2,
+                code: 'ja',
+                name: 'Japanese',
+              },
+            },
           },
         },
         language: {
+          connect: { id: 2 },
+        },
+        customMedia: {
           create: {
-            id: 1,
-            code: 'en',
-            name: 'English',
+            title: 'My Custom Show',
+            slug: 'my-custom-show',
+            userId: 2,
           },
         },
-        createdAt: new Date('2023-10-01T00:00:00Z'), // UTC date
-        updatedAt: new Date('2023-10-01T00:00:00Z'), // UTC date
+      },
+    },
+    noMedia: {
+      data: {
+        activityType: 'GRAMMAR',
+        date: '2025-04-18T00:00:00Z',
+        duration: 15,
+        user: {
+          create: {
+            id: 3,
+            email: 'user3@example.com',
+            timezone: 'UTC',
+            hashedPassword: 'dummy',
+            salt: 'dummy',
+            languages: {
+              create: {
+                id: 3,
+                code: 'es',
+                name: 'Spanish',
+              },
+            },
+          },
+        },
+        language: {
+          connect: { id: 3 },
+        },
       },
     },
   },
 });
 
-export type StandardScenario = ScenarioData<Activity, 'activity', 'one'>;
+export type StandardScenario = typeof standard;

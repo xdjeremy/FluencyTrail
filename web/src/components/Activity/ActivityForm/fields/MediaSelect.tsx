@@ -57,23 +57,33 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
       query: debouncedSearch,
     },
     fetchPolicy: 'cache-and-network',
+    skip: !debouncedSearch || debouncedSearch.length < 2,
   });
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
 
-    // Clear either mediaSlug or customMediaTitle based on whether
-    // searching existing media or creating new
-    const isSelectingExisting = data?.searchMedias?.some(
-      media => media.title.toLowerCase() === value.toLowerCase()
-    );
+    // Clear both fields first
+    form.setValue('mediaSlug', '');
+    form.setValue('customMediaTitle', '');
 
-    if (isSelectingExisting) {
-      form.setValue('customMediaTitle', '');
-    } else {
-      form.setValue('mediaSlug', '');
+    // Only set customMediaTitle if not selecting from results
+    if (value && !data?.searchMedias?.some(m => m.title === value)) {
       form.setValue('customMediaTitle', value);
     }
+  };
+
+  const handleSelect = (slug: string) => {
+    form.setValue('mediaSlug', slug);
+    form.setValue('customMediaTitle', '');
+    form.setFocus('activityType');
+    setSearchValue('');
+  };
+
+  const clearSelection = () => {
+    form.setValue('mediaSlug', '');
+    form.setValue('customMediaTitle', '');
+    setSearchValue('');
   };
 
   return (
@@ -82,7 +92,7 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
       name="mediaSlug"
       render={({ field }) => (
         <FormItem className="grid grid-cols-4 items-center gap-4">
-          <FormLabel className="text-right">Media</FormLabel>
+          <FormLabel className="text-right">Media (optional)</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>
@@ -96,6 +106,7 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                       'text-muted-foreground'
                   )}
                   disabled={isLoading}
+                  onClick={() => !field.value && clearSelection()}
                 >
                   {field.value
                     ? data?.searchMedias.find(
@@ -107,13 +118,7 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="p-0">
-              <Command
-                filter={(value, search) => {
-                  const media = data?.searchMedias.find(m => m.slug === value);
-                  const title = media?.title?.toLowerCase() || '';
-                  return title.includes(search.toLowerCase()) ? 1 : 0;
-                }}
-              >
+              <Command>
                 <CommandInput
                   placeholder="Search media or type to create new..."
                   className="h-9"
@@ -124,7 +129,7 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                   <CommandEmpty>
                     {searchValue && (
                       <div className="px-4 py-3 text-sm text-green-600">
-                        Press Enter to create &ldquo;{searchValue}&ldquo;
+                        Press Enter to create &ldquo;{searchValue}&rdquo;
                       </div>
                     )}
                   </CommandEmpty>
@@ -133,12 +138,7 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                       <CommandItem
                         value={media.slug}
                         key={media.slug}
-                        onSelect={() => {
-                          form.setValue('mediaSlug', media.slug);
-                          form.setValue('customMediaTitle', '');
-                          form.setFocus('activityType');
-                          setSearchValue('');
-                        }}
+                        onSelect={() => handleSelect(media.slug)}
                       >
                         {media.title}{' '}
                         {media.date &&

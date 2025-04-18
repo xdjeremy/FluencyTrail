@@ -37,10 +37,6 @@ const ActivitySchema = z
   .refine(data => !(data.mediaSlug && data.customMediaTitle), {
     message: 'Cannot select media and create custom media at the same time',
     path: ['customMediaTitle'],
-  })
-  .refine(data => data.mediaSlug || data.customMediaTitle, {
-    message: 'Either select media or enter custom title',
-    path: ['mediaSlug'],
   });
 
 export { ActivitySchema };

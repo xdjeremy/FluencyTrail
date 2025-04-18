@@ -314,7 +314,11 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
     let mediaId: string | undefined;
     let customMediaId: string | undefined;
 
-    // Handle custom media creation
+    // Media is optional, but validate if provided
+    if (input.mediaSlug && input.customMediaTitle) {
+      throw new RedwoodError('Cannot set both mediaSlug and customMediaTitle');
+    }
+
     if (input.customMediaTitle) {
       const existing = await tx.customMedia.findFirst({
         where: {
@@ -327,7 +331,6 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
         throw new RedwoodError('You already have a media with this title');
       }
 
-      // Generate slug from title
       const slug = `${slugify(input.customMediaTitle)}-${Math.random()
         .toString(36)
         .slice(2, 6)}`;
@@ -340,8 +343,9 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
         },
       });
       customMediaId = customMedia.id;
-    } else if (input.mediaSlug) {
-      // Handle existing media
+    }
+
+    if (input.mediaSlug) {
       const media = await tx.media.findUnique({
         where: { slug: input.mediaSlug },
       });
@@ -351,25 +355,17 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
       mediaId = media.id;
     }
 
-    // Determine the final Date object for Prisma using the TimezoneConverter
-    let finalDateForDb: Date;
+    // Parse the ISO string date from input
+    const userDate = new Date(input.date);
+    if (!isValid(userDate)) {
+      throw new RedwoodError('Invalid date provided');
+    }
+
     const userTimeZone = context.currentUser?.timezone || 'UTC';
-
-    if (!(input.date instanceof Date) || !isValid(input.date)) {
-      throw new Error(
-        'Invalid or unexpected date type received after validation.'
-      );
-    }
-
-    try {
-      const dateString = formatInTimeZone(input.date, 'UTC', 'yyyy-MM-dd');
-      finalDateForDb = TimezoneConverter.userDateToUtc(
-        dateString,
-        userTimeZone
-      );
-    } catch (error) {
-      throw new Error(`Failed to process date for database: ${error.message}`);
-    }
+    const finalDateForDb = TimezoneConverter.userDateToUtc(
+      userDate.toISOString(),
+      userTimeZone
+    );
 
     // Create activity with the appropriate media reference
     return tx.activity.create({
@@ -466,5 +462,11 @@ export const Activity: ActivityRelationResolvers = {
   },
   language: (_obj, { root }) => {
     return db.activity.findUnique({ where: { id: root?.id } }).language();
+  },
+  media: (_obj, { root }) => {
+    return db.activity.findUnique({ where: { id: root?.id } }).media();
+  },
+  customMedia: (_obj, { root }) => {
+    return db.activity.findUnique({ where: { id: root?.id } }).customMedia();
   },
 };
