@@ -59,6 +59,8 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
     fetchPolicy: 'cache-and-network',
   });
 
+  console.log('data', data);
+
   return (
     <FormField
       control={form.control}
@@ -81,14 +83,20 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                   {field.value
                     ? data?.searchMedias.find(
                         media => media.slug === field.value
-                      ).title
+                      )?.title || 'Select media'
                     : 'Select media'}
                   <ChevronsUpDown className="size-4 opacity-50" />
                 </Button>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="p-0">
-              <Command>
+              <Command
+                filter={(value, search) => {
+                  const media = data?.searchMedias.find(m => m.slug === value);
+                  const title = media?.title?.toLowerCase() || '';
+                  return title.includes(search.toLowerCase()) ? 1 : 0;
+                }}
+              >
                 <CommandInput
                   placeholder="Search activity..."
                   className="h-9"
@@ -101,6 +109,7 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                     {data &&
                       data.searchMedias.map(media => (
                         <CommandItem
+                          // FIXME: some media titles are not unique
                           value={media.slug}
                           key={media.slug}
                           onSelect={() => {
@@ -108,7 +117,10 @@ const ActivityMediaSelect = ({ isLoading }: { isLoading: boolean }) => {
                             form.setFocus('activityType');
                           }}
                         >
-                          {media.title} ({format(new Date(media.date), 'yyyy')})
+                          {media.title}{' '}
+                          {media.date
+                            ? `(${format(new Date(media.date), 'yyyy')})`
+                            : ''}
                           <Check
                             className={cn(
                               'ml-auto size-4',
