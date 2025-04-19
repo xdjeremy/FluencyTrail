@@ -19,6 +19,8 @@ import { RedwoodError } from '@redwoodjs/api';
 import { db } from 'src/lib/db';
 import { TimezoneConverter } from 'src/lib/TimezoneConverter';
 import { slugify } from 'src/lib/utils/slugify';
+import { MediaManager } from 'src/services/medias/mediamanager'; // Import MediaManager
+import TheMovieDb from 'src/services/medias/themoviedb'; // Import TheMovieDb client
 
 // --- Service Functions ---
 export const activities: QueryResolvers['activities'] = ({
@@ -310,15 +312,44 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
     throw new RedwoodError('Selected language is not added to your profile');
   }
 
-  return await db.$transaction(async tx => {
-    let mediaId: string | undefined;
-    let customMediaId: string | undefined;
+  // Instantiate MediaManager
+  const tmdbClient = new TheMovieDb(); // Assuming simple instantiation
+  const mediaManager = new MediaManager(tmdbClient);
 
-    // Media is optional, but validate if provided
-    if (input.mediaSlug && input.customMediaTitle) {
-      throw new RedwoodError('Cannot set both mediaSlug and customMediaTitle');
+  let mediaId: string | undefined;
+  let customMediaId: string | undefined;
+
+  // --- Handle Media Lookup BEFORE Transaction ---
+  // Media is optional, but validate if provided
+  if (input.mediaSlug && input.customMediaTitle) {
+    throw new RedwoodError('Cannot set both mediaSlug and customMediaTitle');
+  }
+
+  // If linking existing media, find it *before* the transaction
+  if (input.mediaSlug) {
+    const foundMedia = await mediaManager.getMediaBySlug(input.mediaSlug);
+
+    if (!foundMedia) {
+      throw new RedwoodError('Selected media not found');
     }
 
+    if (foundMedia.mediaType === 'CUSTOM') {
+      customMediaId = foundMedia.id; // Set ID for existing custom media
+    } else if (
+      foundMedia.mediaType === 'MOVIE' ||
+      foundMedia.mediaType === 'TV'
+    ) {
+      mediaId = foundMedia.id; // Set ID for existing TMDB media
+    } else {
+      console.warn(`Unexpected media type found: ${foundMedia.mediaType}`);
+      throw new RedwoodError('Selected media has an unsupported type');
+    }
+  }
+  // Note: If input.customMediaTitle is provided, we handle creation *inside* the transaction
+
+  // --- Start Transaction for Atomic Writes ---
+  return await db.$transaction(async tx => {
+    // If creating NEW custom media, do it inside the transaction
     if (input.customMediaTitle) {
       const existing = await tx.customMedia.findFirst({
         where: {
@@ -335,24 +366,14 @@ export const createActivity: MutationResolvers['createActivity'] = async ({
         .toString(36)
         .slice(2, 6)}`;
 
-      const customMedia = await tx.customMedia.create({
+      const newCustomMedia = await tx.customMedia.create({
         data: {
           title: input.customMediaTitle,
           slug,
           userId: context.currentUser.id,
         },
       });
-      customMediaId = customMedia.id;
-    }
-
-    if (input.mediaSlug) {
-      const media = await tx.media.findUnique({
-        where: { slug: input.mediaSlug },
-      });
-      if (!media) {
-        throw new RedwoodError('Selected media not found');
-      }
-      mediaId = media.id;
+      customMediaId = newCustomMedia.id; // Set ID for newly created custom media
     }
 
     // Parse the ISO string date from input
