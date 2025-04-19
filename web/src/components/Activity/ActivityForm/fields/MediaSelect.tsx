@@ -172,8 +172,6 @@ const ActivityMediaSelect = ({
 
   return (
     <FormField
-      // Use a key derived from the display value to force re-render when cleared
-      key={displayValue}
       control={form.control}
       name="mediaSlug" // Still control mediaSlug, but display logic is separate
       render={() => (
@@ -217,8 +215,9 @@ const ActivityMediaSelect = ({
               )}
             </div>
             <PopoverContent className="p-0">
-              {/* Removed shouldFilter={false} as filtering is manual */}
-              <Command>
+              <Command shouldFilter={false}>
+                {' '}
+                {/* Add shouldFilter={false} back */}
                 <CommandInput
                   disabled={isLoading || loading} // Disable input if parent is loading
                   placeholder="Search or type to create..."
