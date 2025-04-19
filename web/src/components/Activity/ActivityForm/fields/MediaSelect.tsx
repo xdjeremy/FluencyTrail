@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 import { format } from 'date-fns';
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
 import {
   SearchMediaForActivitySelect,
   SearchMediaForActivitySelectVariables,
@@ -52,7 +52,7 @@ const SEARCH_MEDIA_QUERY: TypedDocumentNode<
  * - Searches TMDB when 3+ characters are typed
  * - Create custom media by typing and pressing Enter when no results
  * - Keyboard navigation: Arrow keys to navigate, Enter to select/create
- * - Clears state when closing without selection
+ * - Clears state when closing without selection or explicitly cleared
  */
 const ActivityMediaSelect = ({
   /** Pass through loading state from parent form */
@@ -60,10 +60,17 @@ const ActivityMediaSelect = ({
 }: {
   isLoading: boolean;
 }) => {
+  const form = useFormContext();
+  const currentMediaSlug = form.watch('mediaSlug');
+  const currentCustomMediaTitle = form.watch('customMediaTitle');
+
   const [searchValue, setSearchValue] = useState('');
+  // State to hold the title of the selected existing media for display purposes
+  const [selectedMediaTitle, setSelectedMediaTitle] = useState<string | null>(
+    null
+  );
   const [open, setOpen] = useState(false);
   const debouncedSearch = useDebounce(searchValue, 500);
-  const form = useFormContext();
 
   const { data, loading } = useQuery(SEARCH_MEDIA_QUERY, {
     variables: {
@@ -79,7 +86,7 @@ const ActivityMediaSelect = ({
       medias?.filter(media =>
         media.title.toLowerCase().includes(searchValue.toLowerCase())
       ),
-    [data, searchValue]
+    [data, searchValue] // Only depends on searchValue now
   );
 
   // Filter results client-side based on current search value
@@ -87,153 +94,137 @@ const ActivityMediaSelect = ({
     ? filterResults(data.searchMedias)
     : undefined;
 
-  // Handle input value changes and form state updates
-  // - Clear existing selections
-  // - Set customMediaTitle if input doesn't match any result
+  // Effect to initialize selectedMediaTitle if mediaSlug exists on mount
+  useEffect(() => {
+    if (currentMediaSlug && data?.searchMedias && !selectedMediaTitle) {
+      const initialMedia = data.searchMedias.find(
+        m => m.slug === currentMediaSlug
+      );
+      if (initialMedia) {
+        setSelectedMediaTitle(initialMedia.title);
+      } else {
+        // If slug exists but not in initial search data, maybe show slug? Or fetch title?
+        // For now, fallback to slug if title not found in current data
+        setSelectedMediaTitle(currentMediaSlug);
+      }
+    }
+    // Only run when data changes or on initial mount if slug exists
+  }, [data?.searchMedias, currentMediaSlug, selectedMediaTitle]);
+
+  // Simplified search handler: just updates the search value state
   const handleSearch = useCallback(
     (value: string) => {
       setSearchValue(value);
-
-      // Clear both fields first
-      form.setValue('mediaSlug', '');
-      form.setValue('customMediaTitle', '');
-
-      // Only set customMediaTitle if there's a value and no exact match in results
-      if (value) {
-        const exactMatch = filteredResults?.find(
-          m => m.title.toLowerCase() === value.toLowerCase()
-        );
-        if (exactMatch) {
-          form.setValue('mediaSlug', exactMatch.slug);
-          form.setValue('customMediaTitle', '');
-          setOpen(false);
-          form.setFocus('activityType');
-        } else {
-          form.setValue('customMediaTitle', value);
-        }
-      }
+      // Do NOT clear form fields here
     },
-    [filteredResults, form, setOpen, setSearchValue]
+    [setSearchValue]
   );
 
   // Handle selection of an existing media from search results
-  // - Close popover and clear search
-  // - Wait for state updates
-  // - Update form values and focus next field
   const handleSelect = useCallback(
-    async (slug: string) => {
-      const selectedMedia = data?.searchMedias.find(m => m.slug === slug);
-      if (selectedMedia) {
-        // First close the popover and clear the search
-        setOpen(false);
-        setSearchValue('');
-
-        // Wait for state updates before form changes
-        await Promise.resolve();
-
-        // Then update the form values
-        form.setValue('mediaSlug', slug);
-        form.setValue('customMediaTitle', '');
-        form.setFocus('activityType');
-      }
+    (slug: string, title: string) => {
+      form.setValue('mediaSlug', slug);
+      form.setValue('customMediaTitle', ''); // Explicitly clear custom title
+      setSelectedMediaTitle(title); // Store title for display
+      setSearchValue(''); // Clear search input
+      setOpen(false); // Close popover
+      form.setFocus('activityType'); // Move focus
     },
-    [data?.searchMedias, form, setOpen, setSearchValue]
+    [form, setSelectedMediaTitle, setSearchValue, setOpen]
   );
 
-  // Handle custom media creation with keyboard
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (
-        e.key === 'Enter' &&
-        searchValue &&
-        (!filteredResults || filteredResults.length === 0)
-      ) {
-        e.preventDefault();
-        form.setValue('customMediaTitle', searchValue);
-        setOpen(false);
-        setSearchValue('');
-        form.setFocus('activityType');
-      }
-    },
-    [filteredResults, form, searchValue, setOpen, setSearchValue]
-  );
-
-  // Clear all media-related form values and search state
+  // Clear all media-related form values and local state
   const clearSelection = useCallback(() => {
     form.setValue('mediaSlug', '');
     form.setValue('customMediaTitle', '');
+    setSelectedMediaTitle(null);
     setSearchValue('');
-  }, [form, setSearchValue]);
+  }, [form, setSelectedMediaTitle, setSearchValue]);
 
-  const handleButtonClick = useCallback(
-    (value?: string) => {
-      if (!value) {
-        clearSelection();
-      }
-    },
-    [clearSelection]
-  );
-
+  // Handle popover open/close changes
   const handleOpenChange = useCallback(
-    (isOpen: boolean, value?: string) => {
-      if (!isOpen) {
-        if (!value) {
-          clearSelection();
-        } else {
-          setSearchValue('');
-        }
-      }
+    (isOpen: boolean) => {
       setOpen(isOpen);
+      if (!isOpen) {
+        // Popover is closing
+        const currentSlug = form.getValues('mediaSlug');
+        if (!currentSlug && searchValue) {
+          // No existing media selected, but there was text in search input
+          form.setValue('customMediaTitle', searchValue);
+          form.setValue('mediaSlug', ''); // Ensure slug is empty
+          setSelectedMediaTitle(searchValue); // Display the custom title
+          setSearchValue(''); // Clear search input state
+        } else if (!currentSlug && !searchValue) {
+          // No selection and no search text, ensure everything is clear
+          form.setValue('customMediaTitle', '');
+          setSelectedMediaTitle(null);
+        }
+        // If currentSlug exists, handleSelect already did the work.
+        // If closing with empty search, do nothing extra.
+      }
     },
-    [clearSelection, setOpen, setSearchValue]
+    [form, searchValue, setSearchValue, setSelectedMediaTitle, setOpen]
   );
+
+  // Determine the text to display on the button
+  const displayValue =
+    currentCustomMediaTitle || selectedMediaTitle || 'Select media';
 
   return (
     <FormField
+      // Use a key derived from the display value to force re-render when cleared
+      key={displayValue}
       control={form.control}
-      name="mediaSlug"
-      render={({ field }) => (
+      name="mediaSlug" // Still control mediaSlug, but display logic is separate
+      render={() => (
         <FormItem className="grid grid-cols-4 items-center gap-4">
           <FormLabel className="text-right">Media (optional)</FormLabel>
-          <Popover
-            open={open}
-            onOpenChange={isOpen => handleOpenChange(isOpen, field.value)}
-          >
-            <PopoverTrigger asChild>
-              <FormControl>
+          <Popover open={open} onOpenChange={handleOpenChange}>
+            <div className="col-span-3 flex items-center gap-1">
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      'w-full justify-between', // Use w-full
+                      displayValue === 'Select media' && 'text-muted-foreground'
+                    )}
+                    disabled={isLoading || loading}
+                  >
+                    <span className="truncate">{displayValue}</span>{' '}
+                    {/* Wrap text in span for truncation */}
+                    {loading ? (
+                      <Loader2 className="ml-2 size-4 shrink-0 animate-spin" />
+                    ) : (
+                      <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                    )}
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              {/* Add a clear button */}
+              {(currentMediaSlug || currentCustomMediaTitle) && !isLoading && (
                 <Button
-                  variant="outline"
-                  role="combobox"
-                  className={cn(
-                    'col-span-3 justify-between',
-                    !field.value &&
-                      !form.watch('customMediaTitle') &&
-                      'text-muted-foreground'
-                  )}
-                  disabled={isLoading || loading}
-                  onClick={() => handleButtonClick(field.value)}
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 shrink-0"
+                  onClick={clearSelection}
+                  aria-label="Clear media selection"
                 >
-                  {form.watch('customMediaTitle') ||
-                    (field.value && !loading
-                      ? data?.searchMedias?.find(m => m.slug === field.value)
-                          ?.title || field.value
-                      : searchValue || 'Select media')}
-                  {loading ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    <ChevronsUpDown className="size-4 opacity-50" />
-                  )}
+                  <X className="size-4" />
                 </Button>
-              </FormControl>
-            </PopoverTrigger>
+              )}
+            </div>
             <PopoverContent className="p-0">
-              <Command shouldFilter={false} onKeyDown={handleKeyDown}>
+              {/* Removed shouldFilter={false} as filtering is manual */}
+              <Command>
                 <CommandInput
-                  disabled={loading}
-                  placeholder="Search media or type to create new..."
+                  disabled={isLoading || loading} // Disable input if parent is loading
+                  placeholder="Search or type to create..."
                   className="h-9"
                   value={searchValue}
-                  onValueChange={handleSearch}
+                  onValueChange={handleSearch} // Use simplified handler
                 />
                 <CommandList className="max-h-[300px] overflow-auto">
                   <CommandEmpty>
@@ -242,25 +233,24 @@ const ActivityMediaSelect = ({
                         <Loader2 className="size-3 animate-spin" />
                         <span>Searching...</span>
                       </div>
-                    ) : searchValue &&
-                      (!filteredResults || filteredResults.length === 0) ? (
-                      <div className="px-4 py-3 text-sm text-green-600">
-                        Press Enter to create &ldquo;{searchValue}&rdquo;
-                      </div>
-                    ) : searchValue ? (
+                    ) : searchValue ? ( // Simplified empty state
                       <div className="text-muted-foreground px-4 py-3 text-sm">
                         {searchValue.length < 3
-                          ? 'Type at least 3 characters to search...'
-                          : 'No results found'}
+                          ? 'Type 3+ characters to search...'
+                          : 'No results found. Click away to create.'}
                       </div>
-                    ) : null}
+                    ) : (
+                      <div className="text-muted-foreground px-4 py-3 text-sm">
+                        Type to search or create new media.
+                      </div>
+                    )}
                   </CommandEmpty>
                   <CommandGroup>
                     {filteredResults?.map(media => (
                       <CommandItem
-                        value={media.slug}
+                        value={media.slug} // Keep value for potential filtering/accessibility
                         key={media.slug}
-                        onSelect={() => handleSelect(media.slug)}
+                        onSelect={() => handleSelect(media.slug, media.title)} // Pass title too
                       >
                         {media.title}{' '}
                         {media.date &&
@@ -268,7 +258,7 @@ const ActivityMediaSelect = ({
                         <Check
                           className={cn(
                             'ml-auto size-4',
-                            media.slug === field.value
+                            media.slug === currentMediaSlug // Check against watched value
                               ? 'opacity-100'
                               : 'opacity-0'
                           )}
