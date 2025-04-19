@@ -124,19 +124,21 @@ const ActivityMediaSelect = ({
   const handleSelect = useCallback(
     (slug: string, title: string) => {
       form.setValue('mediaSlug', slug);
-      form.setValue('customMediaTitle', ''); // Explicitly clear custom title
+      form.setValue('customMediaTitle', undefined); // Explicitly set to undefined
       setSelectedMediaTitle(title); // Store title for display
       setSearchValue(''); // Clear search input
       setOpen(false); // Close popover
       form.setFocus('activityType'); // Move focus
+      // Manually trigger validation for the fields involved in the refine check
+      form.trigger(['mediaSlug', 'customMediaTitle']);
     },
     [form, setSelectedMediaTitle, setSearchValue, setOpen]
   );
 
   // Clear all media-related form values and local state
   const clearSelection = useCallback(() => {
-    form.setValue('mediaSlug', '');
-    form.setValue('customMediaTitle', '');
+    form.setValue('mediaSlug', undefined); // Set to undefined
+    form.setValue('customMediaTitle', undefined); // Set to undefined
     setSelectedMediaTitle(null);
     setSearchValue('');
   }, [form, setSelectedMediaTitle, setSearchValue]);
@@ -151,12 +153,12 @@ const ActivityMediaSelect = ({
         if (!currentSlug && searchValue) {
           // No existing media selected, but there was text in search input
           form.setValue('customMediaTitle', searchValue);
-          form.setValue('mediaSlug', ''); // Ensure slug is empty
+          form.setValue('mediaSlug', undefined); // Ensure slug is undefined
           setSelectedMediaTitle(searchValue); // Display the custom title
           setSearchValue(''); // Clear search input state
         } else if (!currentSlug && !searchValue) {
           // No selection and no search text, ensure everything is clear
-          form.setValue('customMediaTitle', '');
+          form.setValue('customMediaTitle', undefined); // Set to undefined
           setSelectedMediaTitle(null);
         }
         // If currentSlug exists, handleSelect already did the work.
