@@ -24,9 +24,7 @@ describe('createActivity', () => {
   });
 
   // This is handled by the SDL
-  scenario('failes if user is not logged in', async () => {
-    expect(true).toBe(true);
-  });
+  scenario('fails if user is not logged in', async () => {});
 
   scenario('creates a new activity with custom media', async scenario => {
     mockCurrentUser({
