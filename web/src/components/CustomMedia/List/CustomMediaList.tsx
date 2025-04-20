@@ -84,10 +84,9 @@ const CustomMediaList = ({ mediaItems }: CustomMediaListProps) => {
             Add your first custom media item to get started.
           </p>
           <Button
-            // onClick={() =>
-            //   document.querySelector('[data-create-button="true"]')?.click()
-            // }
-            className="bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400 text-white dark:text-neutral-900"
+          // onClick={() =>
+          //   document.querySelector('[data-create-button="true"]')?.click()
+          // }
           >
             <Plus className="mr-1 h-4 w-4" />
             Add Custom Media
