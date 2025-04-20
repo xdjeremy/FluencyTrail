@@ -165,10 +165,9 @@ class MediaManager {
       return this.mapMediaToDto(existingMedia);
     }
 
-    // TODO: Custom media should only be searchable by the user who created it
     // If not found in Media table, try CustomMedia
     const customMedia = await db.customMedia.findUnique({
-      where: { slug },
+      where: { slug, userId: context.currentUser.id },
       include: {
         User: {
           select: {

@@ -34,6 +34,7 @@ export class CustomMediaFetcher implements MediaFetcher {
             contains: query,
             mode: 'insensitive',
           },
+          userId: context.currentUser.id,
         },
         take: 10, // Limit to 10 results as specified
       });
