@@ -28,17 +28,12 @@ const LanguageSelectionPopup = ({ data }: LanguageSelectionPopupProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  // temp
-  const [isOpen, _setIsOpen] = useState(true);
-  const onClose = () => {};
-
   // Filter languages based on search query
   const filteredLanguages = searchQuery
     ? data.languages.filter(
-        lang => lang.name.toLowerCase().includes(searchQuery.toLowerCase())
-        // TODO: implement nativeName search
-        //  ||
-        //   lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase())
+        lang =>
+          lang.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : data.languages;
 
@@ -74,7 +69,6 @@ const LanguageSelectionPopup = ({ data }: LanguageSelectionPopupProps) => {
 
         // Small delay before closing to show completion
         setTimeout(() => {
-          onClose();
           // Redirect to dashboard after selection
           // router.push('/dashboard');
         }, 500);
@@ -88,12 +82,7 @@ const LanguageSelectionPopup = ({ data }: LanguageSelectionPopupProps) => {
   };
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={open => {
-        if (!open && !isSubmitting) onClose();
-      }}
-    >
+    <Dialog open={true}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold">
@@ -178,15 +167,6 @@ const LanguageSelectionPopup = ({ data }: LanguageSelectionPopupProps) => {
         </div>
 
         <DialogFooter className="mt-6 flex flex-col gap-3 sm:flex-row">
-          {!isSubmitting && (
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="order-2 sm:order-1"
-            >
-              I&apos;ll do this later
-            </Button>
-          )}
           <Button
             onClick={handleSubmit}
             disabled={!selectedLanguage || isSubmitting}

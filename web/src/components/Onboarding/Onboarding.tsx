@@ -5,6 +5,8 @@ import {
 
 import { TypedDocumentNode, useQuery } from '@redwoodjs/web';
 
+import { useAuth } from 'src/auth';
+
 import LanguageSelectionPopup from './LanguageSelectionPopup';
 
 const FETCH_LANGUAGES_FOR_ONBOARDING: TypedDocumentNode<
@@ -18,6 +20,12 @@ const FETCH_LANGUAGES_FOR_ONBOARDING: TypedDocumentNode<
       id
       nativeName
     }
+    user {
+      languages {
+        code
+        id
+      }
+    }
   }
 `;
 
@@ -26,16 +34,20 @@ const Onboarding = () => {
     fetchPolicy: 'cache-and-network',
   });
 
-  // TODO: add checks if user already selected a language
+  const { currentUser } = useAuth();
 
-  if (error) {
-    return null; // or handle the error as needed
-  }
-
-  // only load the popup if the data is available
-  if (data) {
+  // only load the popup if:
+  if (
+    data && // there is data
+    currentUser && // the user is logged in
+    !error && // there is no error
+    data.user?.languages.length < 1 // the user does not have a language
+  ) {
     return <LanguageSelectionPopup data={data} />;
   }
+
+  // if the user is not logged in, or if the user has a primary language, return null
+  return null;
 };
 
 export default Onboarding;
