@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 
-import { OAuthHandler } from '@spoonjoy/redwoodjs-dbauth-oauth-api';
 import type { APIGatewayProxyEvent, Context } from 'aws-lambda';
 
 import { validate } from '@redwoodjs/api';
@@ -306,21 +305,5 @@ export const handler = async (
     signup: signupOptions,
   });
 
-  const oAuthHandler = new OAuthHandler(event, context, authHandler, {
-    // The name of the property you'd call on `db` to access your OAuth table.
-    // i.e. if your Prisma model is named `OAuth` this value would be `oAuth`, as in `db.oAuth`
-    oAuthModelAccessor: 'oAuth',
-    // You can instead do `enabledProviders: {}`, but I find it more clear to be explicitly not enabling these
-    // We'll enable at least one of these later on, but leave it like this for now
-    enabledProviders: { apple: false, github: false, google: false },
-  });
-
-  switch (event.path) {
-    case '/auth':
-      return await authHandler.invoke();
-    case '/auth/oauth':
-      return await oAuthHandler.invoke();
-    default:
-      throw new Error('Unknown auth path');
-  }
+  return await authHandler.invoke();
 };
