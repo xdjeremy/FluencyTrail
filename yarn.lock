@@ -15046,6 +15046,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"flag-icons@npm:^7.3.2":
+  version: 7.3.2
+  resolution: "flag-icons@npm:7.3.2"
+  checksum: 10c0/4ca9698bd13f004311225a3d87d23f59e2020496a055fbea8a2f72642775c0b0ed0f6f87cb00dd7e7a7cfce0328e4cd2e0dc89dc0ee26cd334d334956d068fd5
+  languageName: node
+  linkType: hard
+
 "flat-cache@npm:^3.0.4":
   version: 3.2.0
   resolution: "flat-cache@npm:3.2.0"
@@ -25290,6 +25297,7 @@ __metadata:
     cmdk: "npm:^1.1.1"
     date-fns: "npm:^4.1.0"
     date-fns-tz: "npm:^3.2.0"
+    flag-icons: "npm:^7.3.2"
     humanize-string: "npm:2.1.0"
     initials: "npm:^3.1.2"
     lucide-react: "npm:^0.485.0"
