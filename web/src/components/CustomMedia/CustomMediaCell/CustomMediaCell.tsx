@@ -9,6 +9,9 @@ import type {
   TypedDocumentNode,
 } from '@redwoodjs/web';
 
+import CustomMediaTable from '../List/CustomMediaTable';
+import EmptyCustomMedia from '../List/EmptyCustomMedia';
+
 export const QUERY: TypedDocumentNode<
   GetAllCustomMediasQuery,
   GetAllCustomMediasQueryVariables
@@ -16,13 +19,15 @@ export const QUERY: TypedDocumentNode<
   query GetAllCustomMediasQuery {
     customMedia: customMedias {
       id
+      title
+      createdAt
     }
   }
 `;
 
 export const Loading = () => <div>Loading...</div>;
 
-export const Empty = () => <div>Empty</div>;
+export const Empty = () => <EmptyCustomMedia />;
 
 export const Failure = ({
   error,
@@ -36,5 +41,5 @@ export const Success = ({
   GetAllCustomMediasQuery,
   GetAllCustomMediasQueryVariables
 >) => {
-  return <div>{JSON.stringify(customMedia)}</div>;
+  return <CustomMediaTable customMedia={customMedia} />;
 };

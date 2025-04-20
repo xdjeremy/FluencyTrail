@@ -18,22 +18,7 @@ const CustomMediaPage = () => {
           {/* <CustomMediaCreateButton onClick={() => setIsCreateModalOpen(true)} /> */}
         </section>
 
-        {/* <Card className="border border-neutral-200 p-4 dark:border-neutral-800">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
-            <Input
-              placeholder="Search media by title..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-            />
-          </div>
-        </Card>
-        <CustomMediaList
-          mediaItems={filteredItems}
-          onEdit={setEditingMedia}
-          onDelete={setDeletingMedia}
-        /> */}
+        {/* TODO: add cell */}
       </div>
     </>
   );

@@ -22,12 +22,15 @@ const Routes = () => {
         <Set wrap={BaseLayout}>
           <Route path="/" page={HomePage} name="home" />
           <Route path="/media/{slug}" page={MediaPage} name="media" />
-          <Route path="/activity" page={ActivityPage} name="activity" />
-          <Route
-            path="/custom-media"
-            page={CustomMediaPage}
-            name="customMedia"
-          />
+
+          <PrivateSet unauthenticated="login">
+            <Route path="/activity" page={ActivityPage} name="activity" />
+            <Route
+              path="/custom-media"
+              page={CustomMediaPage}
+              name="customMedia"
+            />
+          </PrivateSet>
           <PrivateSet wrap={SettingLayout} unauthenticated="login">
             <Route
               path="/settings"
