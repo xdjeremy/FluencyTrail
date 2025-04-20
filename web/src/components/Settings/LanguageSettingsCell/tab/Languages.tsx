@@ -3,7 +3,7 @@ import { useState } from 'react';
 import {
   AddUserLanguageMutation,
   AddUserLanguageMutationVariables,
-  FindUserForProfileSettings,
+  LanguageSettingsQuery,
   RemoveUserLanguageMutation,
   RemoveUserLanguageMutationVariables,
   SetPrimaryLanguageMutation,
@@ -83,17 +83,7 @@ const SET_PRIMARY_LANGUAGE = gql`
   }
 `;
 
-type QueryUser = NonNullable<FindUserForProfileSettings['user']>;
-type QueryLanguage = NonNullable<
-  FindUserForProfileSettings['languages']
->[number];
-
-interface LanguagesProps {
-  user: QueryUser;
-  allLanguages: QueryLanguage[];
-}
-
-const Languages = ({ user, allLanguages }: LanguagesProps) => {
+const Languages = ({ user, languages }: LanguageSettingsQuery) => {
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
 
   const [addUserLanguage] = useMutation<
@@ -134,14 +124,14 @@ const Languages = ({ user, allLanguages }: LanguagesProps) => {
   });
 
   // Filter out already added languages from the available options
-  const availableLanguages = allLanguages.filter(
+  const availableLanguages = languages.filter(
     lang => !user.languages?.some(userLang => userLang.id === lang.id)
   );
 
   const handleAddLanguage = () => {
     if (!selectedLanguage) return;
 
-    const language = allLanguages.find(lang => lang.code === selectedLanguage);
+    const language = languages.find(lang => lang.code === selectedLanguage);
     if (!language) return;
 
     addUserLanguage({
@@ -175,13 +165,6 @@ const Languages = ({ user, allLanguages }: LanguagesProps) => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-medium">Languages</h3>
-        <p className="text-muted-foreground text-sm">
-          Manage your languages and select your primary language for tracking.
-        </p>
-      </div>
-
       {/* Add Language Section */}
       <Card>
         <CardHeader>
@@ -197,7 +180,11 @@ const Languages = ({ user, allLanguages }: LanguagesProps) => {
             </SelectTrigger>
             <SelectContent>
               {availableLanguages.map(language => (
-                <SelectItem key={language.code} value={language.code}>
+                <SelectItem
+                  key={language.code}
+                  value={language.code}
+                  className="cursor-pointer"
+                >
                   {language.name}
                 </SelectItem>
               ))}

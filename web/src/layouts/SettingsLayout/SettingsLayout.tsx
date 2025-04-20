@@ -23,10 +23,18 @@ const SettingLayout = ({ children }: SettingLayoutProps) => {
               <NavLink
                 to={routes.accountSettings()}
                 role="button"
-                className="flex items-center justify-start rounded-md bg-neutral-100 px-3 py-2 text-sm font-medium text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50"
-                activeClassName="flex items-center justify-start rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:bg-neutral-900"
+                activeClassName="flex items-center justify-start rounded-md bg-neutral-100 px-3 py-2 text-sm font-medium text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50"
+                className="flex items-center justify-start rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:bg-neutral-900"
               >
                 Account
+              </NavLink>
+              <NavLink
+                to={routes.languageSettings()}
+                role="button"
+                activeClassName="flex items-center justify-start rounded-md bg-neutral-100 px-3 py-2 text-sm font-medium text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50"
+                className="flex items-center justify-start rounded-md px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-50 dark:text-neutral-400 dark:hover:bg-neutral-900"
+              >
+                Language
               </NavLink>
               {/* <button
                 onClick={() => setActiveTab('notifications')}

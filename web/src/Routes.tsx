@@ -29,6 +29,11 @@ const Routes = () => {
               page={AccountSettingsPage}
               name="accountSettings"
             />
+            <Route
+              path="/settings/language"
+              page={LanguageSettingsPage}
+              name="languageSettings"
+            />
           </PrivateSet>
         </Set>
         <Set wrap={AuthLayout}>
