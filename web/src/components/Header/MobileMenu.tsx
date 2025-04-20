@@ -43,7 +43,7 @@ const MobileMenu: FC<MobileMenuProps> = ({ trigger }) => {
             activeClassName="text-brand-600 hover:text-brand-700 text-xl font-medium transition-colors"
             onClick={() => setIsOpen(false)}
           >
-            Dashboard
+            Home
           </NavLink>
           <NavLink
             to={routes.activity()}
@@ -51,14 +51,21 @@ const MobileMenu: FC<MobileMenuProps> = ({ trigger }) => {
             activeClassName="text-brand-600 hover:text-brand-700 text-xl font-medium transition-colors"
             onClick={() => setIsOpen(false)}
           >
-            Lessons
+            Activities
           </NavLink>
           <Link
-            to={routes.home()}
+            to={routes.customMedia()}
             className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
             onClick={() => setIsOpen(false)}
           >
-            My Profile
+            Custom Media
+          </Link>
+          <Link
+            to={routes.accountSettings()}
+            className="hover:text-brand-600 text-xl font-medium text-neutral-600 transition-colors"
+            onClick={() => setIsOpen(false)}
+          >
+            Settings
           </Link>
         </nav>
 

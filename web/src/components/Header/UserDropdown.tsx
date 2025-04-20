@@ -1,5 +1,5 @@
 import initials from 'initials';
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut, Popcorn, Settings } from 'lucide-react';
 
 import { Link, routes } from '@redwoodjs/router';
 
@@ -45,10 +45,10 @@ const UserDropdown = () => {
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
-              {/* <Link href="/profile">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </Link> */}
+              <Link to={routes.customMedia()} className="cursor-pointer">
+                <Popcorn className="mr-2 h-4 w-4" />
+                <span>Custom Media</span>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link to={routes.accountSettings()} className="cursor-pointer">

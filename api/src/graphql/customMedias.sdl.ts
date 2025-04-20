@@ -5,9 +5,9 @@ export const schema = gql`
     slug: String!
     createdAt: DateTime!
     updatedAt: DateTime!
-    userId: Int
-    User: User
-    Activity: [Activity]
+    userId: Int!
+    User: User!
+    Activity: [Activity]!
   }
 
   type Query {
@@ -35,4 +35,4 @@ export const schema = gql`
     ): CustomMedia! @requireAuth
     deleteCustomMedia(id: String!): CustomMedia! @requireAuth
   }
-`;
+`

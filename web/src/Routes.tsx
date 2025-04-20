@@ -23,6 +23,11 @@ const Routes = () => {
           <Route path="/" page={HomePage} name="home" />
           <Route path="/media/{slug}" page={MediaPage} name="media" />
           <Route path="/activity" page={ActivityPage} name="activity" />
+          <Route
+            path="/custom-media"
+            page={CustomMediaPage}
+            name="customMedia"
+          />
           <PrivateSet wrap={SettingLayout} unauthenticated="login">
             <Route
               path="/settings"
