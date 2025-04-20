@@ -8,6 +8,7 @@ export const standard = defineScenario<Prisma.LanguageCreateArgs>({
       data: {
         code: 'String5379744',
         name: 'String',
+        nativeName: 'String',
         updatedAt: '2025-04-11T14:00:03.051Z',
       },
     },
@@ -15,6 +16,7 @@ export const standard = defineScenario<Prisma.LanguageCreateArgs>({
       data: {
         code: 'String8335438',
         name: 'String',
+        nativeName: 'String',
         updatedAt: '2025-04-11T14:00:03.051Z',
       },
     },

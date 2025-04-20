@@ -34,7 +34,8 @@ export const standard = defineScenario<
       data: {
         id: 1,
         name: 'English',
-        code: 'en',
+        code: 'gb',
+        nativeName: 'English',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
