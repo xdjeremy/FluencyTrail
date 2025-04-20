@@ -1,7 +1,10 @@
 import { useState } from 'react';
 
 import { Check, Search } from 'lucide-react';
+import { toast } from 'sonner';
 import { FetchLanguagesForOnboarding } from 'types/graphql';
+
+import { useMutation } from '@redwoodjs/web';
 
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -14,9 +17,24 @@ import {
   DialogTitle,
 } from '../ui/dialog';
 import { Input } from '../ui/input';
-import { Progress } from '../ui/progress';
 
 import '../../../../node_modules/flag-icons/css/flag-icons.min.css';
+
+const ADD_USER_LANGUAGE = gql`
+  mutation AddUserLanguageForOnboarding($input: AddUserLanguageInput!) {
+    addUserLanguage(input: $input) {
+      id
+    }
+  }
+`;
+
+const SET_PRIMARY_LANGUAGE_MUTATION = gql`
+  mutation SetPrimaryLanguageForOnboarding($input: SetPrimaryLanguageInput!) {
+    setPrimaryLanguage(input: $input) {
+      id
+    }
+  }
+`;
 
 interface LanguageSelectionPopupProps {
   data: FetchLanguagesForOnboarding;
@@ -26,7 +44,7 @@ const LanguageSelectionPopup = ({ data }: LanguageSelectionPopupProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [isOpen, setIsOpen] = useState(true);
 
   // Filter languages based on search query
   const filteredLanguages = searchQuery
@@ -42,47 +60,44 @@ const LanguageSelectionPopup = ({ data }: LanguageSelectionPopupProps) => {
     setSelectedLanguage(languageCode);
   };
 
+  // Mutations
+  const [addUserLanguage] = useMutation(ADD_USER_LANGUAGE);
+  const [setPrimaryLanguage] = useMutation(SET_PRIMARY_LANGUAGE_MUTATION);
+
   // Handle form submission
   const handleSubmit = async () => {
     if (!selectedLanguage) return;
-
     setIsSubmitting(true);
 
-    // Simulate progress for better UX
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 150);
-
     try {
-      // await onLanguageSelect(selectedLanguage);
+      await addUserLanguage({
+        variables: {
+          input: {
+            languageCode: selectedLanguage,
+          },
+        },
+      });
 
-      // Ensure progress completes before closing
-      setTimeout(() => {
-        clearInterval(interval);
-        setProgress(100);
+      await setPrimaryLanguage({
+        variables: {
+          input: {
+            languageCode: selectedLanguage,
+          },
+        },
+      });
 
-        // Small delay before closing to show completion
-        setTimeout(() => {
-          // Redirect to dashboard after selection
-          // router.push('/dashboard');
-        }, 500);
-      }, 1000);
-    } catch (error) {
-      console.error('Error saving language preference:', error);
-      clearInterval(interval);
+      // Show success message
+      toast.success('Language added successfully!');
+      // close the dialog
+      setIsOpen(false);
+    } catch {
       setIsSubmitting(false);
-      setProgress(0);
+      toast.error('Error adding language');
     }
   };
 
   return (
-    <Dialog open={true}>
+    <Dialog open={isOpen}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold">
@@ -138,16 +153,6 @@ const LanguageSelectionPopup = ({ data }: LanguageSelectionPopupProps) => {
             </div>
           )}
         </div>
-
-        {isSubmitting && (
-          <div className="my-4 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Setting up your language profile...</span>
-              <span>{progress}%</span>
-            </div>
-            <Progress value={progress} className="h-2" />
-          </div>
-        )}
 
         <div className="mt-4 rounded-lg border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-800 dark:bg-neutral-900">
           <h4 className="flex items-center gap-2 text-sm font-medium">
