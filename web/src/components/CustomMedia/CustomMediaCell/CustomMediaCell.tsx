@@ -21,6 +21,9 @@ export const QUERY: TypedDocumentNode<
       id
       title
       createdAt
+      Activity {
+        id
+      }
     }
   }
 `;

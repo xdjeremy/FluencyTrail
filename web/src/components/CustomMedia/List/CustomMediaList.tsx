@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { GetAllCustomMediasQuery } from 'types/graphql';
 
+import { Badge } from 'src/components/ui/badge';
 import { Button } from 'src/components/ui/button';
 import { Card } from 'src/components/ui/card';
 import {
@@ -29,7 +30,7 @@ const CustomMediaList = ({ mediaItems }: CustomMediaListProps) => {
         mediaItems.map(media => (
           <Card
             key={media.id}
-            className="border border-neutral-200 p-4 transition-colors hover:border-neutral-300 dark:border-neutral-800 dark:hover:border-neutral-700"
+            className="border p-4 transition-colors hover:border-neutral-300 dark:hover:border-neutral-400"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -37,7 +38,12 @@ const CustomMediaList = ({ mediaItems }: CustomMediaListProps) => {
                   <Popcorn className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-medium">{media.title}</h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold">{media.title}</h3>
+                    <Badge variant="outline">
+                      {media.Activity.length} Activities
+                    </Badge>
+                  </div>
                   <div className="mt-1 flex items-center text-xs text-neutral-500 dark:text-neutral-400">
                     <Calendar className="mr-1 h-3 w-3" />
                     Added on {formatDate(media.createdAt, 'MMM d, yyyy')}

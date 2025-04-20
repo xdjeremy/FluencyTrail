@@ -2,6 +2,8 @@
 
 import { Metadata } from '@redwoodjs/web';
 
+import CustomMediaCell from 'src/components/CustomMedia/CustomMediaCell';
+
 const CustomMediaPage = () => {
   return (
     <>
@@ -18,7 +20,7 @@ const CustomMediaPage = () => {
           {/* <CustomMediaCreateButton onClick={() => setIsCreateModalOpen(true)} /> */}
         </section>
 
-        {/* TODO: add cell */}
+        <CustomMediaCell />
       </div>
     </>
   );

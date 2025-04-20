@@ -28,7 +28,7 @@ const CustomMediaTable = ({ customMedia }: GetAllCustomMediasQuery) => {
 
   return (
     <div className="flex flex-col space-y-6">
-      <Card className="border border-neutral-200 p-4 dark:border-neutral-800">
+      <Card className="border p-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
           <Input
