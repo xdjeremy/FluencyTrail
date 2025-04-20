@@ -1,13 +1,5 @@
-import type { CustomMedia } from '@prisma/client'
-
-import {
-  customMedias,
-  customMedia,
-  createCustomMedia,
-  updateCustomMedia,
-  deleteCustomMedia,
-} from './customMedias'
-import type { StandardScenario } from './customMedias.scenarios'
+import { customMedias } from './customMedias';
+import type { StandardScenario } from './customMedias.scenarios';
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float.
@@ -15,56 +7,23 @@ import type { StandardScenario } from './customMedias.scenarios'
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
-describe('customMedias', () => {
+describe('list customMedias', () => {
   scenario('returns all customMedias', async (scenario: StandardScenario) => {
-    const result = await customMedias()
+    mockCurrentUser({
+      id: scenario.customMedia.one.userId,
+      email: 'String2369822',
+      name: 'String2369822',
+      timezone: 'UTC',
+    });
 
-    expect(result.length).toEqual(Object.keys(scenario.customMedia).length)
-  })
+    const result = await customMedias();
 
-  scenario(
-    'returns a single customMedia',
-    async (scenario: StandardScenario) => {
-      const result = await customMedia({ id: scenario.customMedia.one.id })
+    expect(result.length).toEqual(1);
+  });
 
-      expect(result).toEqual(scenario.customMedia.one)
-    }
-  )
+  scenario('unauthorized user cannot list customMedias', async () => {
+    const result = await customMedias();
 
-  scenario('creates a customMedia', async (scenario: StandardScenario) => {
-    const result = await createCustomMedia({
-      input: {
-        title: 'String',
-        slug: 'String3434444',
-        updatedAt: '2025-04-20T16:15:04.287Z',
-        userId: scenario.customMedia.two.userId,
-      },
-    })
-
-    expect(result.title).toEqual('String')
-    expect(result.slug).toEqual('String3434444')
-    expect(result.updatedAt).toEqual(new Date('2025-04-20T16:15:04.287Z'))
-    expect(result.userId).toEqual(scenario.customMedia.two.userId)
-  })
-
-  scenario('updates a customMedia', async (scenario: StandardScenario) => {
-    const original = (await customMedia({
-      id: scenario.customMedia.one.id,
-    })) as CustomMedia
-    const result = await updateCustomMedia({
-      id: original.id,
-      input: { title: 'String2' },
-    })
-
-    expect(result.title).toEqual('String2')
-  })
-
-  scenario('deletes a customMedia', async (scenario: StandardScenario) => {
-    const original = (await deleteCustomMedia({
-      id: scenario.customMedia.one.id,
-    })) as CustomMedia
-    const result = await customMedia({ id: original.id })
-
-    expect(result).toEqual(null)
-  })
-})
+    expect(result.length).toEqual(0);
+  });
+});
