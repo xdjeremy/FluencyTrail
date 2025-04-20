@@ -1,101 +1,67 @@
-import type { Prisma } from '@prisma/client';
+import type { Language, Media, Prisma, User } from '@prisma/client'; // Import User
 
-export const standard = defineScenario<Prisma.ActivityCreateArgs>({
-  activity: {
-    withTMDBMedia: {
+import type { ScenarioData } from '@redwoodjs/testing/api';
+
+// Add explicit generic types and adjust data for CreateArgs compatibility
+export const standard = defineScenario<
+  Prisma.MediaCreateArgs | Prisma.LanguageCreateArgs | Prisma.UserCreateArgs, // Add UserCreateArgs
+  'media' | 'language' | 'user', // Add 'user'
+  'one'
+>({
+  media: {
+    one: {
       data: {
-        activityType: 'WATCHING',
-        date: '2025-04-18T00:00:00Z',
-        duration: 30,
-        user: {
-          create: {
-            id: 1,
-            email: 'test@example.com',
-            timezone: 'UTC',
-            hashedPassword: 'dummy',
-            salt: 'dummy',
-            languages: {
-              create: {
-                id: 1,
-                code: 'en',
-                name: 'English',
-              },
-            },
-          },
-        },
-        language: {
+        id: 'tmdb-123',
+        slug: 'tmdb-movie-123',
+        title: 'Test Movie',
+        mediaType: 'MOVIE',
+        externalId: '123',
+        originalTitle: 'Test Movie',
+        description: 'Test description',
+        posterUrl: 'https://test.com/poster.jpg',
+        backdropUrl: 'https://test.com/backdrop.jpg',
+        popularity: 7.5,
+        releaseDate: new Date('2024-01-01'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        lastSyncedAt: new Date(),
+        ttl: 2592000,
+      },
+    },
+  },
+  language: {
+    one: {
+      data: {
+        id: 1,
+        name: 'English',
+        code: 'en',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    },
+  },
+  // Add user scenario
+  user: {
+    one: {
+      data: {
+        id: 1,
+        email: 'user1@example.com',
+        name: 'User One',
+        timezone: 'UTC',
+        primaryLanguageId: 1, // Link to the primary language
+        languages: {
+          // Connect the user to the language defined above
           connect: { id: 1 },
         },
-        media: {
-          create: {
-            title: 'Test Movie',
-            slug: 'test-movie',
-            externalId: 'tmdb-123',
-            mediaType: 'MOVIE',
-          },
-        },
-      },
-    },
-    withCustomMedia: {
-      data: {
-        activityType: 'WATCHING',
-        date: '2025-04-18T00:00:00Z',
-        duration: 45,
-        user: {
-          create: {
-            id: 2,
-            email: 'user2@example.com',
-            timezone: 'UTC',
-            hashedPassword: 'dummy',
-            salt: 'dummy',
-            languages: {
-              create: {
-                id: 2,
-                code: 'ja',
-                name: 'Japanese',
-              },
-            },
-          },
-        },
-        language: {
-          connect: { id: 2 },
-        },
-        customMedia: {
-          create: {
-            title: 'My Custom Show',
-            slug: 'my-custom-show',
-            userId: 2,
-          },
-        },
-      },
-    },
-    noMedia: {
-      data: {
-        activityType: 'GRAMMAR',
-        date: '2025-04-18T00:00:00Z',
-        duration: 15,
-        user: {
-          create: {
-            id: 3,
-            email: 'user3@example.com',
-            timezone: 'UTC',
-            hashedPassword: 'dummy',
-            salt: 'dummy',
-            languages: {
-              create: {
-                id: 3,
-                code: 'es',
-                name: 'Spanish',
-              },
-            },
-          },
-        },
-        language: {
-          connect: { id: 3 },
-        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     },
   },
 });
 
-export type StandardScenario = typeof standard;
+// Update the type definition to include the user
+export type StandardScenario = ScenarioData<
+  Media | Language | User, // Add User
+  'media' | 'language' | 'user' // Add 'user'
+>;
