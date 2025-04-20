@@ -15,9 +15,10 @@ generator client {
 }
 
 model Language {
-  id   Int    @id @default(autoincrement())
-  code String @unique // e.g., 'en', 'es', 'ja'
-  name String // e.g., 'English', 'Spanish', 'Japanese'
+  id         Int    @id @default(autoincrement())
+  code       String @unique // e.g., 'en', 'es', 'ja'
+  name       String // e.g., 'English', 'Spanish', 'Japanese'
+  nativeName String // e.g., 'English', 'Español', '日本語'
 
   users      User[] // Implicit many-to-many relation with User
   activities Activity[] // One-to-many relation with Activity
