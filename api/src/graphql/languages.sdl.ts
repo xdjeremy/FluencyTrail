@@ -3,6 +3,7 @@ export const schema = gql`
     id: Int!
     code: String!
     name: String!
+    nativeName: String!
   }
 
   type Query {

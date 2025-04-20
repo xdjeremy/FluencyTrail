@@ -16,6 +16,7 @@ const FETCH_LANGUAGES_FOR_ONBOARDING: TypedDocumentNode<
       name
       code
       id
+      nativeName
     }
   }
 `;

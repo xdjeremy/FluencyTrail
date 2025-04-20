@@ -130,13 +130,12 @@ const LanguageSelectionPopup = ({ data }: LanguageSelectionPopupProps) => {
                 disabled={isSubmitting}
               >
                 <div className="flex w-full items-center gap-3">
-                  {/* <div className="text-2xl">{language.flag}</div> */}
                   <span className={`fi fi-${language.code}`}></span>
                   <div className="flex flex-col items-start text-left">
                     <span className="font-semibold">{language.name}</span>
-                    {/* <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                    <span className="text-xs text-neutral-500 dark:text-neutral-400">
                       {language.nativeName}
-                    </span> */}
+                    </span>
                   </div>
                   {selectedLanguage === language.code && (
                     <Check className="text-brand-600 dark:text-brand-400 ml-auto h-4 w-4" />
