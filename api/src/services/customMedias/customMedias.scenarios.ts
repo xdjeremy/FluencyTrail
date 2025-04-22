@@ -1,6 +1,6 @@
-import type { Prisma, CustomMedia } from '@prisma/client'
+import type { Prisma, CustomMedia } from '@prisma/client';
 
-import type { ScenarioData } from '@redwoodjs/testing/api'
+import type { ScenarioData } from '@redwoodjs/testing/api';
 
 export const standard = defineScenario<Prisma.CustomMediaCreateArgs>({
   customMedia: {
@@ -20,7 +20,7 @@ export const standard = defineScenario<Prisma.CustomMediaCreateArgs>({
     },
     two: {
       data: {
-        title: 'String',
+        title: 'String2',
         slug: 'String2769790',
         updatedAt: '2025-04-20T16:15:04.397Z',
         User: {
@@ -33,6 +33,6 @@ export const standard = defineScenario<Prisma.CustomMediaCreateArgs>({
       },
     },
   },
-})
+});
 
-export type StandardScenario = ScenarioData<CustomMedia, 'customMedia'>
+export type StandardScenario = ScenarioData<CustomMedia, 'customMedia'>;

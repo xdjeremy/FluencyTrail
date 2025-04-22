@@ -1,10 +1,13 @@
 import type {
-  QueryResolvers,
-  MutationResolvers,
   CustomMediaRelationResolvers,
+  MutationResolvers,
+  QueryResolvers,
 } from 'types/graphql';
 
+import { validate } from '@redwoodjs/api';
+
 import { db } from 'src/lib/db';
+import { slugify } from 'src/lib/utils/slugify';
 
 export const customMedias: QueryResolvers['customMedias'] = () => {
   if (!context.currentUser) {
@@ -29,8 +32,27 @@ export const customMedia: QueryResolvers['customMedia'] = ({ id }) => {
 export const createCustomMedia: MutationResolvers['createCustomMedia'] = ({
   input,
 }) => {
+  // validate input
+  validate(input.title, 'Title', {
+    presence: {
+      message: 'Title is required',
+    },
+    length: {
+      max: 100,
+    },
+  });
+
+  // generate slug
+  const slug = `${slugify(input.title)}-${Math.random()
+    .toString(36)
+    .slice(2, 6)}`;
+
   return db.customMedia.create({
-    data: input,
+    data: {
+      title: input.title,
+      slug: slug,
+      userId: context.currentUser.id,
+    },
   });
 };
 

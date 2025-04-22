@@ -17,14 +17,10 @@ export const schema = gql`
 
   input CreateCustomMediaInput {
     title: String!
-    slug: String!
-    userId: Int!
   }
 
   input UpdateCustomMediaInput {
     title: String
-    slug: String
-    userId: Int
   }
 
   type Mutation {
@@ -35,4 +31,4 @@ export const schema = gql`
     ): CustomMedia! @requireAuth
     deleteCustomMedia(id: String!): CustomMedia! @requireAuth
   }
-`
+`;
