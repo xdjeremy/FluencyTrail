@@ -1,7 +1,6 @@
-// import { Link, routes } from '@redwoodjs/router'
-
 import { Metadata } from '@redwoodjs/web';
 
+import CustomMediaCreateModal from 'src/components/CustomMedia/Create/CustomMediaCreateModal';
 import CustomMediaCell from 'src/components/CustomMedia/CustomMediaCell';
 
 const CustomMediaPage = () => {
@@ -17,7 +16,7 @@ const CustomMediaPage = () => {
               Create and manage your custom language learning media
             </p>
           </div>
-          {/* <CustomMediaCreateButton onClick={() => setIsCreateModalOpen(true)} /> */}
+          <CustomMediaCreateModal />
         </section>
 
         <CustomMediaCell />
