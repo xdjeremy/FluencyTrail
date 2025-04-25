@@ -1,12 +1,5 @@
 import { formatDate } from 'date-fns';
-import {
-  Calendar,
-  MoreHorizontal,
-  Pencil,
-  Plus,
-  Popcorn,
-  Trash2,
-} from 'lucide-react';
+import { Calendar, MoreHorizontal, Pencil, Popcorn } from 'lucide-react';
 import { GetAllCustomMediasQuery } from 'types/graphql';
 
 import { Badge } from 'src/components/ui/badge';
@@ -18,6 +11,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'src/components/ui/dropdown-menu';
+
+import CustomMediaCreateModal from '../Create/CustomMediaCreateModal';
+import CustomMediaDelete from '../Delete/CustomMediaDelete';
 
 interface CustomMediaListProps {
   mediaItems: GetAllCustomMediasQuery['customMedia'];
@@ -65,13 +61,7 @@ const CustomMediaList = ({ mediaItems }: CustomMediaListProps) => {
                     <Pencil className="mr-2 h-4 w-4" />
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    // onClick={() => onDelete(media)}
-                    className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
-                  </DropdownMenuItem>
+                  <CustomMediaDelete />
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -83,14 +73,7 @@ const CustomMediaList = ({ mediaItems }: CustomMediaListProps) => {
           <p className="mb-6">
             Add your first custom media item to get started.
           </p>
-          <Button
-          // onClick={() =>
-          //   document.querySelector('[data-create-button="true"]')?.click()
-          // }
-          >
-            <Plus className="mr-1 h-4 w-4" />
-            Add Custom Media
-          </Button>
+          <CustomMediaCreateModal />
         </div>
       )}
     </div>
