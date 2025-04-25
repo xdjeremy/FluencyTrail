@@ -368,3 +368,72 @@ describe('update customMedia', () => {
     expect(updated.slug).not.toEqual(scenario.customMedia.one.slug);
   });
 });
+
+describe('get customMedia', () => {
+  scenario('return custom media', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.customMedia.one.userId,
+      email: 'String2369822',
+      name: 'String2369822',
+      timezone: 'UTC',
+    });
+
+    const fcn = async () =>
+      await customMedia({ id: scenario.customMedia.one.id });
+
+    expect(fcn).not.toThrow();
+    const result = await fcn();
+    expect(result?.id).toEqual(scenario.customMedia.one.id);
+  });
+
+  scenario(
+    'return null when customMedia ID does not exist',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const media = await customMedia({
+        id: 'non-existing-id',
+      });
+
+      expect(media).toBeNull();
+    }
+  );
+
+  scenario(
+    'return null when customMedia ID does not belong to user',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const media = await customMedia({
+        id: scenario.customMedia.two.id,
+      });
+      expect(media).toBeNull();
+    }
+  );
+
+  scenario(
+    'returns null when customMedia ID is not provided',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const media = await customMedia({ id: '' });
+
+      expect(media).toBeNull();
+    }
+  );
+});
