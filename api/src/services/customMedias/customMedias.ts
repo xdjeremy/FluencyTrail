@@ -60,9 +60,28 @@ export const updateCustomMedia: MutationResolvers['updateCustomMedia'] = ({
   id,
   input,
 }) => {
+  // validate input
+  validate(input.title, 'Title', {
+    presence: {
+      message: 'Title is required',
+    },
+    length: {
+      max: 100,
+      min: 1,
+    },
+  });
+
+  // generate slug
+  const slug = `${slugify(input.title)}-${Math.random()
+    .toString(36)
+    .slice(2, 6)}`;
+
   return db.customMedia.update({
-    data: input,
-    where: { id },
+    data: {
+      title: input.title,
+      slug: slug,
+    },
+    where: { id, userId: context.currentUser.id },
   });
 };
 

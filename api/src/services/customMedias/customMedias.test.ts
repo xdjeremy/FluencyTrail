@@ -3,8 +3,10 @@ import { addUserLanguage } from '../users/users';
 
 import {
   createCustomMedia,
+  customMedia,
   customMedias,
   deleteCustomMedia,
+  updateCustomMedia,
 } from './customMedias';
 import type { StandardScenario } from './customMedias.scenarios';
 
@@ -208,4 +210,161 @@ describe('delete customMedia', () => {
       await expect(fcn).rejects.toThrow();
     }
   );
+});
+
+describe('update customMedia', () => {
+  scenario('update a customMedia', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.customMedia.one.userId,
+      email: 'String2369822',
+      name: 'String2369822',
+      timezone: 'UTC',
+    });
+
+    const updated = await updateCustomMedia({
+      id: scenario.customMedia.one.id,
+      input: {
+        title: 'Updated Custom Media',
+      },
+    });
+
+    // Check immediate return value
+    expect(updated.title).toEqual('Updated Custom Media');
+
+    // Verify database record
+    const result = await customMedia({ id: scenario.customMedia.one.id });
+    expect(result?.title).toEqual('Updated Custom Media');
+  });
+
+  scenario(
+    'throws error when customMedia with invalid data',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const fcn = async () =>
+        await updateCustomMedia({
+          id: scenario.customMedia.one.id,
+          input: {
+            title: '',
+          },
+        });
+      await expect(fcn).rejects.toThrow();
+    }
+  );
+
+  scenario(
+    'throws error when customMedia ID does not exist',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const fcn = async () =>
+        await updateCustomMedia({
+          id: 'non-existing-id',
+          input: {
+            title: 'Updated Custom Media',
+          },
+        });
+      await expect(fcn).rejects.toThrow();
+    }
+  );
+
+  scenario(
+    'throws error when customMedia ID does not belong to user',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const fcn = async () =>
+        await updateCustomMedia({
+          id: scenario.customMedia.two.id,
+          input: {
+            title: 'Updated Custom Media',
+          },
+        });
+      await expect(fcn).rejects.toThrow();
+    }
+  );
+
+  scenario(
+    'throws error when customMedia with existing title from same user',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      // create new custom media
+      await createCustomMedia({
+        input: {
+          title: 'New Custom Media',
+        },
+      });
+
+      // update custom media with existing title
+      const fcn = async () =>
+        await updateCustomMedia({
+          id: scenario.customMedia.one.id,
+          input: {
+            title: 'New Custom Media',
+          },
+        });
+      await expect(fcn).rejects.toThrow();
+    }
+  );
+
+  scenario(
+    'update customMedia with existing title from different user',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      // update custom media with existing title
+      const updated = await updateCustomMedia({
+        id: scenario.customMedia.one.id,
+        input: {
+          title: scenario.customMedia.two.title,
+        },
+      });
+      // Check immediate return value
+      expect(updated.title).toEqual(scenario.customMedia.two.title);
+    }
+  );
+
+  scenario('slug updates when updating', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.customMedia.one.userId,
+      email: 'String2369822',
+      name: 'String2369822',
+      timezone: 'UTC',
+    });
+
+    const updated = await updateCustomMedia({
+      id: scenario.customMedia.one.id,
+      input: {
+        title: 'Updated Custom Media',
+      },
+    });
+
+    expect(updated.slug).not.toEqual(scenario.customMedia.one.slug);
+  });
 });
