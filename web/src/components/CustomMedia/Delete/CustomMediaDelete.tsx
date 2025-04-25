@@ -82,7 +82,7 @@ const CustomMediaDelete = ({ media }: CustomMediaDeleteProps) => {
               });
             }}
             disabled={loading}
-            className="focußs:ring-red-600 bg-red-600 text-white hover:bg-red-700"
+            className="focus:ring-red-600 bg-red-600 text-white hover:bg-red-700"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}{' '}
             Delete
