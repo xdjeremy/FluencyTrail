@@ -1,16 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, Pencil, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   GetAllCustomMediasQuery,
+  GetCustomMediaForUpdate,
+  GetCustomMediaForUpdateVariables,
   UpdateCustomMediaMutation,
   UpdateCustomMediaMutationVariables,
 } from 'types/graphql';
 
 import { Form, SubmitHandler, useForm } from '@redwoodjs/forms';
-import { useMutation } from '@redwoodjs/web';
+import { useMutation, useQuery } from '@redwoodjs/web';
 
 import { Button } from 'src/components/ui/button';
 import {
@@ -49,6 +51,15 @@ const UPDATE_CUSTOM_MEDIA = gql`
   }
 `;
 
+const GET_CUSTOM_MEDIA = gql`
+  query GetCustomMediaForUpdate($customMediaId: String!) {
+    customMedia(id: $customMediaId) {
+      id
+      title
+    }
+  }
+`;
+
 interface CustomMediaEditProps {
   media: GetAllCustomMediasQuery['customMedia'][number];
 }
@@ -63,6 +74,14 @@ const CustomMediaEdit = ({ media }: CustomMediaEditProps) => {
   });
 
   // fetch the current title
+  const { data, loading: mediaLoading } = useQuery<
+    GetCustomMediaForUpdate,
+    GetCustomMediaForUpdateVariables
+  >(GET_CUSTOM_MEDIA, {
+    variables: {
+      customMediaId: media.id,
+    },
+  });
 
   const [mutate, { loading }] = useMutation<
     UpdateCustomMediaMutation,
@@ -88,6 +107,18 @@ const CustomMediaEdit = ({ media }: CustomMediaEditProps) => {
       },
     });
   };
+
+  const isLoading = mediaLoading || loading;
+
+  useEffect(() => {
+    if (data?.customMedia) {
+      form.setValue('title', data.customMedia.title);
+    }
+  }, [data?.customMedia, form]);
+
+  if (mediaLoading) {
+    return null;
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -120,7 +151,7 @@ const CustomMediaEdit = ({ media }: CustomMediaEditProps) => {
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input {...field} disabled={loading} />
+                  <Input {...field} disabled={isLoading} />
                 </FormControl>
                 <FormDescription>
                   The title of your custom media entry.
@@ -135,12 +166,12 @@ const CustomMediaEdit = ({ media }: CustomMediaEditProps) => {
               type="button"
               variant="outline"
               onClick={() => setIsOpen(false)}
-              disabled={loading}
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? (
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
