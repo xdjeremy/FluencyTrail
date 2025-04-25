@@ -190,7 +190,7 @@ export const completedToday: QueryResolvers['completedToday'] = async ({
   languageId,
 }) => {
   const userId = context.currentUser.id;
-  const userTimeZone = context.currentUser?.timezone || 'UTC'; // Default to UTC
+  const userTimeZone = context.currentUser?.timezone || 'UTC';
 
   // Get current time and convert to user's timezone
   const now = new Date();
@@ -200,19 +200,21 @@ export const completedToday: QueryResolvers['completedToday'] = async ({
   const startOfToday = startOfDay(nowInUserTz);
   const endOfToday = endOfDay(nowInUserTz);
 
-  // Prisma stores dates in UTC, so we need to compare against the UTC equivalents
-  // of the user's start/end of day.
-  // Note: startOfDay/endOfDay return dates in the *local* system time, but representing
-  // the correct wall-clock time in the target timezone. We don't need to convert them back to UTC
-  // explicitly for Prisma comparison if the DB connection handles timezone correctly,
-  // but it's safer to be explicit if unsure. Prisma typically expects ISO strings or Date objects
-  // which it treats as UTC. Let's use the Date objects directly.
+  // Convert the local timezone dates to UTC for database comparison
+  const utcStartOfToday = TimezoneConverter.userDateToUtc(
+    startOfToday.toISOString(),
+    userTimeZone
+  );
+  const utcEndOfToday = TimezoneConverter.userDateToUtc(
+    endOfToday.toISOString(),
+    userTimeZone
+  );
 
   const where: Prisma.ActivityWhereInput = {
     userId: userId,
     date: {
-      gte: startOfToday,
-      lte: endOfToday,
+      gte: utcStartOfToday,
+      lte: utcEndOfToday,
     },
   };
 
