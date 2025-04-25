@@ -1,5 +1,5 @@
 import { formatDate } from 'date-fns';
-import { Calendar, MoreHorizontal, Pencil, Popcorn } from 'lucide-react';
+import { Calendar, MoreHorizontal, Popcorn } from 'lucide-react';
 import { GetAllCustomMediasQuery } from 'types/graphql';
 
 import { Badge } from 'src/components/ui/badge';
@@ -8,12 +8,12 @@ import { Card } from 'src/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'src/components/ui/dropdown-menu';
 
 import CustomMediaCreateModal from '../Create/CustomMediaCreateModal';
 import CustomMediaDelete from '../Delete/CustomMediaDelete';
+import CustomMediaEdit from '../Edit/CustomMediaEdit';
 
 interface CustomMediaListProps {
   mediaItems: GetAllCustomMediasQuery['customMedia'];
@@ -55,12 +55,7 @@ const CustomMediaList = ({ mediaItems }: CustomMediaListProps) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                  // onClick={() => onEdit(media)}
-                  >
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
+                  <CustomMediaEdit media={media} />
                   <CustomMediaDelete media={media} />
                 </DropdownMenuContent>
               </DropdownMenu>
