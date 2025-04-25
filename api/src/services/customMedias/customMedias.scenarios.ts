@@ -2,7 +2,9 @@ import type { Prisma, CustomMedia } from '@prisma/client';
 
 import type { ScenarioData } from '@redwoodjs/testing/api';
 
-export const standard = defineScenario<Prisma.CustomMediaCreateArgs>({
+export const standard = defineScenario<
+  Prisma.CustomMediaCreateArgs | Prisma.LanguageCreateArgs
+>({
   customMedia: {
     one: {
       data: {
@@ -30,6 +32,16 @@ export const standard = defineScenario<Prisma.CustomMediaCreateArgs>({
             updatedAt: '2025-04-20T16:15:04.408Z',
           },
         },
+      },
+    },
+  },
+  language: {
+    one: {
+      data: {
+        id: 1,
+        code: 'gb',
+        name: 'English',
+        nativeName: 'English',
       },
     },
   },

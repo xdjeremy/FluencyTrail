@@ -69,8 +69,18 @@ export const updateCustomMedia: MutationResolvers['updateCustomMedia'] = ({
 export const deleteCustomMedia: MutationResolvers['deleteCustomMedia'] = ({
   id,
 }) => {
+  validate(id, 'ID', {
+    presence: {
+      message: 'ID is required',
+    },
+    length: {
+      min: 1,
+      message: 'ID is required',
+    },
+  });
+
   return db.customMedia.delete({
-    where: { id },
+    where: { id, userId: context.currentUser.id },
   });
 };
 

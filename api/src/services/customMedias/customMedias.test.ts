@@ -1,4 +1,11 @@
-import { createCustomMedia, customMedias } from './customMedias';
+import { createActivity } from '../activities/activities';
+import { addUserLanguage } from '../users/users';
+
+import {
+  createCustomMedia,
+  customMedias,
+  deleteCustomMedia,
+} from './customMedias';
 import type { StandardScenario } from './customMedias.scenarios';
 
 // Generated boilerplate tests do not account for all circumstances
@@ -94,6 +101,106 @@ describe('create customMedia', () => {
 
       const result = await customMedias();
       expect(result.length).toEqual(2);
+    }
+  );
+});
+
+describe('delete customMedia', () => {
+  scenario('delete a customMedia', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.customMedia.one.userId,
+      email: 'String2369822',
+      name: 'String2369822',
+      timezone: 'UTC',
+    });
+
+    const fcn = async () =>
+      await deleteCustomMedia({ id: scenario.customMedia.one.id });
+
+    expect(fcn).not.toThrow();
+
+    const fcn2 = async () => await customMedias();
+
+    expect(fcn2.length).toEqual(0);
+  });
+
+  scenario(
+    'throws error when customMedia with invalid data',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const fcn = async () => await deleteCustomMedia({ id: '' });
+
+      await expect(fcn).rejects.toThrow('ID is required');
+    }
+  );
+
+  scenario(
+    'throws an error when customMedia have an activity that depends on',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      // add user language
+      await addUserLanguage({
+        input: {
+          languageCode: 'gb',
+        },
+      });
+
+      // create activity
+      await createActivity({
+        input: {
+          date: '2025-04-20T16:15:04.385Z',
+          mediaSlug: scenario.customMedia.one.slug,
+          activityType: 'WATCHING',
+          duration: 60,
+          languageId: 1,
+        },
+      });
+    }
+  );
+
+  scenario(
+    'throws error when customMedia ID does not exist',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const fcn = async () =>
+        await deleteCustomMedia({ id: 'non-existing-id' });
+
+      await expect(fcn).rejects.toThrow();
+    }
+  );
+
+  scenario(
+    'throws an error when customMedia Id does not belong to user',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.customMedia.one.userId,
+        email: 'String2369822',
+        name: 'String2369822',
+        timezone: 'UTC',
+      });
+
+      const fcn = async () =>
+        await deleteCustomMedia({ id: scenario.customMedia.two.id });
+
+      await expect(fcn).rejects.toThrow();
     }
   );
 });
