@@ -167,6 +167,11 @@ describe('delete customMedia', () => {
           languageId: 1,
         },
       });
+
+      const fcn = async () =>
+        await deleteCustomMedia({ id: scenario.customMedia.one.id });
+
+      await expect(fcn).rejects.toThrow();
     }
   );
 

@@ -92,7 +92,7 @@ model Activity {
   media       Media?       @relation(fields: [mediaId], references: [id], onDelete: SetNull)
   language    Language     @relation(fields: [languageId], references: [id], onDelete: Restrict)
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  customMedia CustomMedia? @relation(fields: [customMediaId], references: [id], onDelete: SetNull)
+  customMedia CustomMedia? @relation(fields: [customMediaId], references: [id], onDelete: Restrict)
 
   @@index([languageId])
 }
