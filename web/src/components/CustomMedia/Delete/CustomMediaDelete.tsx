@@ -48,7 +48,13 @@ const CustomMediaDelete = ({ media }: CustomMediaDeleteProps) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild={true}>
-        <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400">
+        <DropdownMenuItem
+          className="cursor-pointer text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+          onSelect={e => {
+            e.preventDefault();
+            setIsOpen(true);
+          }}
+        >
           <Trash2 className="mr-2 h-4 w-4" />
           Delete
         </DropdownMenuItem>
