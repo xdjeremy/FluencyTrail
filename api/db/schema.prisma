@@ -24,7 +24,8 @@ model Language {
   activities Activity[] // One-to-many relation with Activity
 
   // Relation for tracking primary language
-  UserPrimaryLanguage User[] @relation("UserPrimaryLanguage")
+  UserPrimaryLanguage User[]          @relation("UserPrimaryLanguage")
+  activityTimers      ActivityTimer[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -50,9 +51,10 @@ model User {
   primaryLanguageId Int? // Foreign key for primary language
   primaryLanguage   Language?  @relation("UserPrimaryLanguage", fields: [primaryLanguageId], references: [id], onDelete: Restrict)
 
-  Activity    Activity[]
-  OAuth       OAuth[]
-  CustomMedia CustomMedia[]
+  Activity      Activity[]
+  OAuth         OAuth[]
+  CustomMedia   CustomMedia[]
+  ActivityTimer ActivityTimer[]
 
   @@index([primaryLanguageId])
 }
@@ -89,10 +91,11 @@ model Activity {
   userId        Int
   customMediaId String?
 
-  media       Media?       @relation(fields: [mediaId], references: [id], onDelete: SetNull)
-  language    Language     @relation(fields: [languageId], references: [id], onDelete: Restrict)
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  customMedia CustomMedia? @relation(fields: [customMediaId], references: [id], onDelete: Restrict)
+  media         Media?          @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  language      Language        @relation(fields: [languageId], references: [id], onDelete: Restrict)
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customMedia   CustomMedia?    @relation(fields: [customMediaId], references: [id], onDelete: Restrict)
+  activityTimer ActivityTimer[]
 
   @@index([languageId])
 }
@@ -128,6 +131,7 @@ model Media {
   MovieMetadata MovieMetadata?
   TvMetadata    TvMetadata?
   Activity      Activity[]
+  ActivityTimer ActivityTimer[]
 
   @@unique([externalId, mediaType])
 }
@@ -141,8 +145,9 @@ model CustomMedia {
 
   userId Int
 
-  User     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Activity Activity[]
+  User          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Activity      Activity[]
+  ActivityTimer ActivityTimer[]
 
   @@unique([userId, title])
 }
@@ -178,4 +183,25 @@ model TvMetadata {
   originalCountry  String[]
 
   media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+}
+
+model ActivityTimer {
+  id           String       @id @default(uuid())
+  startTime    DateTime
+  endTime      DateTime?
+  activityType ActivityType
+
+  userId        Int
+  mediaId       String?
+  customMediaId String?
+  languageId    Int
+  activityId    String?
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media       Media?       @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+  customMedia CustomMedia? @relation(fields: [customMediaId], references: [id], onDelete: SetNull)
+  language    Language     @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  activity    Activity?    @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startTime])
 }
