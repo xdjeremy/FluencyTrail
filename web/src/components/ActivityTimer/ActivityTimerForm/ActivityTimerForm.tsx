@@ -1,0 +1,180 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Check, ChevronsUpDown, Clock } from 'lucide-react';
+
+import { Form, useForm } from '@redwoodjs/forms';
+
+import { activityTypes } from 'src/components/Activity/ActivityForm/constants';
+import LanguageSelect from 'src/components/Activity/ActivityForm/fields/LanguageSelect';
+import ActivityMediaSelect from 'src/components/Activity/ActivityForm/fields/MediaSelect';
+import { Button } from 'src/components/ui/button';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from 'src/components/ui/command';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from 'src/components/ui/dialog';
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from 'src/components/ui/form';
+import { Input } from 'src/components/ui/input';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from 'src/components/ui/popover';
+import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
+import { cn } from 'src/utils/cn';
+
+import {
+  ActivityTimerSchema,
+  ActivityTimerSchemaType,
+} from './ActivityTimerSchema';
+
+const ActivityTimerForm = () => {
+  const { isActivityTimerModalOpen, setActivityTimerModalOpen } =
+    useActivityModal();
+
+  const form = useForm<ActivityTimerSchemaType>({
+    resolver: zodResolver(ActivityTimerSchema),
+    defaultValues: {
+      notes: '',
+      activityType: 'WATCHING',
+      mediaSlug: '',
+    },
+  });
+
+  return (
+    <Form formMethods={form}>
+      <Dialog
+        open={isActivityTimerModalOpen}
+        onOpenChange={setActivityTimerModalOpen}
+      >
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Set Up Timed Activity</DialogTitle>
+            <DialogDescription>
+              Enter activity details before starting the timer. Duration will be
+              automatically recorded.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <ActivityMediaSelect isLoading={false} />
+            <LanguageSelect />
+            <FormField
+              control={form.control}
+              name="activityType"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <FormLabel className="text-right">Type*</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            'col-span-3 justify-between lowercase',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                          // disabled={props.loading}
+                        >
+                          {field.value
+                            ? activityTypes.find(
+                                activity => activity === field.value
+                              )
+                            : 'Select activity'}
+                          <ChevronsUpDown className="size-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Search activity..."
+                          className="h-9"
+                        />
+                        <CommandList>
+                          <CommandEmpty>No activity found.</CommandEmpty>
+                          <CommandGroup>
+                            {activityTypes.map(activity => (
+                              <CommandItem
+                                value={activity}
+                                key={activity}
+                                className="lowercase"
+                                onSelect={() => {
+                                  form.setValue('activityType', activity);
+                                }}
+                              >
+                                {activity}
+                                <Check
+                                  className={cn(
+                                    'ml-auto size-4',
+                                    activity === field.value
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <FormLabel className="text-right">Notes</FormLabel>
+                  <FormControl className="col-span-3">
+                    <Input
+                      placeholder="Optional notes about this activity"
+                      // disabled={props.loading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline">Cancel</Button>
+            <Button
+              // onClick={handleStartTimer}
+              variant="default"
+              className="gap-2"
+            >
+              <Clock className="h-4 w-4" />
+              Start Timer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Form>
+  );
+};
+
+export default ActivityTimerForm;

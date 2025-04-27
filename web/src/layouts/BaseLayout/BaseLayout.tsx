@@ -14,7 +14,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
         {children}
       </div>
       <Onboarding />
-      {/* <NewActivity /> */}
       <QuickAddButton />
     </>
   );

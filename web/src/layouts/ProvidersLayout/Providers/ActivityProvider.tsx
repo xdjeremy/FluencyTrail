@@ -3,6 +3,9 @@ import { createContext, ReactNode, useContext, useState } from 'react';
 const ActivtyProviderContext = createContext({
   isActivityModalOpen: false,
   setActivityModalOpen: (_isOpen: boolean) => {},
+
+  isActivityTimerModalOpen: false,
+  setActivityTimerModalOpen: (_isOpen: boolean) => {},
 });
 
 const useActivityModal = () => {
@@ -15,10 +18,16 @@ const useActivityModal = () => {
 
 const ActivityProvider = ({ children }: { children: ReactNode }) => {
   const [isActivityModalOpen, setActivityModalOpen] = useState(false);
+  const [isActivityTimerModalOpen, setActivityTimerModalOpen] = useState(false);
 
   return (
     <ActivtyProviderContext.Provider
-      value={{ isActivityModalOpen, setActivityModalOpen }}
+      value={{
+        isActivityModalOpen,
+        setActivityModalOpen,
+        isActivityTimerModalOpen,
+        setActivityTimerModalOpen,
+      }}
     >
       {children}
     </ActivtyProviderContext.Provider>

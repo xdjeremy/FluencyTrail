@@ -1,10 +1,9 @@
-import React from 'react';
-
-import { Plus, Clock, FileText } from 'lucide-react';
+import { Clock, FileText, Plus } from 'lucide-react';
 
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
 
 import NewActivity from '../Activity/NewActivity/NewActivity';
+import NewActivityTimer from '../ActivityTimer/NewActivityTimer/NewActivityTimer';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -14,8 +13,9 @@ import {
 } from '../ui/dropdown-menu';
 
 const QuickAddButton = () => {
-  const { setActivityModalOpen } = useActivityModal();
-  const handleStartTimer = () => {};
+  const { setActivityModalOpen, setActivityTimerModalOpen } =
+    useActivityModal();
+
   return (
     <>
       <DropdownMenu>
@@ -29,7 +29,7 @@ const QuickAddButton = () => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuItem
-            onClick={handleStartTimer}
+            onClick={() => setActivityTimerModalOpen(true)}
             className="cursor-pointer"
           >
             <Clock className="mr-2 h-4 w-4" />
@@ -47,6 +47,7 @@ const QuickAddButton = () => {
 
       {/* MODALS */}
       <NewActivity />
+      <NewActivityTimer />
     </>
   );
 };
