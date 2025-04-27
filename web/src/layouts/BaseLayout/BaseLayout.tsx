@@ -1,6 +1,6 @@
-import NewActivity from 'src/components/Activity/NewActivity/NewActivity';
 import Header from 'src/components/Header/Header';
 import Onboarding from 'src/components/Onboarding/Onboarding';
+import QuickAddButton from 'src/components/QuickAdd/QuickAddButton';
 
 type BaseLayoutProps = {
   children?: React.ReactNode;
@@ -14,7 +14,8 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
         {children}
       </div>
       <Onboarding />
-      <NewActivity />
+      {/* <NewActivity /> */}
+      <QuickAddButton />
     </>
   );
 };

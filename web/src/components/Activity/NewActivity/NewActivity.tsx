@@ -1,4 +1,3 @@
-import { Plus } from 'lucide-react';
 import { useReward } from 'react-rewards';
 import { toast } from 'sonner';
 import type {
@@ -10,7 +9,6 @@ import type {
 import type { TypedDocumentNode } from '@redwoodjs/web';
 import { useMutation } from '@redwoodjs/web';
 
-import { Button } from 'src/components/ui/button';
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
 
 import ActivityForm from '../ActivityForm';
@@ -56,13 +54,6 @@ const NewActivity = () => {
 
   return (
     <>
-      <Button
-        onClick={() => setActivityModalOpen(true)}
-        className="bg-brand-600 hover:bg-brand-700 dark:bg-brand-500 dark:hover:bg-brand-400 fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full text-white shadow-lg dark:text-neutral-900"
-        aria-label="Quick add activity"
-      >
-        <Plus className="h-6 w-6" />
-      </Button>
       <span id="rewardId" className="fixed bottom-0 right-1/2" />
       <ActivityForm onSave={onSave} loading={loading} error={error} />
     </>
