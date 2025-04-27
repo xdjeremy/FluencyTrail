@@ -1,3 +1,4 @@
+import { toZonedTime } from 'date-fns-tz';
 import type {
   ActivityTimerRelationResolvers,
   MutationResolvers,
@@ -17,7 +18,25 @@ export const activeTimer: QueryResolvers['activeTimer'] = async () => {
 };
 
 export const startActivityTimer: MutationResolvers['startActivityTimer'] =
-  () => {};
+  async ({ input }) => {
+    const { activityType, languageId } = input;
+
+    const userTimeZone = context.currentUser?.timezone || 'UTC';
+
+    // Get current time and convert to user's timezone
+    const now = new Date();
+    const nowInUserTz = toZonedTime(now, userTimeZone);
+
+    return await db.activityTimer.create({
+      data: {
+        startTime: nowInUserTz,
+        endTime: null,
+        activityType,
+        user: { connect: { id: context.currentUser.id } },
+        language: { connect: { id: languageId } },
+      },
+    });
+  };
 
 export const ActivityTimer: ActivityTimerRelationResolvers = {
   media: (_obj, { root }) => {
