@@ -64,7 +64,7 @@ const CurrentActivityTimerModal = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
-            <Clock className={'text-brand-600 dark:text-brand-400 h-5 w-5'} />
+            <Clock className={'text-brand-600 h-5 w-5'} />
             Activity Timer
           </DialogTitle>
         </DialogHeader>
@@ -74,7 +74,7 @@ const CurrentActivityTimerModal = ({
             <div className="flex flex-col items-center">
               <div
                 className={
-                  'bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 flex h-20 w-16 items-center justify-center rounded-lg font-mono text-4xl font-bold sm:text-5xl'
+                  'bg-brand-100 text-brand-700 flex h-20 w-16 items-center justify-center rounded-lg font-mono text-4xl font-bold sm:text-5xl'
                 }
               >
                 {hours}
@@ -89,7 +89,7 @@ const CurrentActivityTimerModal = ({
             <div className="flex flex-col items-center">
               <div
                 className={
-                  'bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 flex h-20 w-16 items-center justify-center rounded-lg font-mono text-4xl font-bold sm:text-5xl'
+                  'bg-brand-100 text-brand-700 flex h-20 w-16 items-center justify-center rounded-lg font-mono text-4xl font-bold sm:text-5xl'
                 }
               >
                 {minutes}
@@ -106,7 +106,7 @@ const CurrentActivityTimerModal = ({
             <div className="flex flex-col items-center">
               <div
                 className={
-                  'bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 flex h-20 w-16 items-center justify-center rounded-lg font-mono text-4xl font-bold sm:text-5xl'
+                  'bg-brand-100 text-brand-700 flex h-20 w-16 items-center justify-center rounded-lg font-mono text-4xl font-bold sm:text-5xl'
                 }
               >
                 {seconds}
@@ -117,7 +117,7 @@ const CurrentActivityTimerModal = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1.5 text-sm dark:bg-neutral-800">
+          <div className="flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1.5 text-sm">
             <span
               className={'h-2 w-2 animate-pulse rounded-full bg-green-500'}
             ></span>

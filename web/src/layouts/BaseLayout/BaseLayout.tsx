@@ -1,4 +1,3 @@
-import CurrentActivityTimerCell from 'src/components/ActivityTimer/CurrentActivityTimerCell';
 import Header from 'src/components/Header/Header';
 import Onboarding from 'src/components/Onboarding/Onboarding';
 import QuickAddButton from 'src/components/QuickAdd/QuickAddButton';
@@ -19,7 +18,6 @@ const BaseLayout = ({ children }: BaseLayoutProps) => {
       <span id="rewardId" className="fixed bottom-0 right-1/2" />
       <Onboarding />
       <QuickAddButton />
-      <CurrentActivityTimerCell />
     </>
   );
 };

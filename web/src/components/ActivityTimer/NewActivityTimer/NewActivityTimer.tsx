@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { toast } from 'sonner';
 import {
   StartActivityTimer,
@@ -37,7 +35,10 @@ const NewActivityTimer = () => {
       onError: error => {
         toast.error(error.message);
       },
-      refetchQueries: ['GetActivityTimerForHeader'],
+      refetchQueries: [
+        'GetActivityTimerForHeader',
+        'GetActiveTimerForQuickAdd',
+      ],
     }
   );
 

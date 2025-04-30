@@ -1,8 +1,9 @@
-import { Clock, FileText, Plus } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
 
 import NewActivity from '../Activity/NewActivity/NewActivity';
+import CurrentActivityTimerCell from '../ActivityTimer/CurrentActivityTimerCell';
 import NewActivityTimer from '../ActivityTimer/NewActivityTimer/NewActivityTimer';
 import { Button } from '../ui/button';
 import {
@@ -12,9 +13,10 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 
+import QuickAddTimer from './QuickAddTimer';
+
 const QuickAddButton = () => {
-  const { setActivityModalOpen, setActivityTimerModalOpen } =
-    useActivityModal();
+  const { setActivityModalOpen } = useActivityModal();
 
   return (
     <>
@@ -28,13 +30,7 @@ const QuickAddButton = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem
-            onClick={() => setActivityTimerModalOpen(true)}
-            className="cursor-pointer"
-          >
-            <Clock className="mr-2 h-4 w-4" />
-            <span>Start Timer</span>
-          </DropdownMenuItem>
+          <QuickAddTimer />
           <DropdownMenuItem
             onClick={() => setActivityModalOpen(true)}
             className="cursor-pointer"
@@ -48,6 +44,7 @@ const QuickAddButton = () => {
       {/* MODALS */}
       <NewActivity />
       <NewActivityTimer />
+      <CurrentActivityTimerCell />
     </>
   );
 };

@@ -47,7 +47,7 @@ const StopTimer = ({ activeTimer }: StopTimerProps) => {
         `Error stopping timer: ${error.message}. Please try again later.`
       );
     },
-    refetchQueries: ['GetActivityTimerForHeader'],
+    refetchQueries: ['GetActivityTimerForHeader', 'GetActiveTimerForQuickAdd'],
   });
 
   return (
@@ -62,7 +62,8 @@ const StopTimer = ({ activeTimer }: StopTimerProps) => {
         })
       }
       disabled={loading}
-      className="bg-brand-600 hover:bg-brand-700 w-full gap-1.5 text-white sm:w-auto"
+      variant="brand"
+      className="w-full gap-1.5 sm:w-auto"
     >
       {loading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
