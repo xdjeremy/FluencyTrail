@@ -6,6 +6,9 @@ const ActivtyProviderContext = createContext({
 
   isActivityTimerModalOpen: false,
   setActivityTimerModalOpen: (_isOpen: boolean) => {},
+
+  isActiveTimerModalOpen: false,
+  setActiveTimerModalOpen: (_isOpen: boolean) => {},
 });
 
 const useActivityModal = () => {
@@ -19,6 +22,7 @@ const useActivityModal = () => {
 const ActivityProvider = ({ children }: { children: ReactNode }) => {
   const [isActivityModalOpen, setActivityModalOpen] = useState(false);
   const [isActivityTimerModalOpen, setActivityTimerModalOpen] = useState(false);
+  const [isActiveTimerModalOpen, setActiveTimerModalOpen] = useState(false);
 
   return (
     <ActivtyProviderContext.Provider
@@ -27,6 +31,8 @@ const ActivityProvider = ({ children }: { children: ReactNode }) => {
         setActivityModalOpen,
         isActivityTimerModalOpen,
         setActivityTimerModalOpen,
+        isActiveTimerModalOpen,
+        setActiveTimerModalOpen,
       }}
     >
       {children}
