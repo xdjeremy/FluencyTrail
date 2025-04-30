@@ -37,6 +37,7 @@ const NewActivityTimer = () => {
       onError: error => {
         toast.error(error.message);
       },
+      refetchQueries: ['GetActivityTimerForHeader'],
     }
   );
 

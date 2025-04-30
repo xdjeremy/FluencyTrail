@@ -47,6 +47,7 @@ const StopTimer = ({ activeTimer }: StopTimerProps) => {
         `Error stopping timer: ${error.message}. Please try again later.`
       );
     },
+    refetchQueries: ['GetActivityTimerForHeader'],
   });
 
   return (
