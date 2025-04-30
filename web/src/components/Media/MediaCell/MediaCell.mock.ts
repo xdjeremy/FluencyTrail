@@ -11,7 +11,6 @@ export const standard = (/* vars, { ctx, req } */): FindMediaQuery => ({
     originalTitle: "The Hitchhiker's Guide to the Galaxy",
     posterUrl: 'https://placehold.co/600x1200/png?text=Monds',
     popularity: 1234,
-    releaseDate: '2005-04-29',
     mediaType: 'MOVIE',
     MovieMetadata: {
       originalLanguage: 'en',
@@ -27,7 +26,6 @@ export const standard = (/* vars, { ctx, req } */): FindMediaQuery => ({
       mediaType: 'MOVIE',
       slug: 'the-hitchhiker-43-MOVIE',
       posterUrl: 'https://placehold.co/600x1200/png?text=Monds',
-      releaseDate: '2005-04-29',
     },
   ],
 });
