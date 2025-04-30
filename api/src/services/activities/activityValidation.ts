@@ -8,7 +8,7 @@ import type { CurrentUser } from '@redwoodjs/auth'; // Import CurrentUser type
 
 // Assuming MediaManager is correctly located relative to this new file path
 // Adjust the import path if necessary
-import MediaManager from '../medias/mediamanager';
+import { MediaManager } from '../medias/mediamanager';
 
 export const validateActivityInput = async (
   input: CreateActivityInput,
@@ -76,7 +76,7 @@ export const validateActivityInput = async (
   });
 
   // Media Validation (using validateWith)
-  let media: Media | null = null;
+  let media = null;
   const mediaManager = new MediaManager();
   await validateWith(async () => {
     if (!input.mediaSlug) {

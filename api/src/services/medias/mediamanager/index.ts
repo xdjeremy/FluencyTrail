@@ -55,7 +55,7 @@ class MediaManager {
   private customMediaFetcher: CustomMediaFetcher;
   private tmdbClient: TheMovieDb;
 
-  constructor(tmdbClient: TheMovieDb) {
+  constructor(tmdbClient?: TheMovieDb) {
     this.tmdbClient = tmdbClient;
     this.tmdbFetcher = new TmdbFetcher(tmdbClient, false); // Database operations
     this.displayFetcher = new TmdbFetcher(tmdbClient, true); // Display-only results
