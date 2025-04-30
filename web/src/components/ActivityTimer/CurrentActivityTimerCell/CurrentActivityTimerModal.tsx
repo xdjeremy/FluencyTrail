@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Clock, Pause, RotateCcw, Square } from 'lucide-react';
+import { Clock, Square } from 'lucide-react';
 import { GetActivityTimerForModal } from 'types/graphql';
 
 import { Button } from 'src/components/ui/button';
@@ -125,7 +125,7 @@ const CurrentActivityTimerModal = ({
         </div>
 
         <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:gap-0">
-          <div className="flex w-full gap-2 sm:w-auto">
+          {/* <div className="flex w-full gap-2 sm:w-auto">
             <Button
               variant="outline"
               // onClick={pauseTimer}
@@ -144,7 +144,7 @@ const CurrentActivityTimerModal = ({
               <RotateCcw className="h-4 w-4" />
               Reset
             </Button>
-          </div>
+          </div> */}
 
           <Button
             // onClick={handleStopTimer}

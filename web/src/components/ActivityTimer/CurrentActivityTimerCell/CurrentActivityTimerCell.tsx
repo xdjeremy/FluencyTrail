@@ -11,6 +11,14 @@ import type {
 
 import CurrentActivityTimerModal from './CurrentActivityTimerModal';
 
+export const beforeQuery = () => {
+  return {
+    fetchPolicy: 'cache-and-network',
+    pollInterval: 30000,
+    notifyOnNetworkStatusChange: true,
+  };
+};
+
 export const QUERY: TypedDocumentNode<
   GetActivityTimerForModal,
   GetActivityTimerForModalVariables
