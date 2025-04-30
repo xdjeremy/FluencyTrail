@@ -1,7 +1,5 @@
-import { SearchMediaByQuery } from 'types/graphql';
-
 // Define your own mock data here:
-export const standard = (/* vars, { ctx, req } */): SearchMediaByQuery => ({
+export const standard = (/* vars, { ctx, req } */) => ({
   medias: [
     {
       __typename: 'Media' as const,
