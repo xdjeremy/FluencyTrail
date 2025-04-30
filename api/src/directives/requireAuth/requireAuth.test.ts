@@ -16,8 +16,9 @@ describe('requireAuth directive', () => {
         currentUser: {
           id: 1,
           name: 'Lebron McGretzky',
-          timezone: 'America/Los_Angeles',
+          timezone: 'America/Los Angeles',
           roles: ['admin'],
+          email: 'email@example.com',
         },
       },
     });
