@@ -68,10 +68,7 @@ const ActivityTimerForm = ({
     },
   });
 
-  console.log(form.formState.errors);
-
   const handleStartTimer = (data: ActivityTimerSchemaType) => {
-    console.log('handleStartTimer', data);
     const input: StartTimerInput = {
       mediaSlug: data.mediaSlug,
       activityType: data.activityType as ActivityType,

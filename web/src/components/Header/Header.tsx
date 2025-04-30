@@ -9,6 +9,7 @@ import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 
 import Logo from './fluencytrail-logo-two-lines.svg';
+import HeaderTimerCell from './HeaderTimer/HeaderTimerCell';
 import MobileMenu from './MobileMenu';
 import SearchBox from './Search/SearchBox';
 import { SearchNavigationProvider } from './Search/useSearchNavigation';
@@ -57,6 +58,7 @@ const Header = () => {
           </div>
 
           <div className="flex items-center gap-4">
+            <HeaderTimerCell />
             <SearchBox />
             <DarkModeToggle />
 
