@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Clock, Square } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { GetActivityTimerForModal } from 'types/graphql';
 
-import { Button } from 'src/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -12,6 +11,8 @@ import {
   DialogTitle,
 } from 'src/components/ui/dialog';
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
+
+import StopTimer from './StopTimer';
 
 interface CurrentActivityTimerModalProps {
   activeTimer: GetActivityTimerForModal['activeTimer'];
@@ -146,14 +147,7 @@ const CurrentActivityTimerModal = ({
             </Button>
           </div> */}
 
-          <Button
-            // onClick={handleStopTimer}
-            // disabled={time === 0 || isSubmitting}
-            className="bg-brand-600 hover:bg-brand-700 w-full gap-1.5 text-white sm:w-auto"
-          >
-            <Square className="h-4 w-4" />
-            Complete Activity
-          </Button>
+          <StopTimer activeTimer={activeTimer} />
         </DialogFooter>
       </DialogContent>
     </Dialog>

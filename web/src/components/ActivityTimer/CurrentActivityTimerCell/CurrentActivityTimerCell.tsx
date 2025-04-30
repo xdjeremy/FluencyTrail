@@ -25,6 +25,7 @@ export const QUERY: TypedDocumentNode<
 > = gql`
   query GetActivityTimerForModal {
     activeTimer: activeTimer {
+      id
       startTime
     }
   }

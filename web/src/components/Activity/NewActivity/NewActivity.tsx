@@ -54,7 +54,6 @@ const NewActivity = () => {
 
   return (
     <>
-      <span id="rewardId" className="fixed bottom-0 right-1/2" />
       <ActivityForm onSave={onSave} loading={loading} error={error} />
     </>
   );
