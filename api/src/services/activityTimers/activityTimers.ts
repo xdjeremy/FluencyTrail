@@ -1,4 +1,3 @@
-import { toZonedTime } from 'date-fns-tz';
 import type {
   ActivityTimerRelationResolvers,
   MutationResolvers,
@@ -9,12 +8,13 @@ import { RedwoodError } from '@redwoodjs/api';
 
 import { db } from 'src/lib/db';
 import { logger } from 'src/lib/logger';
+import { TimezoneConverter } from 'src/lib/TimezoneConverter';
 import { slugify } from 'src/lib/utils/slugify';
 import { MediaManager } from 'src/services/medias/mediamanager';
 import TheMovieDb from 'src/services/medias/themoviedb';
 
 export const activeTimer: QueryResolvers['activeTimer'] = async () => {
-  return db.activityTimer.findFirst({
+  const timer = await db.activityTimer.findFirst({
     where: {
       endTime: null,
       userId: context.currentUser.id,
@@ -26,6 +26,34 @@ export const activeTimer: QueryResolvers['activeTimer'] = async () => {
       language: true,
     },
   });
+
+  if (!timer) return null;
+
+  const userTimeZone = context.currentUser.timezone;
+  const userTzStartTime = new Date(
+    TimezoneConverter.utcToUserFormat(
+      timer.startTime,
+      userTimeZone,
+      "yyyy-MM-dd'T'HH:mm:ss"
+    )
+  );
+
+  let userTzEndTime = null;
+  if (timer.endTime) {
+    userTzEndTime = new Date(
+      TimezoneConverter.utcToUserFormat(
+        timer.endTime,
+        userTimeZone,
+        "yyyy-MM-dd'T'HH:mm:ss"
+      )
+    );
+  }
+
+  return {
+    ...timer,
+    startTime: userTzStartTime,
+    endTime: userTzEndTime,
+  };
 };
 
 export const startActivityTimer: MutationResolvers['startActivityTimer'] =
@@ -96,10 +124,7 @@ export const startActivityTimer: MutationResolvers['startActivityTimer'] =
       }
     }
 
-    const userTimeZone = context.currentUser?.timezone || 'UTC';
-    const now = new Date();
-    const nowInUserTz = toZonedTime(now, userTimeZone);
-
+    const now = new Date(); // Store in UTC
     logger.info({ mediaId, customMediaId }, 'IDs before transaction'); // Log 2
 
     // Start transaction for atomic writes
@@ -141,7 +166,7 @@ export const startActivityTimer: MutationResolvers['startActivityTimer'] =
 
       const createdTimer = await tx.activityTimer.create({
         data: {
-          startTime: nowInUserTz,
+          startTime: now,
           endTime: null,
           activityType: input.activityType,
           userId: context.currentUser.id,
@@ -157,23 +182,87 @@ export const startActivityTimer: MutationResolvers['startActivityTimer'] =
       });
 
       logger.info({ createdTimer }, 'Created timer object'); // Log 4
-      return createdTimer;
+
+      const userTimeZone = context.currentUser.timezone;
+      const userTzStartTime = new Date(
+        TimezoneConverter.utcToUserFormat(
+          createdTimer.startTime,
+          userTimeZone,
+          "yyyy-MM-dd'T'HH:mm:ss"
+        )
+      );
+
+      return {
+        ...createdTimer,
+        startTime: userTzStartTime,
+        endTime: null,
+      };
     });
   };
 
+export const stopActivityTimer: MutationResolvers['stopActivityTimer'] =
+  async ({ input }) => {
+    const timer = await db.activityTimer.findFirst({
+      where: {
+        id: input.id,
+        userId: context.currentUser.id,
+        endTime: null,
+      },
+    });
+
+    if (!timer) {
+      throw new RedwoodError('Timer not found or already stopped');
+    }
+
+    const now = new Date(); // Store in UTC
+
+    const updatedTimer = await db.activityTimer.update({
+      where: { id: timer.id },
+      data: { endTime: now },
+      include: {
+        media: true,
+        customMedia: true,
+        language: true,
+      },
+    });
+
+    const userTimeZone = context.currentUser.timezone;
+    const userTzStartTime = new Date(
+      TimezoneConverter.utcToUserFormat(
+        updatedTimer.startTime,
+        userTimeZone,
+        "yyyy-MM-dd'T'HH:mm:ss"
+      )
+    );
+
+    const userTzEndTime = new Date(
+      TimezoneConverter.utcToUserFormat(
+        updatedTimer.endTime,
+        userTimeZone,
+        "yyyy-MM-dd'T'HH:mm:ss"
+      )
+    );
+
+    return {
+      ...updatedTimer,
+      startTime: userTzStartTime,
+      endTime: userTzEndTime,
+    };
+  };
+
 export const ActivityTimer: ActivityTimerRelationResolvers = {
-  media: (_obj, { root }) => {
+  media: async (_args, { root }) => {
     return db.activityTimer.findUnique({ where: { id: root?.id } }).media();
   },
-  customMedia: (_obj, { root }) => {
+  customMedia: async (_args, { root }) => {
     return db.activityTimer
       .findUnique({ where: { id: root?.id } })
       .customMedia();
   },
-  language: (_obj, { root }) => {
+  language: async (_args, { root }) => {
     return db.activityTimer.findUnique({ where: { id: root?.id } }).language();
   },
-  activity: (_obj, { root }) => {
+  activity: async (_args, { root }) => {
     return db.activityTimer.findUnique({ where: { id: root?.id } }).activity();
   },
 };
