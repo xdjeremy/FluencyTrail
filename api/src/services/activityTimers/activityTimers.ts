@@ -1,3 +1,4 @@
+import { differenceInSeconds } from 'date-fns';
 import type {
   ActivityTimerRelationResolvers,
   MutationResolvers,
@@ -214,19 +215,29 @@ export const stopActivityTimer: MutationResolvers['stopActivityTimer'] =
       throw new RedwoodError('Timer not found or already stopped');
     }
 
-    const now = new Date(); // Store in UTC
-
     return await db.$transaction(async tx => {
+      const transactionNow = new Date(); // Create timestamp inside transaction
+
       // Update the timer
       const updatedTimer = await tx.activityTimer.update({
         where: { id: timer.id },
-        data: { endTime: now },
+        data: { endTime: transactionNow },
         include: {
           media: true,
           customMedia: true,
           language: true,
         },
       });
+
+      // Fetch fresh timestamps from DB to ensure accuracy
+      const freshTimer = await tx.activityTimer.findUnique({
+        where: { id: timer.id },
+        select: { startTime: true, endTime: true },
+      });
+
+      if (!freshTimer || !freshTimer.endTime) {
+        throw new RedwoodError('Failed to retrieve timer timestamps');
+      }
 
       // Validate media references if present
       if (updatedTimer.mediaId) {
@@ -247,17 +258,32 @@ export const stopActivityTimer: MutationResolvers['stopActivityTimer'] =
         }
       }
 
-      // Calculate duration in seconds
-      const duration = Math.floor(
-        (updatedTimer.endTime.getTime() - updatedTimer.startTime.getTime()) /
-          1000
+      // Calculate duration in minutes, rounding up partial minutes
+      const durationSeconds = differenceInSeconds(
+        freshTimer.endTime,
+        freshTimer.startTime
       );
+      const durationMinutes = Math.ceil(durationSeconds / 60);
+
+      logger.info(
+        {
+          startTime: freshTimer.startTime,
+          endTime: freshTimer.endTime,
+          durationSeconds,
+          durationMinutes,
+        },
+        'Timer duration calculation'
+      );
+
+      if (durationMinutes < 1) {
+        throw new RedwoodError('Timer duration must be at least 1 minute');
+      }
 
       // Create the activity record
       await tx.activity.create({
         data: {
           activityType: updatedTimer.activityType,
-          duration,
+          duration: durationMinutes,
           date: updatedTimer.endTime,
           userId: context.currentUser.id,
           languageId: updatedTimer.languageId,
