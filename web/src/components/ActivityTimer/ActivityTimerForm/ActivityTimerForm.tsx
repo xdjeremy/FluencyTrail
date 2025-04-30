@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check, ChevronsUpDown, Clock } from 'lucide-react';
+import { ActivityType, StartTimerInput } from 'types/graphql';
 
-import { Form, useForm } from '@redwoodjs/forms';
+import { Form, FormError, useForm, type RWGqlError } from '@redwoodjs/forms';
 
 import { activityTypes } from 'src/components/Activity/ActivityForm/constants';
 import LanguageSelect from 'src/components/Activity/ActivityForm/fields/LanguageSelect';
@@ -44,7 +45,17 @@ import {
   ActivityTimerSchemaType,
 } from './ActivityTimerSchema';
 
-const ActivityTimerForm = () => {
+interface ActivityTimerFormProps {
+  onSubmit: (input: StartTimerInput) => void;
+  mutationLoading?: boolean;
+  error?: RWGqlError;
+}
+
+const ActivityTimerForm = ({
+  onSubmit,
+  mutationLoading,
+  error,
+}: ActivityTimerFormProps) => {
   const { isActivityTimerModalOpen, setActivityTimerModalOpen } =
     useActivityModal();
 
@@ -57,13 +68,27 @@ const ActivityTimerForm = () => {
     },
   });
 
+  console.log(form.formState.errors);
+
+  const handleStartTimer = (data: ActivityTimerSchemaType) => {
+    console.log('handleStartTimer', data);
+    const input: StartTimerInput = {
+      mediaSlug: data.mediaSlug,
+      activityType: data.activityType as ActivityType,
+      languageId: data.languageId,
+      customMediaTitle: data.customMediaTitle,
+    };
+    onSubmit(input);
+  };
+
   return (
-    <Form formMethods={form}>
-      <Dialog
-        open={isActivityTimerModalOpen}
-        onOpenChange={setActivityTimerModalOpen}
-      >
-        <DialogContent className="sm:max-w-[500px]">
+    <Dialog
+      open={isActivityTimerModalOpen}
+      onOpenChange={setActivityTimerModalOpen}
+    >
+      <DialogContent className="sm:max-w-[500px]">
+        <Form formMethods={form} onSubmit={handleStartTimer} error={error}>
+          <FormError error={error} />
           <DialogHeader>
             <DialogTitle>Set Up Timed Activity</DialogTitle>
             <DialogDescription>
@@ -91,7 +116,7 @@ const ActivityTimerForm = () => {
                             'col-span-3 justify-between lowercase',
                             !field.value && 'text-muted-foreground'
                           )}
-                          // disabled={props.loading}
+                          disabled={mutationLoading}
                         >
                           {field.value
                             ? activityTypes.find(
@@ -161,19 +186,20 @@ const ActivityTimerForm = () => {
           </div>
 
           <DialogFooter>
-            <Button variant="outline">Cancel</Button>
             <Button
-              // onClick={handleStartTimer}
-              variant="default"
-              className="gap-2"
+              variant="outline"
+              onClick={() => setActivityTimerModalOpen(false)}
             >
+              Cancel
+            </Button>
+            <Button type="submit" variant="default" className="gap-2">
               <Clock className="h-4 w-4" />
               Start Timer
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </Form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
