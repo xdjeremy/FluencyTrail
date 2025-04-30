@@ -29,8 +29,6 @@ const QuickAddTimer = () => {
     GetActiveTimerForQuickAddVariables
   >(GET_ACTIVTE_TIMER);
 
-  console.log('activeTimer', activeTimer);
-
   const { setActivityTimerModalOpen, setActiveTimerModalOpen } =
     useActivityModal();
   return (

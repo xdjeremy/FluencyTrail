@@ -216,38 +216,80 @@ export const stopActivityTimer: MutationResolvers['stopActivityTimer'] =
 
     const now = new Date(); // Store in UTC
 
-    const updatedTimer = await db.activityTimer.update({
-      where: { id: timer.id },
-      data: { endTime: now },
-      include: {
-        media: true,
-        customMedia: true,
-        language: true,
-      },
+    return await db.$transaction(async tx => {
+      // Update the timer
+      const updatedTimer = await tx.activityTimer.update({
+        where: { id: timer.id },
+        data: { endTime: now },
+        include: {
+          media: true,
+          customMedia: true,
+          language: true,
+        },
+      });
+
+      // Validate media references if present
+      if (updatedTimer.mediaId) {
+        const mediaExists = await tx.media.findUnique({
+          where: { id: updatedTimer.mediaId },
+        });
+        if (!mediaExists) {
+          throw new RedwoodError('Linked media no longer exists');
+        }
+      }
+
+      if (updatedTimer.customMediaId) {
+        const customMediaExists = await tx.customMedia.findUnique({
+          where: { id: updatedTimer.customMediaId },
+        });
+        if (!customMediaExists) {
+          throw new RedwoodError('Custom media no longer exists');
+        }
+      }
+
+      // Calculate duration in seconds
+      const duration = Math.floor(
+        (updatedTimer.endTime.getTime() - updatedTimer.startTime.getTime()) /
+          1000
+      );
+
+      // Create the activity record
+      await tx.activity.create({
+        data: {
+          activityType: updatedTimer.activityType,
+          duration,
+          date: updatedTimer.endTime,
+          userId: context.currentUser.id,
+          languageId: updatedTimer.languageId,
+          mediaId: updatedTimer.mediaId,
+          customMediaId: updatedTimer.customMediaId,
+        },
+      });
+
+      // Convert times to user timezone for response
+      const userTimeZone = context.currentUser.timezone;
+      const userTzStartTime = new Date(
+        TimezoneConverter.utcToUserFormat(
+          updatedTimer.startTime,
+          userTimeZone,
+          "yyyy-MM-dd'T'HH:mm:ss"
+        )
+      );
+
+      const userTzEndTime = new Date(
+        TimezoneConverter.utcToUserFormat(
+          updatedTimer.endTime,
+          userTimeZone,
+          "yyyy-MM-dd'T'HH:mm:ss"
+        )
+      );
+
+      return {
+        ...updatedTimer,
+        startTime: userTzStartTime,
+        endTime: userTzEndTime,
+      };
     });
-
-    const userTimeZone = context.currentUser.timezone;
-    const userTzStartTime = new Date(
-      TimezoneConverter.utcToUserFormat(
-        updatedTimer.startTime,
-        userTimeZone,
-        "yyyy-MM-dd'T'HH:mm:ss"
-      )
-    );
-
-    const userTzEndTime = new Date(
-      TimezoneConverter.utcToUserFormat(
-        updatedTimer.endTime,
-        userTimeZone,
-        "yyyy-MM-dd'T'HH:mm:ss"
-      )
-    );
-
-    return {
-      ...updatedTimer,
-      startTime: userTzStartTime,
-      endTime: userTzEndTime,
-    };
   };
 
 export const ActivityTimer: ActivityTimerRelationResolvers = {
