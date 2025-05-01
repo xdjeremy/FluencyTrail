@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 
 import { format } from 'date-fns';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
@@ -60,6 +60,7 @@ const ActivityMediaSelect = ({
 }: {
   isLoading: boolean;
 }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const form = useFormContext();
   const currentMediaSlug = form.watch('mediaSlug');
   const currentCustomMediaTitle = form.watch('customMediaTitle');
@@ -79,6 +80,13 @@ const ActivityMediaSelect = ({
     fetchPolicy: 'cache-and-network',
     skip: !open || !debouncedSearch || debouncedSearch.length < 3, // Require at least 3 chars
   });
+
+  // Focus input when popover opens or during loading
+  useEffect(() => {
+    if (inputRef.current && open) {
+      inputRef.current.focus();
+    }
+  }, [open, loading]);
 
   // Memoize filter function to prevent unnecessary re-renders
   const filterResults = useCallback(
@@ -187,18 +195,22 @@ const ActivityMediaSelect = ({
                     variant="outline"
                     role="combobox"
                     className={cn(
-                      'w-full justify-between', // Use w-full
+                      'relative w-full justify-between', // Added relative positioning
                       displayValue === 'Select media' && 'text-muted-foreground'
                     )}
                     disabled={isLoading || loading}
                   >
-                    <span className="truncate">{displayValue}</span>{' '}
-                    {/* Wrap text in span for truncation */}
-                    {loading ? (
-                      <Loader2 className="ml-2 size-4 shrink-0 animate-spin" />
-                    ) : (
-                      <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                    <span className="truncate">{displayValue}</span>
+                    {/* Use absolute positioning for loading indicator */}
+                    {loading && (
+                      <Loader2 className="absolute right-2 ml-2 size-4 shrink-0 animate-spin" />
                     )}
+                    <ChevronsUpDown
+                      className={cn(
+                        'ml-2 size-4 shrink-0 transition-opacity duration-150',
+                        loading ? 'opacity-0' : 'opacity-50'
+                      )}
+                    />
                   </Button>
                 </FormControl>
               </PopoverTrigger>
@@ -221,20 +233,25 @@ const ActivityMediaSelect = ({
                 {' '}
                 {/* Add shouldFilter={false} back */}
                 <CommandInput
-                  disabled={isLoading || loading} // Disable input if parent is loading
+                  ref={inputRef}
+                  disabled={isLoading || loading}
                   placeholder="Search or type to create..."
                   className="h-9"
                   value={searchValue}
-                  onValueChange={handleSearch} // Use simplified handler
+                  onValueChange={handleSearch}
                 />
                 <CommandList className="max-h-[300px] overflow-auto">
                   <CommandEmpty>
-                    {loading ? (
-                      <div className="text-muted-foreground flex items-center gap-2 px-4 py-3 text-sm">
-                        <Loader2 className="size-3 animate-spin" />
-                        <span>Searching...</span>
-                      </div>
-                    ) : searchValue ? ( // Simplified empty state
+                    <div
+                      className={cn(
+                        'text-muted-foreground flex items-center gap-2 px-4 py-3 text-sm transition-opacity duration-150',
+                        loading ? 'opacity-100' : 'opacity-0'
+                      )}
+                    >
+                      <Loader2 className="size-3 animate-spin" />
+                      <span>Searching...</span>
+                    </div>
+                    {!loading && searchValue ? (
                       <div className="text-muted-foreground px-4 py-3 text-sm">
                         {searchValue.length < 3
                           ? 'Type 3+ characters to search...'
