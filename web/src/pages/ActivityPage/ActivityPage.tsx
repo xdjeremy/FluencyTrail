@@ -10,25 +10,22 @@ const ActivityPage = () => {
     <>
       <Metadata title="Activities" description="Activity page" />
 
-      <div className="container mx-auto py-6">
-        <div className="flex flex-col space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Activities</h1>
-              <p className="text-muted-foreground">
-                View and manage your language learning activities
-              </p>
-            </div>
-            <Button onClick={() => setActivityModalOpen(true)}>
-              <span className="hidden md:inline">Add Activity</span>
-              <span className="inline md:hidden">+</span>
-            </Button>
+      <div className="flex flex-col gap-6">
+        <section className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <h1 className="mb-1 text-2xl font-bold">Activities</h1>
+            <p className="text-neutral-600 dark:text-neutral-400">
+              View and manage your language learning activities
+            </p>
           </div>
+          <Button onClick={() => setActivityModalOpen(true)}>
+            <span className="hidden md:inline">Add Activity</span>
+            <span className="inline md:hidden">+</span>
+          </Button>
+        </section>
 
-          {/* <ActivityFilters filters={filters} setFilters={setFilters} /> */}
-
-          <ActivitiesCell itemsPerPage={10} />
-        </div>
+        {/* Note: I had to put this in a different component so it can access the context provider */}
+        <ActivitiesCell itemsPerPage={10} />
       </div>
     </>
   );
