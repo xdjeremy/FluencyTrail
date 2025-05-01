@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { formatInTimeZone } from 'date-fns-tz';
 import { Clock } from 'lucide-react';
 import { GetActivityTimerForModal } from 'types/graphql';
 
+import { useAuth } from 'src/auth';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +25,7 @@ const CurrentActivityTimerModal = ({
 }: CurrentActivityTimerModalProps) => {
   const { isActiveTimerModalOpen, setActiveTimerModalOpen } =
     useActivityModal();
+  const { currentUser } = useAuth();
 
   const [elapsed, setElapsed] = useState(0);
   const startTime = useMemo(
@@ -34,7 +37,15 @@ const CurrentActivityTimerModal = ({
     if (!activeTimer) return;
 
     const calculateElapsed = () => {
-      setElapsed(Date.now() - startTime);
+      // Get the current time in the user's timezone
+      const now = new Date(
+        formatInTimeZone(
+          new Date(),
+          currentUser.timezone,
+          'yyyy-MM-dd HH:mm:ss'
+        )
+      ).getTime();
+      setElapsed(now - startTime);
     };
 
     // Immediate first update
@@ -45,7 +56,7 @@ const CurrentActivityTimerModal = ({
 
     // Cleanup on unmount or startTime change
     return () => clearInterval(interval);
-  }, [startTime, activeTimer]);
+  }, [startTime, activeTimer, currentUser.timezone]);
 
   const formatTime = (ms: number) => {
     const hours = Math.floor(ms / 3600000);

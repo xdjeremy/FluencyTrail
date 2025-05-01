@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { formatInTimeZone } from 'date-fns-tz';
 import { Clock } from 'lucide-react';
 import { GetActivityTimerForHeader } from 'types/graphql';
 
+import { useAuth } from 'src/auth';
 import { Button } from 'src/components/ui/button';
 import { useActivityModal } from 'src/layouts/ProvidersLayout/Providers/ActivityProvider';
 
@@ -12,6 +14,7 @@ interface HeaderTimerProps {
 
 const HeaderTimer = ({ activeTimer }: HeaderTimerProps) => {
   const { setActiveTimerModalOpen } = useActivityModal();
+  const { currentUser } = useAuth();
 
   const [elapsed, setElapsed] = useState(0);
   const startTime = useMemo(
@@ -21,7 +24,15 @@ const HeaderTimer = ({ activeTimer }: HeaderTimerProps) => {
 
   useEffect(() => {
     const calculateElapsed = () => {
-      setElapsed(Date.now() - startTime);
+      // Get the current time in the user's timezone
+      const now = new Date(
+        formatInTimeZone(
+          new Date(),
+          currentUser.timezone,
+          'yyyy-MM-dd HH:mm:ss'
+        )
+      ).getTime();
+      setElapsed(now - startTime);
     };
 
     // Immediate first update
@@ -32,7 +43,7 @@ const HeaderTimer = ({ activeTimer }: HeaderTimerProps) => {
 
     // Cleanup on unmount or startTime change
     return () => clearInterval(interval);
-  }, [startTime]);
+  }, [startTime, currentUser.timezone]);
 
   const formatTime = (ms: number) => {
     const hours = Math.floor(ms / 3600000);
