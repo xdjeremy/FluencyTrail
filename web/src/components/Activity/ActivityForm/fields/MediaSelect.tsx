@@ -239,6 +239,7 @@ const ActivityMediaSelect = ({
                   className="h-9 text-base"
                   value={searchValue}
                   autoComplete="off"
+                  type="search"
                   inputMode="search"
                   onValueChange={handleSearch}
                 />
