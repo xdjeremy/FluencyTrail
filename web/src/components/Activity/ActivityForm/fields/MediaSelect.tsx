@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { format } from 'date-fns';
 import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
@@ -239,7 +239,6 @@ const ActivityMediaSelect = ({
                   className="h-9 text-base"
                   value={searchValue}
                   autoComplete="off"
-                  type="search"
                   inputMode="search"
                   onValueChange={handleSearch}
                 />
