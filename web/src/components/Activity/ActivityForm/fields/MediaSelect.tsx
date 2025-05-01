@@ -236,8 +236,10 @@ const ActivityMediaSelect = ({
                   ref={inputRef}
                   disabled={isLoading || loading}
                   placeholder="Search or type to create..."
-                  className="h-9"
+                  className="h-9 text-[16px]"
                   value={searchValue}
+                  autoComplete="off"
+                  inputMode="search"
                   onValueChange={handleSearch}
                 />
                 <CommandList className="max-h-[300px] overflow-auto">
