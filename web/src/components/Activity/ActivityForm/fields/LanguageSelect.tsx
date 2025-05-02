@@ -42,9 +42,13 @@ const GET_USER_LANGUAGES_QUERY: TypedDocumentNode<
   }
 `;
 
-const LanguageSelect = () => {
+interface LanguageSelectProps {
+  isLoading?: boolean;
+}
+
+const LanguageSelect = ({ isLoading }: LanguageSelectProps) => {
   const form = useFormContext<ActivitySchemaType>();
-  const { data, loading } = useQuery(GET_USER_LANGUAGES_QUERY, {
+  const { data, loading: queryLoading } = useQuery(GET_USER_LANGUAGES_QUERY, {
     fetchPolicy: 'cache-and-network',
   });
 
@@ -54,6 +58,8 @@ const LanguageSelect = () => {
       form.setValue('languageId', data.user.primaryLanguage.id);
     }
   }, [data?.user.primaryLanguage, data?.user.primaryLanguage.id, form]); // Only run when primaryLanguage ID changes
+
+  const loading = isLoading || queryLoading;
 
   return (
     <FormField

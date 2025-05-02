@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check, ChevronsUpDown, Clock } from 'lucide-react';
+import { Check, ChevronsUpDown, Clock, Loader2 } from 'lucide-react';
 import { ActivityType, StartTimerInput } from 'types/graphql';
 
 import { Form, FormError, useForm, type RWGqlError } from '@redwoodjs/forms';
@@ -95,8 +95,8 @@ const ActivityTimerForm = ({
           </DialogHeader>
 
           <div className="grid gap-4 py-4">
-            <ActivityMediaSelect isLoading={false} />
-            <LanguageSelect />
+            <ActivityMediaSelect isLoading={mutationLoading} />
+            <LanguageSelect isLoading={mutationLoading} />
             <FormField
               control={form.control}
               name="activityType"
@@ -172,7 +172,7 @@ const ActivityTimerForm = ({
                   <FormControl className="col-span-3">
                     <Input
                       placeholder="Optional notes about this activity"
-                      // disabled={props.loading}
+                      disabled={mutationLoading}
                       {...field}
                     />
                   </FormControl>
@@ -186,11 +186,21 @@ const ActivityTimerForm = ({
             <Button
               variant="outline"
               onClick={() => setActivityTimerModalOpen(false)}
+              disabled={mutationLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" variant="default" className="gap-2">
-              <Clock className="h-4 w-4" />
+            <Button
+              type="submit"
+              variant="default"
+              className="gap-2"
+              disabled={mutationLoading}
+            >
+              {mutationLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Clock className="h-4 w-4" />
+              )}
               Start Timer
             </Button>
           </DialogFooter>
