@@ -173,7 +173,7 @@ const ActivityForm = ({ ...props }: ActivityFormProps) => {
             />
             <ActivityMediaSelect isLoading={props.loading} />
             {/* Language Select Field */}
-            <LanguageSelect />
+            <LanguageSelect isLoading={props.loading} />
             <FormField
               control={form.control}
               name="activityType"
