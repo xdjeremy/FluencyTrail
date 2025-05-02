@@ -46,7 +46,7 @@ interface LanguageSelectProps {
   isLoading?: boolean;
 }
 
-const LanguageSelect = ({ isLoading }: LanguageSelectProps) => {
+const LanguageSelect = ({ isLoading = false }: LanguageSelectProps) => {
   const form = useFormContext<ActivitySchemaType>();
   const { data, loading: queryLoading } = useQuery(GET_USER_LANGUAGES_QUERY, {
     fetchPolicy: 'cache-and-network',
